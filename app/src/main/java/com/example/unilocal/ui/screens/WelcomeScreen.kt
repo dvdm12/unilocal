@@ -1,24 +1,27 @@
 package com.example.unilocal.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.unilocal.R
+import com.example.unilocal.ui.components.Feature
+import com.example.unilocal.ui.components.FeatureList
+import com.example.unilocal.ui.components.UniLocalImage
+import com.example.unilocal.ui.components.UniPrimaryButton
+import com.example.unilocal.ui.theme.FooterTextColor
 
 @Composable
 fun WelcomeScreen(
@@ -26,9 +29,6 @@ fun WelcomeScreen(
     onRegisterClick: () -> Unit
 ) {
     val backgroundColor = Color(0xFFFDF4F0)
-    val buttonOrange = Color(0xFFFF8C1A)
-    val buttonTextColor = Color.White
-    val footerTextColor = Color(0xFF888888)
 
     Column(
         modifier = Modifier
@@ -39,14 +39,8 @@ fun WelcomeScreen(
     ) {
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Imagen superior
-        Image(
-            painter = painterResource(id = R.drawable.ic_launcher_background),
-            contentDescription = stringResource(R.string.welcome_image_description),
-            modifier = Modifier
-                .height(180.dp)
-                .padding(16.dp)
-        )
+        // Imagen superior reutilizable
+        UniLocalImage()
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -73,26 +67,15 @@ fun WelcomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Botón de login
-        Button(
-            onClick = onLoginClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = buttonOrange,
-                contentColor = buttonTextColor
-            )
-        ) {
-            Text(
-                text = stringResource(R.string.button_login),
-                style = MaterialTheme.typography.labelLarge
-            )
-        }
+        // Botón primario reutilizable
+        UniPrimaryButton(
+            text = stringResource(R.string.button_login),
+            onClick = onLoginClick
+        )
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Botón de registro
+        // Botón secundario (outlined)
         OutlinedButton(
             onClick = onRegisterClick,
             modifier = Modifier
@@ -110,8 +93,14 @@ fun WelcomeScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Características con íconos
-        FeatureList()
+        // Lista de características reutilizable
+        FeatureList(
+            features = listOf(
+                Feature(Icons.Outlined.LocationOn, stringResource(R.string.feature_nearby)),
+                Feature(Icons.Outlined.Star, stringResource(R.string.feature_review)),
+                Feature(Icons.Outlined.FavoriteBorder, stringResource(R.string.feature_favorites))
+            )
+        )
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -120,42 +109,10 @@ fun WelcomeScreen(
             text = stringResource(R.string.footer_terms),
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
-            color = footerTextColor,
+            color = FooterTextColor,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
-        )
-    }
-}
-
-@Composable
-private fun FeatureList() {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        FeatureItem(icon = Icons.Outlined.LocationOn, text = stringResource(R.string.feature_nearby))
-        FeatureItem(icon = Icons.Outlined.AccountCircle, text = stringResource(R.string.feature_review))
-        FeatureItem(icon = Icons.Outlined.FavoriteBorder, text = stringResource(R.string.feature_favorites))
-    }
-}
-
-@Composable
-private fun FeatureItem(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = Color.Black,
-            modifier = Modifier.size(20.dp)
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.Black
         )
     }
 }

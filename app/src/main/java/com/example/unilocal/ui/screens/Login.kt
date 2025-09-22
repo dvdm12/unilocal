@@ -9,6 +9,6 @@ import androidx.compose.ui.Modifier
 fun Login() {
     Text(
         text = "Hi user, how are you?",
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     )
 }
