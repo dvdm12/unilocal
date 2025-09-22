@@ -1,18 +1,24 @@
 package com.example.unilocal.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.unilocal.R
-
-
 
 @Composable
 fun WelcomeScreen(
@@ -28,15 +34,27 @@ fun WelcomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .padding(24.dp),
+            .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.weight(0.1f))
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Imagen superior
+        Image(
+            painter = painterResource(id = R.drawable.ic_launcher_background),
+            contentDescription = stringResource(R.string.welcome_image_description),
+            modifier = Modifier
+                .height(180.dp)
+                .padding(16.dp)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Título
         Text(
             text = stringResource(R.string.welcome_title),
-            style = MaterialTheme.typography.titleLarge,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             color = Color.Black,
             modifier = Modifier.fillMaxWidth()
@@ -55,10 +73,12 @@ fun WelcomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Botón de login (naranja)
+        // Botón de login
         Button(
             onClick = onLoginClick,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = buttonOrange,
                 contentColor = buttonTextColor
@@ -66,29 +86,31 @@ fun WelcomeScreen(
         ) {
             Text(
                 text = stringResource(R.string.button_login),
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.labelLarge
             )
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Botón de registro (gris claro)
+        // Botón de registro
         OutlinedButton(
             onClick = onRegisterClick,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
             colors = ButtonDefaults.outlinedButtonColors(
                 contentColor = Color.Black
-            ),
-            border = ButtonDefaults.outlinedButtonBorder(enabled = true)
+            )
         ) {
             Text(
                 text = stringResource(R.string.button_register),
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.labelLarge
             )
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // Características con íconos
         FeatureList()
 
         Spacer(modifier = Modifier.weight(1f))
@@ -108,13 +130,32 @@ fun WelcomeScreen(
 
 @Composable
 private fun FeatureList() {
-    val modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = 8.dp)
+    Column(modifier = Modifier.fillMaxWidth()) {
+        FeatureItem(icon = Icons.Outlined.LocationOn, text = stringResource(R.string.feature_nearby))
+        FeatureItem(icon = Icons.Outlined.AccountCircle, text = stringResource(R.string.feature_review))
+        FeatureItem(icon = Icons.Outlined.FavoriteBorder, text = stringResource(R.string.feature_favorites))
+    }
+}
 
-    Column(modifier = modifier) {
-        Text("• ${stringResource(R.string.feature_nearby)}", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
-        Text("• ${stringResource(R.string.feature_review)}", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
-        Text("• ${stringResource(R.string.feature_favorites)}", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+@Composable
+private fun FeatureItem(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = Color.Black,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color.Black
+        )
     }
 }

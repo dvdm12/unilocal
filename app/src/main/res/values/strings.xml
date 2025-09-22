@@ -2,11 +2,16 @@
     <!-- Initial Screen -->
     <string name="app_name">uniLocal</string>
     <string name="welcome_title">Bienvenido a UniLocal</string>
-    <string name="welcome_subtitle">Descubre y apoya negocios locales cerca de ti: restaurantes, cafeterías, comidas rápidas, museos y hoteles.</string>
+    <string name="welcome_subtitle">
+        Descubre y apoya negocios locales cerca de ti: restaurantes, cafeterías, comidas rápidas, museos y hoteles.
+    </string>
     <string name="button_login">Iniciar sesión</string>
     <string name="button_register">Crear cuenta</string>
     <string name="feature_nearby">Encuentra lugares cercanos</string>
     <string name="feature_review">Califica y comenta</string>
     <string name="feature_favorites">Guarda tus favoritos</string>
-    <string name="footer_terms">Al continuar aceptas los Términos y la Política de Privacidad.</string>
+    <string name="footer_terms">
+        Al continuar aceptas los Términos y la Política de Privacidad.
+    </string>
+    <string name="welcome_image_description">Ilustración de tienda local</string>
 </resources>
