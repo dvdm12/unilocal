@@ -9,29 +9,29 @@ import com.example.unilocal.ui.config.RouteScreen
 
 @Composable
 fun Navigation() {
-    val navController = rememberNavController()
+    val navController = rememberNavController() // Navigation controller for managing navigation stack
 
     NavHost(
         navController = navController,
-        startDestination = RouteScreen.WelcomeScreen
+        startDestination = RouteScreen.WelcomeScreen // Set initial screen
     ){
         composable<RouteScreen.WelcomeScreen> {
             WelcomeScreen(
                 onLoginClick = {
-                    navController.navigate(RouteScreen.Login)
+                    navController.navigate(RouteScreen.Login) // Navigate to Login screen
                 },
                 onRegisterClick = {
-                    navController.navigate(RouteScreen.Register)
+                    navController.navigate(RouteScreen.Register) // Navigate to Register screen
                 }
             )
         }
 
         composable<RouteScreen.Login>{
-            Login()
+            Login() // Show Login screen
         }
 
         composable<RouteScreen.Register>{
-            Register()
+            Register() // Show Register screen
         }
     }
 }

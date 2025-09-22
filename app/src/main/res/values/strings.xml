@@ -14,4 +14,19 @@
         Al continuar aceptas los Términos y la Política de Privacidad.
     </string>
     <string name="welcome_image_description">Ilustración de tienda local</string>
+
+    <!-- Login Screen -->
+    <string name="login_email_label">Email o usuario</string>
+    <string name="login_email_placeholder">Ingresa tu email o usuario</string>
+    <string name="login_password_label">Contraseña</string>
+    <string name="login_password_placeholder">Ingresa tu contraseña</string>
+    <string name="login_forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="login_button">Iniciar sesión</string>
+    <string name="login_google">Continuar con Google</string>
+    <string name="login_facebook">Continuar con Facebook</string>
+    <string name="login_register_link">Crear cuenta</string>
+
+    <!-- Componente autenticacion -->
+    <string name="login_email_error">Correo debe ser @gmail.com válido</string>
+    <string name="login_password_error">Contraseña mínimo 5 caracteres</string>
 </resources>
