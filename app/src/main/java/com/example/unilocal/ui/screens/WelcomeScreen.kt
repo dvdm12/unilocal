@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.unilocal.R
 
@@ -58,7 +57,7 @@ fun WelcomeScreen(
 
         // Botón de login (naranja)
         Button(
-            onClick = {onLoginClick},
+            onClick = onLoginClick,
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = buttonOrange,
@@ -75,7 +74,7 @@ fun WelcomeScreen(
 
         // Botón de registro (gris claro)
         OutlinedButton(
-            onClick = {onRegisterClick},
+            onClick = onRegisterClick,
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.outlinedButtonColors(
                 contentColor = Color.Black

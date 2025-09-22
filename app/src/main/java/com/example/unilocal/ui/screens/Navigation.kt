@@ -25,5 +25,13 @@ fun Navigation() {
                 }
             )
         }
+
+        composable<RouteScreen.Login>{
+            Login()
+        }
+
+        composable<RouteScreen.Register>{
+            Register()
+        }
     }
 }
