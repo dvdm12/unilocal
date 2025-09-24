@@ -17,10 +17,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.unilocal.R
-import com.example.unilocal.ui.components.Feature
-import com.example.unilocal.ui.components.FeatureList
-import com.example.unilocal.ui.components.UniLocalImage
-import com.example.unilocal.ui.components.UniPrimaryButton
+import com.example.unilocal.ui.components.home.Feature
+import com.example.unilocal.ui.components.home.FeatureList
+import com.example.unilocal.ui.components.home.UniLocalImage
+import com.example.unilocal.ui.components.home.UniPrimaryButton
 import com.example.unilocal.ui.theme.FooterTextColor
 
 @Composable

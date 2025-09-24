@@ -1,4 +1,4 @@
-package com.example.unilocal.ui.components // Package declaration
+package com.example.unilocal.ui.components.home // Package declaration
 
 import androidx.compose.foundation.layout.* // Import for layout components
 import androidx.compose.material3.* // Import for Material3 components

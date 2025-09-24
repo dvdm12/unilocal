@@ -1,4 +1,4 @@
-package com.example.unilocal.ui.components
+package com.example.unilocal.ui.components.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth

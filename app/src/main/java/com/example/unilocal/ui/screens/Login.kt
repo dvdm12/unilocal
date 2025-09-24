@@ -17,9 +17,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.unilocal.R
-import com.example.unilocal.ui.components.AuthTextField
-import com.example.unilocal.ui.components.SocialButton
-import com.example.unilocal.ui.components.UniPrimaryButton
+import com.example.unilocal.ui.components.home.AuthTextField
+import com.example.unilocal.ui.components.home.SocialButton
+import com.example.unilocal.ui.components.home.UniPrimaryButton
 
 /**
  * Login composable displays the login screen UI, including email and password fields,

@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.unilocal.ui.config.RouteScreen
+import com.example.unilocal.ui.screens.user.HomeUser
 
 
 @Composable
@@ -27,11 +28,17 @@ fun Navigation() {
         }
 
         composable<RouteScreen.Login>{
-            Login() // Show Login screen
+            Login(onLoginClick = {
+                navController.navigate(RouteScreen.HomeUser) // Navigate to User Screen
+            })
         }
 
         composable<RouteScreen.Register>{
             Register() // Show Register screen
+        }
+
+        composable<RouteScreen.HomeUser>{
+            HomeUser() // Show User screen
         }
     }
 }
