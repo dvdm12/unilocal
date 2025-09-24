@@ -1,6 +1,8 @@
 <resources>
-    <!-- Welcome Screen -->
+    <!-- App -->
     <string name="app_name">uniLocal</string>
+
+    <!-- Welcome Screen -->
     <string name="welcome_title">Bienvenido a UniLocal</string>
     <string name="welcome_subtitle">
         Descubre y apoya negocios locales cerca de ti: restaurantes, cafeterías, comidas rápidas, museos y hoteles.
@@ -16,21 +18,30 @@
     <string name="welcome_image_description">Ilustración de tienda local</string>
 
     <!-- Login Screen -->
+    <string name="login_title">Iniciar sesión</string>
+    <string name="login_welcome">Bienvenido, por favor ingresa tus datos para continuar</string>
     <string name="login_email_label">Email o usuario</string>
     <string name="login_email_placeholder">Ingresa tu email o usuario</string>
+    <string name="login_email_error">Correo debe ser @gmail.com válido</string>
     <string name="login_password_label">Contraseña</string>
     <string name="login_password_placeholder">Ingresa tu contraseña</string>
+    <string name="login_password_error">Contraseña mínimo 5 caracteres</string>
     <string name="login_forgot_password">¿Olvidaste tu contraseña?</string>
     <string name="login_button">Iniciar sesión</string>
+    <string name="login_or_continue">o continuar con</string>
     <string name="login_google">Continuar con Google</string>
     <string name="login_facebook">Continuar con Facebook</string>
     <string name="login_register_link">Crear cuenta</string>
+    <string name="login_error_accept">Aceptar</string>
+    <string name="login_error_title">Campos incompletos</string>
+    <string name="login_error_message">Por favor ingresa correo y contraseña para continuar.</string>
 
-    <!-- Componente autenticacion -->
-    <string name="login_email_error">Correo debe ser @gmail.com válido</string>
-    <string name="login_password_error">Contraseña mínimo 5 caracteres</string>
 
-    <!-- Registro autenticacion -->
+
+    <!-- Alertas -->
+    <string name="accept">Aceptar</string>
+
+    <!-- Registro autenticación -->
     <string name="dropdown_expand_description">Expandir menú</string>
     <string name="register_create_account">Crear Cuenta</string>
 
@@ -57,25 +68,23 @@
     <string name="filter_published">Publicados</string>
     <string name="filter_pending">Pendientes</string>
     <string name="filter_rejected">Rechazados</string>
-    <string name="sort_content_desc">Sort</string>
+    <string name="sort_content_desc">Ordenar</string>
     <string name="created_on">Creado el 14 de Marzo</string>
     <string name="place_name">Café El Paraíso</string>
     <string name="place_category">Cafetería</string>
     <string name="view">Ver</string>
     <string name="edit">Editar</string>
     <string name="delete">Eliminar</string>
-    <string name="user_avatar_desc">User Avatar</string>
-    <string name="back_content_desc">Back</string>
-    <string name="settings_content_desc">Settings</string>
+    <string name="user_avatar_desc">Avatar de usuario</string>
+    <string name="back_content_desc">Atrás</string>
+    <string name="settings_content_desc">Configuraciones</string>
 
     <!-- Play Card Messages -->
-    <string name="play_card_message">Settings</string>
+    <string name="play_card_message">Configuraciones</string>
 
-    <!-- Resources -->
+    <!-- Navigation -->
     <string name="nav_my_places">Mis lugares</string>
     <string name="nav_add_place">Agregar lugar</string>
     <string name="nav_search">Buscar</string>
     <string name="nav_profile">Mi perfil</string>
-
-
 </resources>

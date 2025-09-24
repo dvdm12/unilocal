@@ -2,10 +2,13 @@ package com.example.unilocal.ui.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,20 +26,91 @@ import com.example.unilocal.ui.components.home.SocialButton
 import com.example.unilocal.ui.components.home.UniPrimaryButton
 
 /**
- * Login composable displays the login screen UI, including email and password fields,
- * error validation, social login buttons, and navigation links. It uses AuthTextField
- * for input validation and supports previewing with initial values.
- *
- * @param onLoginClick Callback for login button click.
- * @param onGoogleLogin Callback for Google login button click.
- * @param onFacebookLogin Callback for Facebook login button click.
- * @param onRegisterClick Callback for register link click.
- * @param onForgotPassword Callback for forgot password link click.
- * @param emailInitial Initial value for the email field (useful for preview/testing).
- * @param passwordInitial Initial value for the password field (useful for preview/testing).
+ * Validación simple: email y password no vacíos
+ */
+fun isLoginValid(email: String, password: String): Boolean {
+    return email.isNotBlank() && password.isNotBlank()
+}
+
+/**
+ * Botón alternativo para registro (estética diferente al de login principal).
  */
 @Composable
+fun RegisterButton(
+    text: String = stringResource(R.string.login_register_link),
+    onClick: () -> Unit
+) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = MaterialTheme.colorScheme.primary
+        )
+    ) {
+        Text(
+            text = text,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp
+        )
+    }
+}
+
+/**
+ * Composable for the error dialog shown when login fields are invalid.
+ */
+@Composable
+fun LoginErrorDialog(show: Boolean, onDismiss: () -> Unit) {
+    if (show) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            confirmButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.login_error_accept))
+                }
+            },
+            title = { Text(stringResource(R.string.login_error_title)) },
+            text = { Text(stringResource(R.string.login_error_message)) }
+        )
+    }
+}
+
+/**
+ * Composable for the separator row with 'or continue with'.
+ */
+@Composable
+fun OrContinueWithSeparator() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            color = Color.LightGray,
+            thickness = 1.dp
+        )
+        Text(
+            text = stringResource(R.string.login_or_continue),
+            color = Color.Gray,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            color = Color.LightGray,
+            thickness = 1.dp
+        )
+    }
+}
+
+/**
+ * Pantalla de Login con TopBar, validación y alerta en caso de campos vacíos.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun Login(
+    onBackClick: () -> Unit = {},
     onLoginClick: () -> Unit = {},
     onGoogleLogin: () -> Unit = {},
     onFacebookLogin: () -> Unit = {},
@@ -46,95 +121,148 @@ fun Login(
 ) {
     var email by remember { mutableStateOf(emailInitial) }
     var password by remember { mutableStateOf(passwordInitial) }
+    var showErrorDialog by remember { mutableStateOf(false) }
 
-    val emailErrorText = stringResource(R.string.login_email_error)
-    val passwordErrorText = stringResource(R.string.login_password_error)
+    val scrollState = rememberScrollState()
 
-    Column( // Main layout column for the login screen
-        modifier = Modifier
-            .fillMaxSize() // Fill the entire available space
-            .padding(horizontal = 24.dp), // Add horizontal padding
-        verticalArrangement = Arrangement.Center, // Center content vertically
-        horizontalAlignment = Alignment.CenterHorizontally // Center content horizontally
-    ) {
-        AuthTextField( // Email input field with validation
-            value = email,
-            onValueChange = { email = it },
-            label = stringResource(R.string.login_email_label), // Get label from strings.xml
-            placeholder = stringResource(R.string.login_email_placeholder), // Get placeholder from strings.xml
-            leadingIcon = Icons.Default.Email, // Show email icon
-            fieldType = "email", // Specify field type for validation
-            emailErrorText = emailErrorText // Error message for invalid email
-        )
-
-        Spacer(modifier = Modifier.height(16.dp)) // Space between fields
-
-        AuthTextField( // Password input field with validation
-            value = password,
-            onValueChange = { password = it },
-            label = stringResource(R.string.login_password_label), // Get label from strings.xml
-            placeholder = stringResource(R.string.login_password_placeholder), // Get placeholder from strings.xml
-            leadingIcon = Icons.Default.Lock, // Show lock icon
-            isPassword = true, // Hide password input
-            fieldType = "password", // Specify field type for validation
-            passwordErrorText = passwordErrorText // Error message for invalid password
-        )
-
-        Spacer(modifier = Modifier.height(8.dp)) // Space before forgot password link
-
-        Text( // Forgot password link
-            text = stringResource(R.string.login_forgot_password), // Get text from strings.xml
-            color = Color.Gray, // Set text color
-            fontSize = 13.sp, // Set text size
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.login_title),
+                        modifier = Modifier.fillMaxWidth(), // Center horizontally
+                        textAlign = TextAlign.Left, // Center text
+                        fontWeight = FontWeight.Bold, // Make font bold
+                        fontSize = 22.sp // Larger font size
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.back_content_desc)
+                        )
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        Column(
             modifier = Modifier
-                .align(Alignment.End) // Align to the end
-                .clickable { onForgotPassword() } // Handle click event
-        )
+                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(24.dp)
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Mensaje de bienvenida
+            Text(
+                text = stringResource(R.string.login_welcome),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
 
-        Spacer(modifier = Modifier.height(24.dp)) // Space before login button
+            // Campo Email
+            AuthTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = stringResource(R.string.login_email_label),
+                placeholder = stringResource(R.string.login_email_placeholder),
+                leadingIcon = Icons.Default.Email,
+                fieldType = "email",
+                emailErrorText = stringResource(R.string.login_email_error)
+            )
 
-        UniPrimaryButton( // Main login button
-            text = stringResource(R.string.login_button), // Get button text from strings.xml
-            onClick = onLoginClick // Handle login click
-        )
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(16.dp)) // Space before social buttons
+            // Campo Password
+            AuthTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = stringResource(R.string.login_password_label),
+                placeholder = stringResource(R.string.login_password_placeholder),
+                leadingIcon = Icons.Default.Lock,
+                isPassword = true,
+                fieldType = "password",
+                passwordErrorText = stringResource(R.string.login_password_error)
+            )
 
-        SocialButton( // Google login button
-            icon = painterResource(id = R.drawable.ic_launcher_foreground), // Show Google icon
-            text = stringResource(R.string.login_google), // Get button text from strings.xml
-            containerColor = Color(0xFFF5F5F5), // Set button background color
-            contentColor = Color.Black, // Set button text color
-            onClick = onGoogleLogin // Handle Google login click
-        )
+            Spacer(modifier = Modifier.height(8.dp))
 
-        Spacer(modifier = Modifier.height(12.dp)) // Space before Facebook button
+            // Olvidé mi contraseña
+            Text(
+                text = stringResource(R.string.login_forgot_password),
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 13.sp,
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .clickable { onForgotPassword() }
+            )
 
-        SocialButton( // Facebook login button
-            icon = painterResource(id = R.drawable.ic_launcher_foreground), // Show Facebook icon
-            text = stringResource(R.string.login_facebook), // Get button text from strings.xml
-            containerColor = Color(0xFF1877F2), // Set button background color
-            contentColor = Color.White, // Set button text color
-            onClick = onFacebookLogin // Handle Facebook login click
-        )
+            Spacer(modifier = Modifier.height(24.dp))
 
-        Spacer(modifier = Modifier.height(32.dp)) // Space before register link
+            // Botón Iniciar sesión
+            UniPrimaryButton(
+                text = stringResource(R.string.login_button),
+                onClick = {
+                    if (isLoginValid(email, password)) {
+                        onLoginClick()
+                    } else {
+                        showErrorDialog = true
+                    }
+                }
+            )
 
-        Text( // Register link
-            text = stringResource(R.string.login_register_link), // Get text from strings.xml
-            color = Color.Black, // Set text color
-            fontWeight = FontWeight.Medium, // Set font weight
-            modifier = Modifier.clickable { onRegisterClick() } // Handle click event
-        )
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Separador "o continuar con"
+            OrContinueWithSeparator()
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Botón Google
+            SocialButton(
+                icon = painterResource(id = R.drawable.ic_launcher_foreground),
+                text = stringResource(R.string.login_google),
+                containerColor = Color(0xFFDB4437), // Rojo oficial de Google
+                contentColor = Color.White,
+                onClick = onGoogleLogin
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Botón Facebook
+            SocialButton(
+                icon = painterResource(id = R.drawable.ic_launcher_foreground),
+                text = stringResource(R.string.login_facebook),
+                containerColor = Color(0xFF1877F2), // Azul oficial de Facebook
+                contentColor = Color.White,
+                onClick = onFacebookLogin
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Crear cuenta
+            RegisterButton(
+                text = stringResource(R.string.login_register_link),
+                onClick = onRegisterClick
+            )
+        }
     }
+
+    // Alerta de error
+    LoginErrorDialog(show = showErrorDialog, onDismiss = { showErrorDialog = false })
 }
 
-/**
- * LoginPreview composable provides a preview of the Login screen in Android Studio,
- * using sample initial values to demonstrate error messages and layout.
- */
 @Preview(showBackground = true)
 @Composable
 fun LoginPreview() {
-    Login(emailInitial = "correo", passwordInitial = "123")
+    Login(
+        emailInitial = "correo",
+        passwordInitial = "123"
+    )
 }

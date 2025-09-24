@@ -28,13 +28,25 @@ fun Navigation() {
         }
 
         composable<RouteScreen.Login>{
-            Login(onLoginClick = {
-                navController.navigate(RouteScreen.HomeUser) // Navigate to User Screen
-            })
+            Login(
+                onLoginClick = {
+                    navController.navigate(RouteScreen.HomeUser) // Navigate to User Screen
+                },
+                onRegisterClick = {
+                    navController.navigate(RouteScreen.Register) // Navigate to Register screen
+                },
+                onBackClick = {
+                    navController.navigate(RouteScreen.WelcomeScreen)
+                }
+            )
         }
 
         composable<RouteScreen.Register>{
-            Register() // Show Register screen
+            Register(
+                onBackClick = {
+                    navController.navigate(RouteScreen.WelcomeScreen)
+                }
+            ) // Show Register screen
         }
 
         composable<RouteScreen.HomeUser>{
