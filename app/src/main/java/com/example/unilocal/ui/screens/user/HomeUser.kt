@@ -10,8 +10,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -52,7 +52,7 @@ fun HomeUser() {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back_content_desc))
+            Icon(imageVector = Icons.Default.DateRange, contentDescription = stringResource(R.string.back_content_desc))
             Text(text = stringResource(R.string.profile_title), fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Icon(imageVector = Icons.Default.Build, contentDescription = stringResource(R.string.settings_content_desc))
         }
@@ -134,10 +134,7 @@ fun HomeUser() {
             imageRes = R.drawable.ic_launcher_background
         )
     }
-
-    // TODO: Puedes añadir aquí un BottomNavigation si lo necesitas globalmente
 }
-
 
 
 @Preview(showBackground = true)

@@ -6,11 +6,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import com.example.unilocal.ui.config.RouteTab
 import com.example.unilocal.ui.screens.user.tabs.Destination
 
 @Composable
 fun BottomNavBar(
-    selectedRoute: String,
+    selectedRoute: RouteTab,
     navController: NavController
 ) {
     NavigationBar {
@@ -46,5 +47,5 @@ fun BottomNavBar(
 @Composable
 fun BottomNavBarPreview() {
     val navController = rememberNavController()
-    BottomNavBar(selectedRoute = Destination.MY_PLACES.route, navController = navController)
+    BottomNavBar(selectedRoute = RouteTab.HomeUser, navController = navController)
 }
