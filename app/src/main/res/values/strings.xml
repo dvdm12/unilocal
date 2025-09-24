@@ -58,7 +58,7 @@
     <string name="filter_pending">Pendientes</string>
     <string name="filter_rejected">Rechazados</string>
     <string name="sort_content_desc">Sort</string>
-    <string name="created_on">Creado el %1$s</string>
+    <string name="created_on">Creado el 14 de Marzo</string>
     <string name="place_name">Café El Paraíso</string>
     <string name="place_category">Cafetería</string>
     <string name="view">Ver</string>
@@ -67,4 +67,15 @@
     <string name="user_avatar_desc">User Avatar</string>
     <string name="back_content_desc">Back</string>
     <string name="settings_content_desc">Settings</string>
+
+    <!-- Play Card Messages -->
+    <string name="play_card_message">Settings</string>
+
+    <!-- Resources -->
+    <string name="nav_my_places">Mis lugares</string>
+    <string name="nav_add_place">Agregar lugar</string>
+    <string name="nav_search">Buscar</string>
+    <string name="nav_profile">Mi perfil</string>
+
+
 </resources>

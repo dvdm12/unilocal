@@ -10,7 +10,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -50,9 +52,9 @@ fun HomeUser() {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(imageVector = Icons.Default.MoreVert, contentDescription = stringResource(R.string.back_content_desc))
+            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back_content_desc))
             Text(text = stringResource(R.string.profile_title), fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            Icon(imageVector = Icons.Default.MoreVert, contentDescription = stringResource(R.string.settings_content_desc))
+            Icon(imageVector = Icons.Default.Build, contentDescription = stringResource(R.string.settings_content_desc))
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -67,6 +69,7 @@ fun HomeUser() {
                     modifier = Modifier
                         .size(100.dp)
                         .clip(CircleShape)
+                        .background(Color.LightGray)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(stringResource(R.string.user_full_name), fontWeight = FontWeight.Bold, fontSize = 18.sp)
@@ -113,10 +116,10 @@ fun HomeUser() {
             horizontalArrangement = Arrangement.Absolute.Left
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground), // Cambiar por ícono de filtro
+                imageVector = Icons.Default.KeyboardArrowDown, // Cambiar por ícono de filtro
                 contentDescription = stringResource(R.string.sort_content_desc),
-                modifier = Modifier.size(80.dp).then(Modifier.background(Color.LightGray)),
-                tint= Color.White
+                modifier = Modifier.size(50.dp),
+                tint= Color.Black
             )
         }
 
@@ -124,7 +127,7 @@ fun HomeUser() {
 
         // Lugar listado
         PlaceCard(
-            date = "15 de marzo de 2024",
+            date = stringResource(R.string.play_card_message),
             name = stringResource(R.string.place_name),
             category = stringResource(R.string.place_category),
             rating = 4.5f,
