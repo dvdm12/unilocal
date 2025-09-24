@@ -5,7 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.unilocal.ui.config.RouteScreen
-import com.example.unilocal.ui.screens.user.HomeUser
+import com.example.unilocal.ui.screens.user.NavHomeUser
 
 
 @Composable
@@ -38,7 +38,7 @@ fun Navigation() {
         }
 
         composable<RouteScreen.HomeUser>{
-            HomeUser() // Show User screen
+            NavHomeUser() // Show User screen
         }
     }
 }

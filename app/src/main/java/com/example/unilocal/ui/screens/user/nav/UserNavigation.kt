@@ -1,40 +1,42 @@
 package com.example.unilocal.ui.screens.user.nav
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.unilocal.ui.config.RouteTab
-import com.example.unilocal.ui.screens.user.*
+import com.example.unilocal.ui.screens.user.tabs.HomeUser
 import com.example.unilocal.ui.screens.user.tabs.AddPlace
 import com.example.unilocal.ui.screens.user.tabs.MyPlaces
 import com.example.unilocal.ui.screens.user.tabs.SearchPlace
+import com.example.unilocal.ui.screens.user.tabs.UserNavItem
 
 @Composable
 fun UserNavigation(
+    modifier: Modifier = Modifier,
     navController: NavHostController,
-    startDestination: RouteTab
+    startDestination: String = UserNavItem.HOME.route
 ) {
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        modifier = modifier
     ) {
-        composable<RouteTab.HomeUser> {
+        composable(UserNavItem.HOME.route) {
             HomeUser()
         }
-        composable<RouteTab.Places> {
+        composable(UserNavItem.MY_PLACES.route) {
             MyPlaces()
         }
-        composable<RouteTab.AddPlace> {
+        composable(UserNavItem.ADD.route) {
             AddPlace()
         }
-        composable<RouteTab.SearchPlace> {
+        composable(UserNavItem.SEARCH.route) {
             SearchPlace()
         }
     }
 }
-
 
 @Composable
 fun rememberCurrentRoute(navController: NavHostController): String? {
