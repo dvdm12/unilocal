@@ -1,7 +1,9 @@
 package com.example.unilocal.ui.screens.user
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -87,7 +89,7 @@ fun HomeUser() {
             placeholder = { Text(stringResource(R.string.search_placeholder)) },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp)
+                .height(50.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -108,11 +110,13 @@ fun HomeUser() {
         // Ordenar
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.Absolute.Left
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_launcher_foreground), // Cambiar por ícono de filtro
-                contentDescription = stringResource(R.string.sort_content_desc)
+                contentDescription = stringResource(R.string.sort_content_desc),
+                modifier = Modifier.size(80.dp).then(Modifier.background(Color.LightGray)),
+                tint= Color.White
             )
         }
 
@@ -124,67 +128,18 @@ fun HomeUser() {
             name = stringResource(R.string.place_name),
             category = stringResource(R.string.place_category),
             rating = 4.5f,
-            imageRes = R.drawable.ic_launcher_foreground
+            imageRes = R.drawable.ic_launcher_background
         )
     }
 
     // TODO: Puedes añadir aquí un BottomNavigation si lo necesitas globalmente
 }
 
-@Composable
-fun PlaceCard(
-    date: String,
-    name: String,
-    category: String,
-    rating: Float,
-    imageRes: Int
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp)
-    ) {
-        Text(text = stringResource(R.string.created_on, date), fontSize = 12.sp, color = Color.Gray)
-        Spacer(modifier = Modifier.height(4.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(name, fontWeight = FontWeight.Bold)
-                Text("$category  •  ⭐ $rating", fontSize = 13.sp, color = Color.Gray)
-            }
 
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Image(
-                painter = painterResource(id = imageRes),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(MaterialTheme.shapes.medium),
-                contentScale = ContentScale.Crop
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            OutlinedButton(onClick = {}) {
-                Text(stringResource(R.string.view))
-            }
-            OutlinedButton(onClick = {}) {
-                Text(stringResource(R.string.edit))
-            }
-            OutlinedButton(onClick = {}) {
-                Text(stringResource(R.string.delete))
-            }
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
 fun HomeUserPreview() {
     HomeUser()
 }
+
