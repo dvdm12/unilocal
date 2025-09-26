@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -134,7 +135,7 @@ fun HomeUser(
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
-                placeholder = { Text(stringResource(R.string.search_placeholder)) },
+                placeholder = { Text(stringResource(R.string.search_placeholder), style = TextStyle(fontSize = 15.sp)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)

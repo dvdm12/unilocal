@@ -25,7 +25,7 @@ fun <T : NavBarItem> BottomNavBar(
                     )
                 },
                 label = {
-                    Text(text = stringResource(id = item.labelRes))
+                    Text(text = stringResource(id = item.labelRes), fontSize = MaterialTheme.typography.labelSmall.fontSize)
                 }
             )
         }
