@@ -18,14 +18,14 @@ import androidx.compose.ui.unit.dp // Import for dp units
  * It supports validation for email and password fields, showing error messages from string resources.
  */
 @Composable // Marks this function as a composable
-fun AuthTextField( // Function declaration for AuthTextField
+fun AuthTextField(
+    modifier: Modifier = Modifier,// Modifier for layout/styling
     value: String, // Current field value
     onValueChange: (String) -> Unit, // Callback for value change
     label: String, // Field label
     placeholder: String, // Placeholder text
     leadingIcon: ImageVector, // Icon at the start of the field
     isPassword: Boolean = false, // If true, hides input for password
-    modifier: Modifier = Modifier, // Modifier for layout/styling
     fieldType: String = "text", // Type of field: "email", "password", or "text"
     emailErrorText: String = "", // Error message for invalid email
     passwordErrorText: String = "" // Error message for invalid password
