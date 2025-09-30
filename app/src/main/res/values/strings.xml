@@ -87,9 +87,23 @@
     <string name="nav_profile">Mi perfil</string>
     <string name="play_card_message">Configuraciones</string>
 
-    <!-- Navigation -->
-    <string name="nav_my_places">Mis lugares</string>
-    <string name="nav_add_place">Agregar lugar</string>
-    <string name="nav_search">Buscar</string>
-    <string name="nav_profile">Mi perfil</string>
+
+    <!-- Forgot Password Screen -->
+    <string name="forgot_password_title">¿Olvidaste tu contraseña?</string>
+    <string name="forgot_password_subtitle">Ingresa tu correo para enviar un código de verificación.</string>
+    <string name="forgot_password_email_label">Email</string>
+    <string name="forgot_password_email_placeholder">correo@ejemplo.com</string>
+    <string name="forgot_password_email_error">Correo inválido</string>
+    <string name="forgot_password_button">Enviar código</string>
+    <string name="forgot_password_google">Recuperar con Google</string>
+    <string name="forgot_password_facebook">Recuperar con Facebook</string>
+    <string name="forgot_password_back_to_login">Volver al inicio de sesión</string>
+
+    <!-- Forgot Password Snackbar Messages -->
+    <string name="forgot_password_error_empty_email">Por favor ingresa tu correo</string>
+    <string name="forgot_password_error_invalid_email">@ obligatorio en el correo</string>
+    <string name="forgot_password_code_sent">El código fue enviado a %1$s</string>
+
+
+
 </resources>

@@ -23,158 +23,22 @@ import com.example.unilocal.ui.components.home.DropdownField
 import com.example.unilocal.ui.components.home.SocialButton
 import com.example.unilocal.ui.components.home.UniPrimaryButton
 
-@Composable
-private fun RegisterFields(
-    name: String,
-    lastName: String,
-    email: String,
-    phone: String,
-    country: String,
-    city: String,
-    password: String,
-    confirmPassword: String,
-    onNameChange: (String) -> Unit,
-    onLastNameChange: (String) -> Unit,
-    onEmailChange: (String) -> Unit,
-    onPhoneChange: (String) -> Unit,
-    onCountryChange: (String) -> Unit,
-    onCityChange: (String) -> Unit,
-    onPasswordChange: (String) -> Unit,
-    onConfirmPasswordChange: (String) -> Unit,
-    countries: List<String>,
-    cities: List<String>
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            AuthTextField(
-                value = name,
-                onValueChange = onNameChange,
-                label = stringResource(R.string.register_name),
-                placeholder = stringResource(R.string.register_name),
-                leadingIcon = Icons.Default.Person
-            )
-            AuthTextField(
-                value = lastName,
-                onValueChange = onLastNameChange,
-                label = stringResource(R.string.register_lastname),
-                placeholder = stringResource(R.string.register_lastname),
-                leadingIcon = Icons.Default.Person
-            )
-            AuthTextField(
-                value = email,
-                onValueChange = onEmailChange,
-                label = stringResource(R.string.register_email),
-                placeholder = stringResource(R.string.register_email),
-                leadingIcon = Icons.Default.Email
-            )
-            AuthTextField(
-                value = phone,
-                onValueChange = onPhoneChange,
-                label = stringResource(R.string.register_phone),
-                placeholder = stringResource(R.string.register_phone),
-                leadingIcon = Icons.Default.Phone
-            )
-            DropdownField(
-                label = stringResource(R.string.register_country),
-                options = countries,
-                selectedOption = country,
-                onOptionSelected = onCountryChange
-            )
-            DropdownField(
-                label = stringResource(R.string.register_city),
-                options = cities,
-                selectedOption = city,
-                onOptionSelected = onCityChange
-            )
-            AuthTextField(
-                value = password,
-                onValueChange = onPasswordChange,
-                label = stringResource(R.string.register_password),
-                placeholder = stringResource(R.string.register_password),
-                leadingIcon = Icons.Default.Lock,
-                isPassword = true
-            )
-            AuthTextField(
-                value = confirmPassword,
-                onValueChange = onConfirmPasswordChange,
-                label = stringResource(R.string.register_confirm_password),
-                placeholder = stringResource(R.string.register_confirm_password),
-                leadingIcon = Icons.Default.Lock,
-                isPassword = true
-            )
-        }
-    }
-}
-
-@Composable
-private fun SocialLoginSection(
-    onGoogleClick: () -> Unit,
-    onFacebookClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        SocialButton(
-            icon = painterResource(id = R.drawable.ic_launcher_foreground),
-            text = stringResource(R.string.login_google),
-            containerColor = Color(0xFFDB4437), // rojo Google
-            contentColor = Color.White,
-            onClick = onGoogleClick
-        )
-        SocialButton(
-            icon = painterResource(id = R.drawable.ic_launcher_foreground),
-            text = stringResource(R.string.login_facebook),
-            containerColor = Color(0xFF1877F2), // azul Facebook
-            contentColor = Color.White,
-            onClick = onFacebookClick
-        )
-    }
-}
-
-@Composable
-private fun DividerWithText(text: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        HorizontalDivider(
-            modifier = Modifier.weight(1f),
-            color = Color.LightGray,
-            thickness = 1.dp
-        )
-        Text(
-            text = text,
-            color = Color.Gray,
-            fontSize = 12.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 12.dp)
-        )
-        HorizontalDivider(
-            modifier = Modifier.weight(1f),
-            color = Color.LightGray,
-            thickness = 1.dp
-        )
-    }
-}
-
+/**
+ * Renders the full user registration screen.
+ * Includes form fields, social login buttons, and top navigation.
+ *
+ * @param onRegisterClick Callback triggered when the user submits the form.
+ * @param onGoogleClick Callback for Google login button.
+ * @param onFacebookClick Callback for Facebook login button.
+ * @param onBackClick Callback for back navigation icon.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Register(
     onRegisterClick: () -> Unit = {},
     onGoogleClick: () -> Unit = {},
     onFacebookClick: () -> Unit = {},
-    onBackClick: () -> Unit = {} // callback para retroceder
+    onBackClick: () -> Unit = {}
 ) {
     var name by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -269,6 +133,173 @@ fun Register(
     }
 }
 
+/**
+ * Renders the form fields used in the registration screen.
+ *
+ * @param name, lastName, email, phone, country, city, password, confirmPassword: Current field values.
+ * @param onXChange: Callback for each input field change.
+ * @param countries List of available countries for dropdown.
+ * @param cities List of available cities for dropdown.
+ */
+@Composable
+private fun RegisterFields(
+    name: String,
+    lastName: String,
+    email: String,
+    phone: String,
+    country: String,
+    city: String,
+    password: String,
+    confirmPassword: String,
+    onNameChange: (String) -> Unit,
+    onLastNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPhoneChange: (String) -> Unit,
+    onCountryChange: (String) -> Unit,
+    onCityChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onConfirmPasswordChange: (String) -> Unit,
+    countries: List<String>,
+    cities: List<String>
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            AuthTextField(
+                value = name,
+                onValueChange = onNameChange,
+                label = stringResource(R.string.register_name),
+                placeholder = stringResource(R.string.register_name),
+                leadingIcon = Icons.Default.Person
+            )
+            AuthTextField(
+                value = lastName,
+                onValueChange = onLastNameChange,
+                label = stringResource(R.string.register_lastname),
+                placeholder = stringResource(R.string.register_lastname),
+                leadingIcon = Icons.Default.Person
+            )
+            AuthTextField(
+                value = email,
+                onValueChange = onEmailChange,
+                label = stringResource(R.string.register_email),
+                placeholder = stringResource(R.string.register_email),
+                leadingIcon = Icons.Default.Email
+            )
+            AuthTextField(
+                value = phone,
+                onValueChange = onPhoneChange,
+                label = stringResource(R.string.register_phone),
+                placeholder = stringResource(R.string.register_phone),
+                leadingIcon = Icons.Default.Phone
+            )
+            DropdownField(
+                label = stringResource(R.string.register_country),
+                options = countries,
+                selectedOption = country,
+                onOptionSelected = onCountryChange
+            )
+            DropdownField(
+                label = stringResource(R.string.register_city),
+                options = cities,
+                selectedOption = city,
+                onOptionSelected = onCityChange
+            )
+            AuthTextField(
+                value = password,
+                onValueChange = onPasswordChange,
+                label = stringResource(R.string.register_password),
+                placeholder = stringResource(R.string.register_password),
+                leadingIcon = Icons.Default.Lock,
+                isPassword = true
+            )
+            AuthTextField(
+                value = confirmPassword,
+                onValueChange = onConfirmPasswordChange,
+                label = stringResource(R.string.register_confirm_password),
+                placeholder = stringResource(R.string.register_confirm_password),
+                leadingIcon = Icons.Default.Lock,
+                isPassword = true
+            )
+        }
+    }
+}
+
+/**
+ * Renders a section with Google and Facebook login buttons.
+ *
+ * @param onGoogleClick Callback for Google login.
+ * @param onFacebookClick Callback for Facebook login.
+ */
+@Composable
+private fun SocialLoginSection(
+    onGoogleClick: () -> Unit,
+    onFacebookClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        SocialButton(
+            icon = painterResource(id = R.drawable.ic_launcher_foreground),
+            text = stringResource(R.string.login_google),
+            containerColor = Color(0xFFDB4437), // Google red
+            contentColor = Color.White,
+            onClick = onGoogleClick
+        )
+        SocialButton(
+            icon = painterResource(id = R.drawable.ic_launcher_foreground),
+            text = stringResource(R.string.login_facebook),
+            containerColor = Color(0xFF1877F2), // Facebook blue
+            contentColor = Color.White,
+            onClick = onFacebookClick
+        )
+    }
+}
+
+/**
+ * Displays a horizontal divider line with centered text in between.
+ *
+ * @param text The text to display between the dividers.
+ */
+@Composable
+private fun DividerWithText(text: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            color = Color.LightGray,
+            thickness = 1.dp
+        )
+        Text(
+            text = text,
+            color = Color.Gray,
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 12.dp)
+        )
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            color = Color.LightGray,
+            thickness = 1.dp
+        )
+    }
+}
+
+/**
+ * Preview for the Register screen, shown in Android Studio preview.
+ */
 @Preview(showBackground = true)
 @Composable
 fun RegisterPreview() {

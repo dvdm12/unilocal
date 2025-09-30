@@ -37,6 +37,9 @@ fun Navigation() {
                 },
                 onBackClick = {
                     navController.navigate(RouteScreen.WelcomeScreen)
+                },
+                onForgotPassword={
+                    navController.navigate(RouteScreen.ForgotPasswordScreen)
                 }
             )
         }
@@ -51,6 +54,14 @@ fun Navigation() {
 
         composable<RouteScreen.HomeUser>{
             NavHomeUser() // Show User screen
+        }
+
+        composable<RouteScreen.ForgotPasswordScreen>{
+            ForgotPasswordScreen(
+                onBackToLogin = {
+                    navController.navigate(RouteScreen.Login)
+                }
+            )
         }
     }
 }

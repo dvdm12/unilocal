@@ -14,4 +14,7 @@ sealed class RouteScreen{
 
     @Serializable
     data object HomeUser: RouteScreen()
+
+    @Serializable
+    data object ForgotPasswordScreen: RouteScreen()
 }
