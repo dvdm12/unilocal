@@ -80,6 +80,11 @@
     <string name="settings_content_desc">Configuraciones</string>
 
     <!-- Play Card Messages -->
+    <!-- Navigation -->
+    <string name="nav_my_places">Mis lugares</string>
+    <string name="nav_add_place">Agregar lugar</string>
+    <string name="nav_search">Buscar</string>
+    <string name="nav_profile">Mi perfil</string>
     <string name="play_card_message">Configuraciones</string>
 
     <!-- Navigation -->
