@@ -11,6 +11,10 @@ import com.example.unilocal.ui.screens.user.nav.UserNavigation
 import com.example.unilocal.ui.screens.user.nav.rememberCurrentRoute
 import com.example.unilocal.ui.screens.user.tabs.UserNavItem
 
+/**
+ * Main composable for the user's home navigation screen.
+ * Sets up the navigation controller and bottom navigation bar, and manages navigation between user tabs.
+ */
 @Composable
 fun NavHomeUser() {
     val navController = rememberNavController()
@@ -43,9 +47,12 @@ fun NavHomeUser() {
     }
 }
 
+/**
+ * Preview composable for the user's home navigation screen.
+ * Used to display a preview of NavHomeUser in the Android Studio design editor.
+ */
 @Preview(showBackground = true)
 @Composable
 fun UserScreenPreview() {
     NavHomeUser()
 }
-

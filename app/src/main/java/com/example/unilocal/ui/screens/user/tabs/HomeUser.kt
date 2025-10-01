@@ -10,8 +10,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,15 +29,22 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.unilocal.R
 import com.example.unilocal.ui.screens.user.PlaceCard
+import com.example.unilocal.ui.theme.OrangePrimary
 
-
+/**
+ * Displays the top app bar for the HomeUser screen.
+ * Includes navigation and settings icons, and a centered title.
+ *
+ * @param onBackClick Callback for the back navigation icon.
+ * @param onSettingsClick Callback for the settings icon.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeUserTopBar(
     onBackClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {}
 ) {
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = {
             Text(
                 text = stringResource(R.string.profile_title),
@@ -49,7 +56,7 @@ fun HomeUserTopBar(
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(
-                    imageVector = Icons.Default.DateRange,
+                    imageVector = Icons.Default.ArrowBack,
                     contentDescription = stringResource(R.string.back_content_desc),
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
@@ -65,13 +72,20 @@ fun HomeUserTopBar(
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = OrangePrimary
         ),
         modifier = Modifier.fillMaxWidth(),
         windowInsets = WindowInsets(0)
     )
 }
 
+/**
+ * Main composable for the HomeUser screen.
+ * Displays the user's profile, filters, search bar, and a list of places.
+ *
+ * @param onBackClick Callback for the back navigation icon.
+ * @param onSettingsClick Callback for the settings icon.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeUser(
@@ -183,6 +197,10 @@ fun HomeUser(
     }
 }
 
+/**
+ * Preview composable for the HomeUser screen.
+ * Used to display a preview of HomeUser in the Android Studio design editor.
+ */
 @Preview(showBackground = true)
 @Composable
 fun HomeUserPreview() {
