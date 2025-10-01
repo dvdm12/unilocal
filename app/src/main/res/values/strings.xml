@@ -37,7 +37,6 @@
     <string name="login_error_message">Por favor ingresa correo y contraseña para continuar.</string>
 
 
-
     <!-- Alertas -->
     <string name="accept">Aceptar</string>
 
@@ -104,6 +103,12 @@
     <string name="forgot_password_error_invalid_email">@ obligatorio en el correo</string>
     <string name="forgot_password_code_sent">El código fue enviado a %1$s</string>
 
-
+    <!-- Top Bar Messages -->
+    <string name="logout_dialog_title">Cerrar sesión</string>
+    <string name="logout_dialog_text">¿Estás seguro de que deseas cerrar sesión?</string>
+    <string name="logout_dialog_confirm">Sí, cerrar sesión</string>
+    <string name="logout_dialog_cancel">Cancelar</string>
+    <string name="logout_content_desc">Cerrar sesión</string>
+    <string name="settings_content_des">Configuración de cuenta</string>
 
 </resources>
