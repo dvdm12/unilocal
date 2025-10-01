@@ -111,4 +111,31 @@
     <string name="logout_content_desc">Cerrar sesión</string>
     <string name="settings_content_des">Configuración de cuenta</string>
 
+    <!-- Edit Profile Screen -->
+    <string name="edit_profile_title">Editar perfil</string>
+    <string name="edit_profile_name_label">Nombre</string>
+    <string name="edit_profile_name_placeholder">Ingresa tu nombre</string>
+    <string name="edit_profile_username_label">Usuario</string>
+    <string name="edit_profile_username_placeholder">Ingresa tu usuario</string>
+    <string name="edit_profile_country_label">País</string>
+    <string name="edit_profile_department_label">Departamento</string>
+    <string name="edit_profile_city_label">Ciudad</string>
+    <string name="edit_profile_email_label">Correo electrónico</string>
+    <string name="edit_profile_password_section">Actualizar contraseña</string>
+    <string name="edit_profile_current_password_label">Contraseña actual</string>
+    <string name="edit_profile_current_password_placeholder">Escribe tu contraseña actual</string>
+    <string name="edit_profile_new_password_label">Nueva contraseña</string>
+    <string name="edit_profile_new_password_placeholder">Escribe una nueva contraseña</string>
+    <string name="edit_profile_confirm_password_label">Confirmar nueva contraseña</string>
+    <string name="edit_profile_confirm_password_placeholder">Repite la nueva contraseña</string>
+    <string name="edit_profile_button_save">Guardar cambios</string>
+    <string name="edit_profile_button_clear">Borrar</string>
+
+    <!-- Edit Profile Snackbars -->
+    <string name="snackbar_fields_cleared">Campos limpiados</string>
+    <string name="snackbar_error_empty_fields">Completa todos los campos</string>
+    <string name="snackbar_user_updated">Usuario actualizado</string>
+
+
+
 </resources>

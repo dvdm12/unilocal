@@ -32,10 +32,15 @@ import com.example.unilocal.ui.screens.user.PlaceCard
  * Main composable for the HomeUser screen.
  * Displays the user's profile, search bar, filters, sorting section, and a list of places.
  *
-*/
+ * @param onBackClick Callback for the back navigation icon or logout action.
+ * @param onSettingsClick Callback for the settings icon.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeUser() {
+fun HomeUser(
+    onBackClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {}
+) {
     val scrollState = rememberScrollState()
     val filters = listOf(
         stringResource(R.string.filter_all),
@@ -56,9 +61,9 @@ fun HomeUser() {
         RoleBasedTopBar(
             title = stringResource(R.string.profile_title),
             showLogoutDialog = true,
-            onLogoutConfirmed = {},
+            onLogoutConfirmed = onBackClick,
             showAccountSettings = true,
-            onAccountSettingsClick = {}
+            onAccountSettingsClick = onSettingsClick
         )
 
         Spacer(modifier = Modifier.height(64.dp)) // Prevent overlap with top bar

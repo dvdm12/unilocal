@@ -166,5 +166,21 @@ fun PlaceCard(
     }
 }
 
+/**
+ * Preview composable for the PlaceCard.
+ * Used to display a preview of PlaceCard in the Android Studio design editor.
+ */
+@Composable
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
+fun PlaceCardPreview() {
+    PlaceCard(
+        date = "14 de Marzo",
+        name = "Café El Paraíso",
+        category = "Cafetería",
+        rating = 4.5f,
+        imageRes = R.drawable.ic_launcher_background
+    )
+}
+
 // Helper enum for button types
 private enum class ButtonType { Filled, Outlined, OutlinedError }
