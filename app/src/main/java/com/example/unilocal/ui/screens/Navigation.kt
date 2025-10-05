@@ -33,5 +33,10 @@ fun Navigation() {
         composable<RouteScreen.Register>{
             Register() // Show Register screen
         }
+
+        composable<RouteScreen.Moderator> {
+            ModeratorScreen()
+        }
+
     }
 }

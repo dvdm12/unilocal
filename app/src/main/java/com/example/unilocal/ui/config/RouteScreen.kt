@@ -11,4 +11,8 @@ sealed class RouteScreen{
 
     @Serializable
     data object Register: RouteScreen()
+
+    @Serializable
+    data object Moderator : RouteScreen()
+
 }
