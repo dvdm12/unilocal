@@ -36,6 +36,7 @@ import com.example.unilocal.ui.components.UniPrimaryButton
  */
 @Composable
 fun Login(
+    onLoginSuccess: (username: String, isModerator: Boolean) -> Unit = { _, _ -> },
     onLoginClick: () -> Unit = {},
     onGoogleLogin: () -> Unit = {},
     onFacebookLogin: () -> Unit = {},
@@ -95,7 +96,12 @@ fun Login(
 
         UniPrimaryButton( // Main login button
             text = stringResource(R.string.login_button), // Get button text from strings.xml
-            onClick = onLoginClick // Handle login click
+            onClick =
+                {
+                    val isModerator = email == "moderador@gmail.com" // ejemplo simple
+                    onLoginSuccess(email, isModerator)
+                }
+
         )
 
         Spacer(modifier = Modifier.height(16.dp)) // Space before social buttons

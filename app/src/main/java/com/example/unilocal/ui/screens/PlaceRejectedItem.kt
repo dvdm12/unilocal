@@ -1,6 +1,5 @@
 package com.example.unilocal.ui.screens
 
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -8,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun PlaceAuthorizedItem(place: Place) {
+fun PlaceRejectedItem(place: Place) {
     Card(modifier = Modifier
         .fillMaxWidth()
         .padding(vertical = 8.dp)) {
@@ -21,4 +20,3 @@ fun PlaceAuthorizedItem(place: Place) {
         }
     }
 }
-
