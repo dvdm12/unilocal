@@ -1,17 +1,25 @@
 package com.example.unilocal.ui.screens
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.unilocal.ui.config.RouteScreen
-import com.example.unilocal.ui.screens.user.EditProfileScreen
-import com.example.unilocal.ui.screens.user.NavHomeUser
-import com.example.unilocal.ui.screens.user.tabs.HomeUser
+
 
 @Composable
 fun Navigation() {
     val navController = rememberNavController() // Navigation controller for managing navigation stack
+
+    // Variables de sesión
+    var currentUser by remember { mutableStateOf<String?>(null) }
+    var isModerator by remember { mutableStateOf(false) }
+
+
 
     NavHost(
         navController = navController,
@@ -27,61 +35,38 @@ fun Navigation() {
                 }
             )
         }
-e
+
         composable<RouteScreen.Login>{
             Login(
-                onLoginClick = {
-                    navController.navigate(RouteScreen.NavHomeUser) // Navigate to User Screen
-                },
-                onRegisterClick = {
-                    navController.navigate(RouteScreen.Register) // Navigate to Register screen
-                },
-                onBackClick = {
-                    navController.navigate(RouteScreen.WelcomeScreen)
-                },
-                onForgotPassword={
-                    navController.navigate(RouteScreen.ForgotPasswordScreen)
+                onLoginSuccess = { username, moderator ->
+                    currentUser = username
+                    isModerator = moderator
+                    if (moderator) {
+                        navController.navigate(RouteScreen.Moderator)
+                    } else {
+                        // Aquí puedes navegar a la pantalla principal del usuario (por crear)
+                        navController.navigate(RouteScreen.WelcomeScreen)
+                    }
                 }
             )
         }
 
         composable<RouteScreen.Register>{
-            Register(
-                onBackClick = {
-                    navController.navigate(RouteScreen.WelcomeScreen)
-                }
-            ) // Show Register screen
+            Register() // Show Register screen
         }
 
-        composable<RouteScreen.NavHomeUser>{
-            NavHomeUser() // Show User screen
-        }
 
-        composable<RouteScreen.HomeUser>{
-            HomeUser(
-                onSettingsClick = {
-                    navController.navigate(RouteScreen.EditProfileScreen)
-                },
-                onBackClick = {
+        composable<RouteScreen.Moderator> {
+            ModeratorScreen(
+                moderatorName = currentUser ?: "Moderador",
+                onLogout = {
+                    currentUser = null
+                    isModerator = false
                     navController.navigate(RouteScreen.WelcomeScreen)
                 }
             )
         }
 
-        composable<RouteScreen.EditProfileScreen>{
-            EditProfileScreen(
-                onBackClick = {
-                    navController.navigate(RouteScreen.NavHomeUser)
-                }
-            ) // Show User screen
-        }
 
-        composable<RouteScreen.ForgotPasswordScreen>{
-            ForgotPasswordScreen(
-                onBackToLogin = {
-                    navController.navigate(RouteScreen.Login)
-                }
-            )
-        }
     }
 }
