@@ -256,7 +256,7 @@ fun PlaceImagesSection(images: MutableList<Int>) {
     name = "Pantalla completa",
     showSystemUi = true,
     showBackground = true,
-    device = "spec:width=411dp,height=1500dp,dpi=440"
+    device = "spec:width=411dp,height=1200dp,dpi=440"
 )
 @Composable
 fun PlaceDetailsScreenPreview() {
