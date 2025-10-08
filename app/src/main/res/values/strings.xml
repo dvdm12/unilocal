@@ -146,6 +146,51 @@
     </string>
     <string name="add_place_button_start">Empezar</string>
 
+    <!-- Place Details Screen -->
+    <!-- Título -->
+    <string name="place_details_title">Detalles</string>
+
+    <!-- Campos del formulario -->
+    <string name="place_details_name">Nombre del lugar</string>
+    <string name="place_details_name_placeholder">Nombre del lugar (3-60 caracteres)</string>
+
+    <string name="place_details_category">Categoría</string>
+
+    <string name="place_details_description">Descripción</string>
+    <string name="place_details_description_placeholder">Descripción (30 - 600 caracteres)</string>
+
+    <string name="place_details_phone">Teléfono</string>
+    <string name="place_details_phone_placeholder">Teléfono (opcional)</string>
+
+    <!-- Horarios -->
+    <string name="place_details_schedule_title">Seleccionar Horario</string>
+    <string name="place_details_open_time">Hora de apertura</string>
+    <string name="place_details_close_time">Hora de cierre</string>
+    <string name="place_details_time_example">Ej. 09:30 AM</string>
+    <string name="place_details_add_schedule">Agregar Horario</string>
+
+    <!-- Ubicación -->
+    <string name="place_details_country">País</string>
+    <string name="place_details_department">Departamento</string>
+    <string name="place_details_city">Ciudad</string>
+
+    <!-- Imágenes -->
+    <string name="place_details_images_title">Imágenes</string>
+    <string name="place_details_add_image">Agregar imagen</string>
+
+    <!-- Resumen -->
+    <string name="place_details_summary_title">Resumen</string>
+
+    <!-- Publicar -->
+    <string name="place_details_publish">Publicar lugar</string>
+
+
+
+    <!-- ⭐ Features -->
+    <string name="feature_accessible">Accesible</string>
+    <string name="feature_parking">Parqueadero</string>
+    <string name="feature_pet_friendly">Pet Friendly</string>
+
 
 
 

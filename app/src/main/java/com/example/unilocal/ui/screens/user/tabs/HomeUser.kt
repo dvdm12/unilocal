@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.unilocal.R
 import com.example.unilocal.ui.components.users.SimpleTopBar
-import com.example.unilocal.ui.screens.user.PlaceCard
+import com.example.unilocal.ui.screens.user.create_places.PlaceCard
 
 @Composable
 fun HomeUser(

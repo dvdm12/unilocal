@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.unilocal.ui.config.RouteScreen
 import com.example.unilocal.ui.screens.user.NavHomeUser
+import com.example.unilocal.ui.screens.user.settings.ForgotPasswordScreen
 
 @Composable
 fun Navigation() {

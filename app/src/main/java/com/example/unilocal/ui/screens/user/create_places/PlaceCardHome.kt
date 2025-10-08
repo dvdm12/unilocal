@@ -1,4 +1,4 @@
-package com.example.unilocal.ui.screens.user
+package com.example.unilocal.ui.screens.user.create_places
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,6 +36,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.unilocal.R
@@ -171,7 +172,7 @@ fun PlaceCard(
  * Used to display a preview of PlaceCard in the Android Studio design editor.
  */
 @Composable
-@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
+@Preview(showBackground = true)
 fun PlaceCardPreview() {
     PlaceCard(
         date = "14 de Marzo",
