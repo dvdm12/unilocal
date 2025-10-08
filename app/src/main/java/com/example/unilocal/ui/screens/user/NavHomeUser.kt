@@ -9,7 +9,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.unilocal.ui.components.users.BottomNavBar
 import com.example.unilocal.ui.screens.user.nav.UserNavigation
 import com.example.unilocal.ui.screens.user.nav.rememberCurrentRoute
-import com.example.unilocal.ui.screens.user.tabs.UserNavItem
+import com.example.unilocal.ui.screens.user.nav.UserNavItem
 
 /**
  * Main composable for the user's home navigation screen.

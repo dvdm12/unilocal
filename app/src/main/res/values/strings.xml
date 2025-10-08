@@ -109,7 +109,8 @@
     <string name="logout_dialog_confirm">Sí, cerrar sesión</string>
     <string name="logout_dialog_cancel">Cancelar</string>
     <string name="logout_content_desc">Cerrar sesión</string>
-    <string name="settings_content_des">Configuración de cuenta</string>
+    <string name="settings_content_des">Configuración</string>
+
 
     <!-- Edit Profile Screen -->
     <string name="edit_profile_title">Editar perfil</string>

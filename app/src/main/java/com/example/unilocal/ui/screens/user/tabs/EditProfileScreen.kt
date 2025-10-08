@@ -1,4 +1,4 @@
-package com.example.unilocal.ui.screens.user
+package com.example.unilocal.ui.screens.user.tabs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -20,6 +20,7 @@ import com.example.unilocal.ui.theme.OrangePrimary
 import com.example.unilocal.ui.components.home.AuthTextField
 import com.example.unilocal.ui.components.home.DropdownField
 import com.example.unilocal.ui.components.home.UniPrimaryButton
+import com.example.unilocal.ui.components.users.SimpleTopBar
 import kotlinx.coroutines.launch
 
 /**
@@ -139,20 +140,12 @@ fun EditProfileScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileTopBar(onBackClick: () -> Unit) {
-    CenterAlignedTopAppBar(
-        title = { Text(stringResource(R.string.edit_profile_title), fontWeight = FontWeight.Bold) },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back_content_desc))
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = OrangePrimary,
-            titleContentColor = Color.White,
-            navigationIconContentColor = Color.White
-        )
+    SimpleTopBar(
+        title = stringResource(R.string.edit_profile_title),
+        onLogoutClick = onBackClick
     )
 }
+
 
 /**
  * Section for user information fields: name, lastname, username, and phone.
