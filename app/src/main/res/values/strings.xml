@@ -184,6 +184,9 @@
     <!-- Publicar -->
     <string name="place_details_publish">Publicar lugar</string>
 
+    <string name="place_details_location_title">Por favor, selecciona tu ubicacion</string>
+    <string name="place_details_street">Agrega tu direccion</string>
+    <string name="place_details_street_placeholder">Por favor, selecciona tu ubicacion</string>
 
 
     <!-- ⭐ Features -->

@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
@@ -53,13 +54,14 @@ fun PlaceDetailsScreen(
             val country = remember { mutableStateOf("Colombia") }
             val department = remember { mutableStateOf("Quindío") }
             val city = remember { mutableStateOf("Armenia") }
+            val street = remember { mutableStateOf("") }
             val images = remember { mutableStateListOf<Int>() } // Simula con resource IDs o URIs
 
             PlaceFormSection(name, category, description, phone)
             Spacer(modifier = Modifier.height(16.dp))
             PlaceScheduleSection()
             Spacer(modifier = Modifier.height(16.dp))
-            PlaceLocationDropdowns(country, department, city)
+            PlaceLocationDropdowns(country, department, city, street)
             Spacer(modifier = Modifier.height(16.dp))
             PlaceImagesSection(images)
             Spacer(modifier = Modifier.height(24.dp))
@@ -178,21 +180,23 @@ fun PlaceScheduleSection() {
 }
 
 /**
- * Displays dropdowns for selecting country, department, and city for the place location.
- * Each dropdown is separated by a vertical spacer for better visual clarity.
+ * Displays dropdowns for selecting country, department, city, and a text field for street.
+ * Each dropdown and the text field are separated by vertical spacers for clarity.
  *
  * @param country MutableState holding the selected country.
  * @param department MutableState holding the selected department.
  * @param city MutableState holding the selected city.
+ * @param street MutableState holding the entered street.
  */
 @Composable
 fun PlaceLocationDropdowns(
     country: MutableState<String>,
     department: MutableState<String>,
-    city: MutableState<String>
+    city: MutableState<String>,
+    street: MutableState<String>
 ) {
     Text(
-        text = "Por favor, selecciona tu ubicación:",
+        text = stringResource(R.string.place_details_location_title),
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onBackground,
         modifier = Modifier.padding(bottom = 8.dp)
@@ -216,6 +220,19 @@ fun PlaceLocationDropdowns(
         options = listOf("Armenia", "Medellín", "Cali"),
         selectedOption = city.value,
         onOptionSelected = { city.value = it }
+    )
+    Spacer(modifier = Modifier.height(12.dp))
+    AuthTextField(
+        value = street.value,
+        onValueChange = { street.value = it },
+        label = stringResource(R.string.place_details_street),
+        placeholder = stringResource(R.string.place_details_street_placeholder),
+        leadingIcon = Icons.Default.AccountBox,
+        isPassword = false,
+        fieldType = "text",
+        emailErrorText = "",
+        passwordErrorText = "",
+        modifier = Modifier.fillMaxWidth().height(45.dp)
     )
 }
 
