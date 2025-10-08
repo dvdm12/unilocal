@@ -137,6 +137,16 @@
     <string name="snackbar_error_empty_fields">Completa todos los campos</string>
     <string name="snackbar_user_updated">Usuario actualizado</string>
 
+    <string name="add_place_title">Crear un lugar</string>
+    <string name="add_place_image_desc">Ilustración de crear lugar</string>
+    <string name="add_place_subtitle">Haz visible tu negocio local en el mapa de tu ciudad</string>
+    <string name="add_place_description">
+        Haz visible tu negocio local: ubica el pin, comparte horarios/fotos/contacto y crea un perfil completo con portada.
+        Publícalo con transparencia —nuestra moderación cuida la calidad—, activa tu ubicación, recibe reseñas y multiplica tu alcance.
+    </string>
+    <string name="add_place_button_start">Empezar</string>
+
+
 
 
 </resources>
