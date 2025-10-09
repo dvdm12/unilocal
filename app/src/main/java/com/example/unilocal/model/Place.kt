@@ -13,13 +13,16 @@ data class Place(
     val images: List<String>,
     val owner: User,
     val reviews: List<Review> = emptyList(),
-    val schedules: List<Schedule> = emptyList()
+    val schedules: List<Schedule> = emptyList(),
+    val motive: String
 )
 
 enum class PlaceCategory {
     RESTAURANT,
     CAFE,
-    MUSEUM
+    MUSEUM,
+    STORE,
+    THEATER
 }
 
 enum class PlaceStatus {
