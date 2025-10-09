@@ -347,7 +347,12 @@ fun ActionButtons(
  * Preview composable for the Edit Profile screen.
  * Used to display a preview of EditProfileScreen in the Android Studio design editor.
  */
-@Preview(showBackground = true)
+@Preview(
+    name = "Pantalla completa",
+    showSystemUi = true,
+    showBackground = true,
+    device = "spec:width=411dp,height=1200dp,dpi=440"
+)
 @Composable
 fun EditProfilePreview() {
     EditProfileScreen()

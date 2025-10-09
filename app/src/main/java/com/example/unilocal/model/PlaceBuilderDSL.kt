@@ -7,8 +7,8 @@ class PlaceBuilderDSL {
     var name: String = ""
     var description: String = ""
     var category: PlaceCategory = PlaceCategory.RESTAURANT
-    var latitude: Double = 0.0
-    var longitude: Double = 0.0
+
+    var address: String = ""
     var phone: String = ""
     var status: PlaceStatus = PlaceStatus.PENDING
     var avgRating: Double = 0.0
@@ -24,8 +24,7 @@ class PlaceBuilderDSL {
             name = name,
             description = description,
             category = category,
-            latitude = latitude,
-            longitude = longitude,
+            address=address,
             phone = phone,
             status = status,
             avgRating = avgRating,

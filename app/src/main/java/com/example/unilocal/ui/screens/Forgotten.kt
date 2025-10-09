@@ -1,4 +1,4 @@
-package com.example.unilocal.ui.screens.user.settings
+package com.example.unilocal.ui.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

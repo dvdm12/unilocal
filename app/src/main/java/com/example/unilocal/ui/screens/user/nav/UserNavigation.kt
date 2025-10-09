@@ -6,10 +6,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.unilocal.ui.screens.user.create_places.PlaceDetailsScreen
 import com.example.unilocal.ui.screens.user.tabs.EditProfileScreen
 import com.example.unilocal.ui.screens.user.tabs.HomeUser
-import com.example.unilocal.ui.screens.user.tabs.AddPlace
-import com.example.unilocal.ui.screens.user.tabs.MyPlaces
 import com.example.unilocal.ui.screens.user.tabs.SearchPlace
 
 @Composable
@@ -28,7 +27,7 @@ fun UserNavigation(
         }
 
         composable(UserNavItem.ADD.route) {
-            AddPlace()
+            PlaceDetailsScreen()
         }
         composable(UserNavItem.SEARCH.route) {
             SearchPlace()
@@ -37,6 +36,7 @@ fun UserNavigation(
         composable(UserNavItem.SETTINGS.route) {
             EditProfileScreen()
         }
+
     }
 }
 

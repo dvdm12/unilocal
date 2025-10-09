@@ -62,7 +62,7 @@
     <string name="user_username">@marianaOH09</string>
     <string name="user_location">Armenia, Quindío</string>
     <string name="my_places">Mis lugares</string>
-    <string name="search_placeholder">Buscar por nombre o categoría</string>
+    <string name="search_placeholder">Buscar dirección o sitio</string>
     <string name="filter_all">Todos</string>
     <string name="filter_published">Publicados</string>
     <string name="filter_pending">Pendientes</string>
@@ -193,6 +193,18 @@
     <string name="feature_accessible">Accesible</string>
     <string name="feature_parking">Parqueadero</string>
     <string name="feature_pet_friendly">Pet Friendly</string>
+
+    <string name="location_screen_title">Ubicación</string>
+    <string name="close_content_description">Cerrar</string>
+
+    <!-- Map -->
+    <string name="map_preview_description">Vista previa del mapa</string>
+
+    <!-- Address section -->
+    <string name="no_address_selected">Dirección no seleccionada</string>
+
+    <!-- Button -->
+    <string name="use_this_location">Usar esta ubicación</string>
 
 
 
