@@ -52,7 +52,7 @@ fun Navigation() {
         }
 
         composable<RouteScreen.NavHomeUser>{
-            NavHomeUser() // Show User screen
+            NavHomeUser(navController) // Show User screen
         }
 
         composable<RouteScreen.ForgotPasswordScreen>{
