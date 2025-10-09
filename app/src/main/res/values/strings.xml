@@ -242,6 +242,13 @@
     <string name="created_by">Creado por %1$s • %2$s</string>
     <string name="place_info_format">%1$s · ⭐ %2$.1f · %3$s</string>
 
+    <!-- Iconos -->
+    <string name="gmail_icon">Ícono de Gmail</string>
+    <string name="facebook_icon">Ícono de Facebook</string>
+    <string name="graph_icon">Ícono de gráfica</string>
+    <string name="map_icon">Ícono de mapa</string>
+    <string name="placeholder_icon">Ícono de placeholder</string>
+
 
 
 </resources>

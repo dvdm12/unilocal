@@ -226,7 +226,7 @@ fun Login(
 
             // Botón Google
             SocialButton(
-                icon = painterResource(id = R.drawable.ic_launcher_foreground),
+                icon = painterResource(id = R.drawable.gmail_svgrepo_com),
                 text = stringResource(R.string.login_google),
                 containerColor = Color(0xFFDB4437), // Rojo oficial de Google
                 contentColor = Color.White,
@@ -237,7 +237,7 @@ fun Login(
 
             // Botón Facebook
             SocialButton(
-                icon = painterResource(id = R.drawable.ic_launcher_foreground),
+                icon = painterResource(id = R.drawable.facebook_square_svgrepo_com),
                 text = stringResource(R.string.login_facebook),
                 containerColor = Color(0xFF1877F2), // Azul oficial de Facebook
                 contentColor = Color.White,

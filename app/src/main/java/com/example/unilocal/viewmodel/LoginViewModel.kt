@@ -12,7 +12,7 @@ class LoginViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState
 
-
+    // Usuarios de prueba (simulación de base de datos)
     private val users = listOf(
         User(
             id = "1",
@@ -38,6 +38,7 @@ class LoginViewModel : ViewModel() {
         )
     )
 
+    // Actualiza el email y valida
     fun onEmailChange(email: String) {
         _uiState.update {
             it.copy(
@@ -47,6 +48,7 @@ class LoginViewModel : ViewModel() {
         }
     }
 
+    // Actualiza la contraseña y valida
     fun onPasswordChange(password: String) {
         _uiState.update {
             it.copy(
@@ -56,11 +58,13 @@ class LoginViewModel : ViewModel() {
         }
     }
 
+    // Intenta iniciar sesión
     fun onLoginClick() {
         val currentState = _uiState.value
         val emailError = validateEmail(currentState.email)
         val passwordError = validatePassword(currentState.password)
 
+        // Validación fallida
         if (emailError != null || passwordError != null) {
             _uiState.update {
                 it.copy(
@@ -72,12 +76,17 @@ class LoginViewModel : ViewModel() {
             return
         }
 
+        // Buscar usuario que coincida
         val matchedUser = users.find {
-            it.email == currentState.email && it.password == currentState.password && it.isActive
+            it.email == currentState.email &&
+                    it.password == currentState.password &&
+                    it.isActive
         }
 
+        // Actualizar estado según el rol
         _uiState.update {
             it.copy(
+                currentUser = matchedUser,
                 loginResult = when (matchedUser?.role) {
                     Role.USER -> LoginResult.SUCCESS_USER
                     Role.MODERATOR -> LoginResult.SUCCESS_MODERATOR
@@ -87,12 +96,21 @@ class LoginViewModel : ViewModel() {
         }
     }
 
+    // Limpia el resultado del login
+    fun clearLoginResult() {
+        _uiState.update {
+            it.copy(loginResult = null)
+        }
+    }
+
+    // Validación básica de email
     private fun validateEmail(email: String): String? {
         return if (!email.contains("@") || !email.contains(".com")) {
             "Correo inválido"
         } else null
     }
 
+    // Validación básica de contraseña
     private fun validatePassword(password: String): String? {
         return if (password.length < 6) {
             "Contraseña demasiado corta"

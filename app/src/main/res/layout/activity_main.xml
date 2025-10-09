@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp"
+    tools:context=".MainActivity">
+
+    <!-- Ícono de Gmail -->
+    <ImageView
+        android:id="@+id/image_gmail"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/gmail_svgrepo_com"
+        android:contentDescription="@string/gmail_icon"
+        android:tint="@android:color/black"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Ícono de Facebook -->
+    <ImageView
+        android:id="@+id/image_facebook"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/facebook_square_svgrepo_com"
+        android:contentDescription="@string/facebook_icon"
+        android:tint="@android:color/black"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Ícono de gráfica -->
+    <ImageView
+        android:id="@+id/image_graph"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/graph_new_up_svgrepo_com"
+        android:contentDescription="@string/graph_icon"
+        android:tint="@android:color/black"
+        android:layout_marginBottom="16dp" />
+
+        <!-- Ícono de mapa -->
+    <ImageView
+        android:id="@+id/image_map"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/map_svgrepo_com"
+        android:contentDescription="@string/map_icon"
+        android:tint="@android:color/black"
+        android:layout_marginBottom="16dp" />
+
+        <!-- Ícono de placeholder -->
+    <ImageView
+        android:id="@+id/image_placeholder"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/place_holder_svgrepo_com"
+        android:contentDescription="@string/placeholder_icon"
+        android:layout_marginBottom="16dp" />
+
+
+    <!-- Texto final -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Íconos SVG: Gmail, Facebook y Gráfica"
+        android:textSize="18sp"
+        android:paddingTop="16dp" />
+
+</LinearLayout>

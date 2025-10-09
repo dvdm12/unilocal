@@ -169,14 +169,14 @@ fun ForgotPasswordSocialButtons(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         SocialButton(
-            icon = painterResource(id = R.drawable.ic_launcher_foreground),
+            icon = painterResource(id = R.drawable.gmail_svgrepo_com),
             text = stringResource(R.string.forgot_password_google),
             containerColor = Color.Red, // Consider replacing with Color.White and using correct icon
             contentColor = Color.White,
             onClick = onGoogleClick
         )
         SocialButton(
-            icon = painterResource(id = R.drawable.ic_launcher_foreground),
+            icon = painterResource(id = R.drawable.facebook_square_svgrepo_com),
             text = stringResource(R.string.forgot_password_facebook),
             containerColor = Color(0xFF1877F2), // Facebook Blue
             contentColor = Color.White,

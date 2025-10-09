@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -47,6 +48,8 @@ fun PlaceDetailsScreen(
                 .fillMaxSize()
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
+            TopMapIcon(modifier = Modifier.align(Alignment.CenterHorizontally))
+
             val name = remember { mutableStateOf("") }
             val category = remember { mutableStateOf("General") }
             val description = remember { mutableStateOf("") }
@@ -266,6 +269,21 @@ fun PlaceImagesSection(images: MutableList<Int>) {
     }
 }
 
+
+@Composable
+fun TopMapIcon(modifier: Modifier = Modifier) {
+    Image(
+        painter = painterResource(id = R.drawable.place_holder_svgrepo_com),
+        contentDescription = stringResource(R.string.map_icon),
+        modifier = modifier
+            .size(234.dp)
+            .padding(bottom = 16.dp)
+    )
+}
+
+
+
+
 /**
  * Preview for PlaceDetailsScreen.
  */
@@ -273,7 +291,7 @@ fun PlaceImagesSection(images: MutableList<Int>) {
     name = "Pantalla completa",
     showSystemUi = true,
     showBackground = true,
-    device = "spec:width=411dp,height=1200dp,dpi=440"
+    device = "spec:width=411dp,height=1400dp,dpi=440"
 )
 @Composable
 fun PlaceDetailsScreenPreview() {

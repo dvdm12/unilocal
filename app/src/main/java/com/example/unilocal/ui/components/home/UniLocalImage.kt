@@ -13,7 +13,7 @@ import com.example.unilocal.R
 @Composable
 fun UniLocalImage(modifier: Modifier = Modifier) {
     Image(
-        painter = painterResource(id = R.drawable.ic_launcher_background),
+        painter = painterResource(id = R.drawable.map_svgrepo_com),
         contentDescription = stringResource(R.string.welcome_image_description),
         modifier = modifier
             .fillMaxWidth()
