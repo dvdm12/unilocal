@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,22 +19,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.unilocal.R
-import com.example.unilocal.ui.theme.OrangePrimary
 import com.example.unilocal.ui.components.home.AuthTextField
+import com.example.unilocal.ui.components.home.AuthFieldType
 import com.example.unilocal.ui.components.home.DropdownField
 import com.example.unilocal.ui.components.home.UniPrimaryButton
 import com.example.unilocal.ui.components.users.SimpleTopBar
 import kotlinx.coroutines.launch
 
-/**
- * Main composable for the Edit Profile screen.
- * Allows users to update their profile information, location, email, and password.
- * Displays a top bar, input fields, dropdowns, and action buttons.
- * Shows snackbar messages for field validation and save actions.
- *
- * @param onBackClick Callback for the back navigation icon.
- * @param onSaveClick Callback for the save button.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
@@ -45,7 +39,7 @@ fun EditProfileScreen(
     var country by remember { mutableStateOf("Colombia") }
     var department by remember { mutableStateOf("Quindío") }
     var city by remember { mutableStateOf("Armenia") }
-    val email by remember { mutableStateOf("sofia.ramirez@email.com" ) }
+    val email by remember { mutableStateOf("sofia.ramirez@email.com") }
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -53,7 +47,6 @@ fun EditProfileScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    // ✅ Strings capturados en contexto composable
     val msgFieldsCleared = stringResource(R.string.snackbar_fields_cleared)
     val msgEmptyFields = stringResource(R.string.snackbar_error_empty_fields)
     val msgUserUpdated = stringResource(R.string.snackbar_user_updated)
@@ -131,12 +124,6 @@ fun EditProfileScreen(
     }
 }
 
-/**
- * Top app bar for the Edit Profile screen.
- * Displays the screen title and a back navigation icon.
- *
- * @param onBackClick Callback for the back navigation icon.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileTopBar(onBackClick: () -> Unit) {
@@ -146,19 +133,6 @@ fun EditProfileTopBar(onBackClick: () -> Unit) {
     )
 }
 
-
-/**
- * Section for user information fields: name, lastname, username, and phone.
- *
- * @param name Current name value.
- * @param onNameChange Callback for updating the name.
- * @param lastname Current lastname value.
- * @param onLastnameChange Callback for updating the lastname.
- * @param username Current username value.
- * @param onUsernameChange Callback for updating the username.
- * @param phone Current phone value.
- * @param onPhoneChange Callback for updating the phone.
- */
 @Composable
 fun UserInfoSection(
     name: String, onNameChange: (String) -> Unit,
@@ -172,7 +146,7 @@ fun UserInfoSection(
         label = stringResource(R.string.register_name),
         placeholder = stringResource(R.string.edit_profile_name_placeholder),
         leadingIcon = Icons.Default.Person,
-        fieldType = "text"
+        fieldType = AuthFieldType.Text
     )
 
     AuthTextField(
@@ -181,7 +155,7 @@ fun UserInfoSection(
         label = stringResource(R.string.register_lastname),
         placeholder = stringResource(R.string.register_lastname),
         leadingIcon = Icons.Default.Person,
-        fieldType = "text"
+        fieldType = AuthFieldType.Text
     )
 
     AuthTextField(
@@ -190,7 +164,7 @@ fun UserInfoSection(
         label = stringResource(R.string.edit_profile_username_label),
         placeholder = stringResource(R.string.edit_profile_username_placeholder),
         leadingIcon = Icons.Default.Person,
-        fieldType = "text"
+        fieldType = AuthFieldType.Text
     )
 
     AuthTextField(
@@ -199,20 +173,10 @@ fun UserInfoSection(
         label = stringResource(R.string.register_phone),
         placeholder = stringResource(R.string.register_phone),
         leadingIcon = Icons.Default.Phone,
-        fieldType = "text"
+        fieldType = AuthFieldType.Text
     )
 }
 
-/**
- * Section for location dropdowns: country, department, and city.
- *
- * @param country Current country value.
- * @param onCountryChange Callback for updating the country.
- * @param department Current department value.
- * @param onDepartmentChange Callback for updating the department.
- * @param city Current city value.
- * @param onCityChange Callback for updating the city.
- */
 @Composable
 fun LocationDropdowns(
     country: String, onCountryChange: (String) -> Unit,
@@ -241,11 +205,6 @@ fun LocationDropdowns(
     )
 }
 
-/**
- * Displays the user's email field (read-only).
- *
- * @param email User's email address.
- */
 @Composable
 fun EmailField(email: String) {
     OutlinedTextField(
@@ -258,16 +217,6 @@ fun EmailField(email: String) {
     )
 }
 
-/**
- * Section for password fields: current, new, and confirm password.
- *
- * @param currentPassword Current password value.
- * @param onCurrentPasswordChange Callback for updating the current password.
- * @param newPassword New password value.
- * @param onNewPasswordChange Callback for updating the new password.
- * @param confirmPassword Confirm password value.
- * @param onConfirmPasswordChange Callback for updating the confirm password.
- */
 @Composable
 fun PasswordSection(
     currentPassword: String, onCurrentPasswordChange: (String) -> Unit,
@@ -286,9 +235,7 @@ fun PasswordSection(
         label = stringResource(R.string.edit_profile_current_password_label),
         placeholder = stringResource(R.string.edit_profile_current_password_placeholder),
         leadingIcon = Icons.Default.Lock,
-        isPassword = true,
-        fieldType = "password",
-        passwordErrorText = stringResource(R.string.login_password_error)
+        fieldType = AuthFieldType.Password
     )
 
     AuthTextField(
@@ -297,9 +244,7 @@ fun PasswordSection(
         label = stringResource(R.string.edit_profile_new_password_label),
         placeholder = stringResource(R.string.edit_profile_new_password_placeholder),
         leadingIcon = Icons.Default.Lock,
-        isPassword = true,
-        fieldType = "password",
-        passwordErrorText = stringResource(R.string.login_password_error)
+        fieldType = AuthFieldType.Password
     )
 
     AuthTextField(
@@ -308,17 +253,10 @@ fun PasswordSection(
         label = stringResource(R.string.edit_profile_confirm_password_label),
         placeholder = stringResource(R.string.edit_profile_confirm_password_placeholder),
         leadingIcon = Icons.Default.Lock,
-        isPassword = true,
-        fieldType = "password"
+        fieldType = AuthFieldType.Password
     )
 }
 
-/**
- * Displays action buttons for clearing fields and saving changes.
- *
- * @param onClear Callback for the clear button.
- * @param onSave Callback for the save button.
- */
 @Composable
 fun ActionButtons(
     onClear: () -> Unit,
@@ -343,10 +281,6 @@ fun ActionButtons(
     }
 }
 
-/**
- * Preview composable for the Edit Profile screen.
- * Used to display a preview of EditProfileScreen in the Android Studio design editor.
- */
 @Preview(
     name = "Pantalla completa",
     showSystemUi = true,

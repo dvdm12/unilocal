@@ -1,9 +1,10 @@
 package com.example.unilocal.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,27 +19,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.unilocal.R
 import com.example.unilocal.ui.components.home.*
+import com.example.unilocal.viewmodel.LoginViewModel
 import kotlinx.coroutines.launch
 
-/**
- * Main screen for password recovery.
- * Allows the user to enter their email and request a recovery code.
- * Includes social login options and navigation to return to the login screen.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForgotPasswordScreen(
+    viewModel: LoginViewModel,
     onGoogleClick: () -> Unit = {},
     onFacebookClick: () -> Unit = {},
     onBackToLogin: () -> Unit = {}
 ) {
-    var email by remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
     val emptyEmailMsg = stringResource(R.string.forgot_password_error_empty_email)
     val invalidEmailMsg = stringResource(R.string.forgot_password_error_invalid_email)
-    val codeSentMsg = stringResource(R.string.forgot_password_code_sent, email)
+    val codeSentMsg = stringResource(R.string.forgot_password_code_sent, uiState.email)
 
     Scaffold(
         topBar = {
@@ -49,7 +47,7 @@ fun ForgotPasswordScreen(
                 navigationIcon = {
                     IconButton(onClick = onBackToLogin) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back_content_desc)
                         )
                     }
@@ -70,30 +68,24 @@ fun ForgotPasswordScreen(
                 ForgotPasswordHeader()
                 Spacer(modifier = Modifier.height(24.dp))
                 ForgotPasswordForm(
-                    email = email,
-                    onValueChange = { email = it },
+                    email = uiState.email,
+                    onValueChange = viewModel::onEmailChange,
                     onSendCode = {
                         coroutineScope.launch {
                             when {
-                                email.isBlank() -> {
-                                    snackbarHostState.showSnackbar(
-                                        message = emptyEmailMsg
-                                    )
+                                uiState.email.isBlank() -> {
+                                    snackbarHostState.showSnackbar(emptyEmailMsg)
                                 }
-                                !email.contains("@") -> {
-                                    snackbarHostState.showSnackbar(
-                                        message = invalidEmailMsg
-                                    )
+                                uiState.emailError != null -> {
+                                    snackbarHostState.showSnackbar(invalidEmailMsg)
                                 }
                                 else -> {
-                                    snackbarHostState.showSnackbar(
-                                        message = codeSentMsg
-                                    )
+                                    snackbarHostState.showSnackbar(codeSentMsg)
                                 }
                             }
-
                         }
-                    }
+                    },
+                    emailError = uiState.emailError
                 )
                 Spacer(modifier = Modifier.height(32.dp))
                 ForgotPasswordSocialButtons(
@@ -107,10 +99,6 @@ fun ForgotPasswordScreen(
     }
 }
 
-/**
- * Displays the header section for the forgot password screen,
- * including title and subtitle instructions.
- */
 @Composable
 fun ForgotPasswordHeader() {
     Text(
@@ -124,19 +112,12 @@ fun ForgotPasswordHeader() {
     )
 }
 
-/**
- * Contains the email input field and the primary action button
- * to send the recovery code.
- *
- * @param email Current email input value.
- * @param onValueChange Callback triggered when the input changes.
- * @param onSendCode Callback triggered when the user taps "Send code".
- */
 @Composable
 fun ForgotPasswordForm(
     email: String,
     onValueChange: (String) -> Unit,
-    onSendCode: () -> Unit
+    onSendCode: () -> Unit,
+    emailError: String?
 ) {
     AuthTextField(
         value = email,
@@ -144,9 +125,8 @@ fun ForgotPasswordForm(
         label = stringResource(R.string.forgot_password_email_label),
         placeholder = stringResource(R.string.forgot_password_email_placeholder),
         leadingIcon = Icons.Default.Email,
-        isPassword = false,
-        fieldType = "email",
-        emailErrorText = stringResource(R.string.forgot_password_email_error)
+        fieldType = AuthFieldType.Email,
+        errorMessage = emailError
     )
     Spacer(modifier = Modifier.height(20.dp))
     UniPrimaryButton(
@@ -155,13 +135,6 @@ fun ForgotPasswordForm(
     )
 }
 
-/**
- * Shows buttons for social login options (Google and Facebook),
- * with representative colors and branding.
- *
- * @param onGoogleClick Callback for Google button click.
- * @param onFacebookClick Callback for Facebook button click.
- */
 @Composable
 fun ForgotPasswordSocialButtons(
     onGoogleClick: () -> Unit,
@@ -171,25 +144,20 @@ fun ForgotPasswordSocialButtons(
         SocialButton(
             icon = painterResource(id = R.drawable.gmail_svgrepo_com),
             text = stringResource(R.string.forgot_password_google),
-            containerColor = Color.Red, // Consider replacing with Color.White and using correct icon
+            containerColor = Color.Red,
             contentColor = Color.White,
             onClick = onGoogleClick
         )
         SocialButton(
             icon = painterResource(id = R.drawable.facebook_square_svgrepo_com),
             text = stringResource(R.string.forgot_password_facebook),
-            containerColor = Color(0xFF1877F2), // Facebook Blue
+            containerColor = Color(0xFF1877F2),
             contentColor = Color.White,
             onClick = onFacebookClick
         )
     }
 }
 
-/**
- * Displays a clickable text that navigates back to the login screen.
- *
- * @param onClick Callback when the user taps the text.
- */
 @Composable
 fun BackToLoginText(onClick: () -> Unit) {
     Text(
@@ -206,16 +174,13 @@ fun BackToLoginText(onClick: () -> Unit) {
     )
 }
 
-/**
- * Preview function to visualize the ForgotPasswordScreen
- * during design time in Android Studio.
- */
-@Preview(showBackground = true, name = "ForgotPasswordScreen")
+@SuppressLint("ViewModelConstructorInComposable")
+@Preview(showBackground = true)
 @Composable
 fun ForgotPasswordScreenPreview() {
     MaterialTheme {
         Surface {
-            ForgotPasswordScreen()
+            ForgotPasswordScreen(viewModel = LoginViewModel())
         }
     }
 }

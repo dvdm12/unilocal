@@ -104,7 +104,7 @@ fun SearchLocationBar(
 @Composable
 fun MapPreview() {
     Image(
-        painter = painterResource(id = R.drawable.ic_launcher_background),
+        painter = painterResource(id = R.drawable.map_berlin_brandenburg_04r),
         contentDescription = stringResource(R.string.map_preview_description),
         modifier = Modifier
             .fillMaxWidth()

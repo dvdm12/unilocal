@@ -3,7 +3,6 @@ package com.example.unilocal.ui.screens.user.tabs
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -26,9 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.unilocal.R
-import com.example.unilocal.model.PlaceCategory
-import com.example.unilocal.model.PlaceStatus
-import com.example.unilocal.model.buildPlace
 import com.example.unilocal.ui.components.users.SimpleTopBar
 import com.example.unilocal.ui.screens.user.create_places.PlaceCard
 

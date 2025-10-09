@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.unilocal.R
+import com.example.unilocal.ui.components.home.AuthFieldType
 import com.example.unilocal.ui.components.home.AuthTextField
 import com.example.unilocal.ui.components.home.DropdownField
 import com.example.unilocal.ui.components.home.SocialButton
@@ -137,7 +138,6 @@ fun Register(
  * Renders the form fields used in the registration screen.
  *
  * @param name, lastName, email, phone, country, city, password, confirmPassword: Current field values.
- * @param onXChange: Callback for each input field change.
  * @param countries List of available countries for dropdown.
  * @param cities List of available cities for dropdown.
  */
@@ -179,28 +179,32 @@ private fun RegisterFields(
                 onValueChange = onNameChange,
                 label = stringResource(R.string.register_name),
                 placeholder = stringResource(R.string.register_name),
-                leadingIcon = Icons.Default.Person
+                leadingIcon = Icons.Default.Person,
+                fieldType = AuthFieldType.Text
             )
             AuthTextField(
                 value = lastName,
                 onValueChange = onLastNameChange,
                 label = stringResource(R.string.register_lastname),
                 placeholder = stringResource(R.string.register_lastname),
-                leadingIcon = Icons.Default.Person
+                leadingIcon = Icons.Default.Person,
+                fieldType = AuthFieldType.Text
             )
             AuthTextField(
                 value = email,
                 onValueChange = onEmailChange,
                 label = stringResource(R.string.register_email),
                 placeholder = stringResource(R.string.register_email),
-                leadingIcon = Icons.Default.Email
+                leadingIcon = Icons.Default.Email,
+                fieldType = AuthFieldType.Email
             )
             AuthTextField(
                 value = phone,
                 onValueChange = onPhoneChange,
                 label = stringResource(R.string.register_phone),
                 placeholder = stringResource(R.string.register_phone),
-                leadingIcon = Icons.Default.Phone
+                leadingIcon = Icons.Default.Phone,
+                fieldType = AuthFieldType.Text
             )
             DropdownField(
                 label = stringResource(R.string.register_country),
@@ -220,7 +224,7 @@ private fun RegisterFields(
                 label = stringResource(R.string.register_password),
                 placeholder = stringResource(R.string.register_password),
                 leadingIcon = Icons.Default.Lock,
-                isPassword = true
+                fieldType = AuthFieldType.Password
             )
             AuthTextField(
                 value = confirmPassword,
@@ -228,11 +232,12 @@ private fun RegisterFields(
                 label = stringResource(R.string.register_confirm_password),
                 placeholder = stringResource(R.string.register_confirm_password),
                 leadingIcon = Icons.Default.Lock,
-                isPassword = true
+                fieldType = AuthFieldType.Password
             )
         }
     }
 }
+
 
 /**
  * Renders a section with Google and Facebook login buttons.

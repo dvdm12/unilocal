@@ -6,11 +6,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,8 +19,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.unilocal.R
-import com.example.unilocal.ui.components.home.*
+import com.example.unilocal.ui.components.home.AuthTextField
+import com.example.unilocal.ui.components.home.UniPrimaryButton
 import com.example.unilocal.ui.components.users.SimpleTopBar
+import com.example.unilocal.ui.components.home.DropdownField
 
 @Composable
 fun PlaceDetailsScreen(
@@ -58,7 +56,7 @@ fun PlaceDetailsScreen(
             val department = remember { mutableStateOf("Quindío") }
             val city = remember { mutableStateOf("Armenia") }
             val street = remember { mutableStateOf("") }
-            val images = remember { mutableStateListOf<Int>() } // Simula con resource IDs o URIs
+            val images = remember { mutableStateListOf<Int>() }
 
             PlaceFormSection(name, category, description, phone)
             Spacer(modifier = Modifier.height(16.dp))
@@ -88,13 +86,10 @@ fun PlaceFormSection(
         onValueChange = { name.value = it },
         label = stringResource(R.string.place_details_name),
         placeholder = stringResource(R.string.place_details_name_placeholder),
-        leadingIcon = Icons.Default.Phone,
-        isPassword = false,
-        fieldType = "text",
-        emailErrorText = "",
-        passwordErrorText = ""
+        leadingIcon = Icons.Default.Star,
     )
     Spacer(modifier = Modifier.height(12.dp))
+
     DropdownField(
         label = stringResource(R.string.place_details_category),
         options = listOf("General", "Comercio", "Educación", "Salud", "Turismo"),
@@ -102,28 +97,22 @@ fun PlaceFormSection(
         onOptionSelected = { category.value = it }
     )
     Spacer(modifier = Modifier.height(12.dp))
+
     AuthTextField(
         value = description.value,
         onValueChange = { description.value = it },
         label = stringResource(R.string.place_details_description),
         placeholder = stringResource(R.string.place_details_description_placeholder),
-        leadingIcon = Icons.Default.Star,
-        isPassword = false,
-        fieldType = "text",
-        emailErrorText = "",
-        passwordErrorText = ""
+        leadingIcon = Icons.Default.Done,
     )
     Spacer(modifier = Modifier.height(12.dp))
+
     AuthTextField(
         value = phone.value,
         onValueChange = { phone.value = it },
         label = stringResource(R.string.place_details_phone),
         placeholder = stringResource(R.string.place_details_phone_placeholder),
         leadingIcon = Icons.Default.Phone,
-        isPassword = false,
-        fieldType = "text",
-        emailErrorText = "",
-        passwordErrorText = ""
     )
 }
 
@@ -140,6 +129,7 @@ fun PlaceScheduleSection() {
         fontSize = 16.sp
     )
     Spacer(modifier = Modifier.height(8.dp))
+
     DropdownField(
         label = selectedDay,
         options = days,
@@ -147,18 +137,15 @@ fun PlaceScheduleSection() {
         onOptionSelected = { selectedDay = it }
     )
     Spacer(modifier = Modifier.height(8.dp))
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+
+    Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
         AuthTextField(
             value = openTime,
             onValueChange = { openTime = it },
             label = stringResource(R.string.place_details_open_time),
             placeholder = stringResource(R.string.place_details_time_example),
-            leadingIcon = Icons.Default.Person,
-            isPassword = false,
-            fieldType = "text",
-            emailErrorText = "",
-            passwordErrorText = "",
-            modifier = Modifier.weight(1f).height(40.dp)
+            leadingIcon = Icons.Default.Add,
+            modifier = Modifier.weight(1f)
         )
         AuthTextField(
             value = closeTime,
@@ -166,31 +153,19 @@ fun PlaceScheduleSection() {
             label = stringResource(R.string.place_details_close_time),
             placeholder = stringResource(R.string.place_details_time_example),
             leadingIcon = Icons.Default.Add,
-            isPassword = false,
-            fieldType = "text",
-            emailErrorText = "",
-            passwordErrorText = "",
-            modifier = Modifier.weight(1f).height(40.dp)
+            modifier = Modifier.weight(1f)
         )
     }
+
     Spacer(modifier = Modifier.height(12.dp))
     UniPrimaryButton(
         text = stringResource(R.string.place_details_add_schedule),
         onClick = {
-            // Aquí iría lógica de agregar a la lista de horarios
+            // Agregar horario
         }
     )
 }
 
-/**
- * Displays dropdowns for selecting country, department, city, and a text field for street.
- * Each dropdown and the text field are separated by vertical spacers for clarity.
- *
- * @param country MutableState holding the selected country.
- * @param department MutableState holding the selected department.
- * @param city MutableState holding the selected city.
- * @param street MutableState holding the entered street.
- */
 @Composable
 fun PlaceLocationDropdowns(
     country: MutableState<String>,
@@ -204,6 +179,7 @@ fun PlaceLocationDropdowns(
         color = MaterialTheme.colorScheme.onBackground,
         modifier = Modifier.padding(bottom = 8.dp)
     )
+
     DropdownField(
         label = stringResource(R.string.place_details_country),
         options = listOf("Colombia", "México", "Argentina"),
@@ -211,6 +187,7 @@ fun PlaceLocationDropdowns(
         onOptionSelected = { country.value = it }
     )
     Spacer(modifier = Modifier.height(12.dp))
+
     DropdownField(
         label = stringResource(R.string.place_details_department),
         options = listOf("Quindío", "Antioquia", "Valle"),
@@ -218,6 +195,7 @@ fun PlaceLocationDropdowns(
         onOptionSelected = { department.value = it }
     )
     Spacer(modifier = Modifier.height(12.dp))
+
     DropdownField(
         label = stringResource(R.string.place_details_city),
         options = listOf("Armenia", "Medellín", "Cali"),
@@ -225,17 +203,14 @@ fun PlaceLocationDropdowns(
         onOptionSelected = { city.value = it }
     )
     Spacer(modifier = Modifier.height(12.dp))
+
     AuthTextField(
         value = street.value,
         onValueChange = { street.value = it },
         label = stringResource(R.string.place_details_street),
         placeholder = stringResource(R.string.place_details_street_placeholder),
         leadingIcon = Icons.Default.AccountBox,
-        isPassword = false,
-        fieldType = "text",
-        emailErrorText = "",
-        passwordErrorText = "",
-        modifier = Modifier.fillMaxWidth().height(45.dp)
+        modifier = Modifier.fillMaxWidth()
     )
 }
 
@@ -246,6 +221,7 @@ fun PlaceImagesSection(images: MutableList<Int>) {
         fontWeight = FontWeight.SemiBold
     )
     Spacer(modifier = Modifier.height(8.dp))
+
     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         items(images.size) { index ->
             Image(
@@ -257,10 +233,11 @@ fun PlaceImagesSection(images: MutableList<Int>) {
             )
         }
     }
+
     Spacer(modifier = Modifier.height(8.dp))
+
     OutlinedButton(
         onClick = {
-            // Simula agregar imagen
             images.add(R.drawable.ic_launcher_foreground)
         },
         modifier = Modifier.fillMaxWidth()
@@ -268,7 +245,6 @@ fun PlaceImagesSection(images: MutableList<Int>) {
         Text(stringResource(R.string.place_details_add_image))
     }
 }
-
 
 @Composable
 fun TopMapIcon(modifier: Modifier = Modifier) {
@@ -281,18 +257,7 @@ fun TopMapIcon(modifier: Modifier = Modifier) {
     )
 }
 
-
-
-
-/**
- * Preview for PlaceDetailsScreen.
- */
-@Preview(
-    name = "Pantalla completa",
-    showSystemUi = true,
-    showBackground = true,
-    device = "spec:width=411dp,height=1400dp,dpi=440"
-)
+@Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun PlaceDetailsScreenPreview() {
     PlaceDetailsScreen()
