@@ -1,4 +1,4 @@
-package com.example.unilocal.viewmodel
+package com.example.unilocal.viewmodel.login
 
 import com.example.unilocal.model.User
 

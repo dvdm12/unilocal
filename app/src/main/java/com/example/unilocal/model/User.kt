@@ -1,5 +1,8 @@
 package com.example.unilocal.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class User(
     val id: String,
     val name: String,
@@ -12,6 +15,7 @@ data class User(
     val role: Role
 )
 
+@Serializable
 enum class Role {
     USER,
     MODERATOR

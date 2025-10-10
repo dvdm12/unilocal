@@ -1,5 +1,6 @@
 package com.example.unilocal.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -13,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -26,13 +28,15 @@ import com.example.unilocal.ui.components.home.AuthTextField
 import com.example.unilocal.ui.components.home.AuthFieldType
 import com.example.unilocal.ui.components.home.SocialButton
 import com.example.unilocal.ui.components.home.UniPrimaryButton
-import com.example.unilocal.viewmodel.LoginResult
-import com.example.unilocal.viewmodel.LoginViewModel
+import com.example.unilocal.viewmodel.login.LoginResult
+import com.example.unilocal.viewmodel.login.LoginViewModel
+import com.example.unilocal.viewmodel.data.UserSessionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Login(
     viewModel: LoginViewModel = viewModel(),
+    userSessionViewModel: UserSessionViewModel,
     onBackClick: () -> Unit = {},
     onLoginSuccessUser: () -> Unit = {},
     onLoginSuccessModerator: () -> Unit = {},
@@ -44,16 +48,22 @@ fun Login(
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
 
-    // 👇 Reaccionar a cambios en el resultado de login
+    // ⚡ Reacción ante el resultado del login
     LaunchedEffect(uiState.loginResult) {
         when (uiState.loginResult) {
-            LoginResult.SUCCESS_USER -> {
-                onLoginSuccessUser()
-                viewModel.clearLoginResult()
-            }
+            LoginResult.SUCCESS_USER, LoginResult.SUCCESS_MODERATOR -> {
+                uiState.currentUser?.let { user ->
+                    // Guardar en el SessionManager (a través del ViewModel global)
+                    userSessionViewModel.setUser(user)
+                }
 
-            LoginResult.SUCCESS_MODERATOR -> {
-                onLoginSuccessModerator()
+                // Navegar dependiendo del rol
+                when (uiState.loginResult) {
+                    LoginResult.SUCCESS_USER -> onLoginSuccessUser()
+                    LoginResult.SUCCESS_MODERATOR -> onLoginSuccessModerator()
+                    else -> {}
+                }
+
                 viewModel.clearLoginResult()
             }
 
@@ -190,15 +200,6 @@ fun Login(
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun LoginPreview() {
-    Login(
-        onLoginSuccessUser = {},
-        onLoginSuccessModerator = {}
-    )
-}
-
 @Composable
 fun LoginErrorDialog(show: Boolean, onDismiss: () -> Unit) {
     if (show) {
@@ -262,12 +263,16 @@ fun RegisterButton(
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true, name = "Login Screen")
 @Composable
 fun SimpleLoginPreview() {
     MaterialTheme {
         Surface {
             Login(
+                userSessionViewModel = UserSessionViewModel(
+                    context = LocalContext.current
+                ),
                 onBackClick = {},
                 onLoginSuccessUser = {},
                 onLoginSuccessModerator = {},
@@ -279,5 +284,3 @@ fun SimpleLoginPreview() {
         }
     }
 }
-
-

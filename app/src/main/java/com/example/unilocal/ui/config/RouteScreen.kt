@@ -7,6 +7,9 @@ sealed class RouteScreen{
     data object WelcomeScreen: RouteScreen()
 
     @Serializable
+    data object ModeratorScreen: RouteScreen()
+
+    @Serializable
     data object Login: RouteScreen()
 
     @Serializable

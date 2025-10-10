@@ -8,7 +8,6 @@ import androidx.compose.material3.TextButton // Import for dialog buttons
 import androidx.compose.runtime.* // Import for composable state management
 import androidx.compose.ui.Modifier // Import for Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview // Import for Preview annotation
 import androidx.navigation.NavController // Import for NavController
 import androidx.navigation.compose.rememberNavController // Import for remembering NavController
 import com.example.unilocal.ui.components.users.BottomNavBar // Import for bottom navigation bar component
@@ -17,6 +16,7 @@ import com.example.unilocal.ui.screens.user.nav.UserNavigation // Import for use
 import com.example.unilocal.ui.screens.user.nav.UserNavItem // Import for user navigation items
 import com.example.unilocal.ui.screens.user.nav.rememberCurrentRoute // Import for remembering current route
 import com.example.unilocal.R // Import for string resources
+import com.example.unilocal.viewmodel.data.UserSessionViewModel
 
 /**
  * Main composable that manages navigation for the authenticated user.
@@ -24,7 +24,11 @@ import com.example.unilocal.R // Import for string resources
  * @param rootNavController The global navigation controller for the app.
  */
 @Composable // Marks the function as a composable
-fun NavHomeUser(rootNavController: NavController) { // Main navigation composable for authenticated user
+fun NavHomeUser(
+    rootNavController: NavController,
+    userSessionViewModel: UserSessionViewModel
+) {
+    // Main navigation composable for authenticated user
     val userNavController = rememberNavController() // Local NavController for user navigation
     val currentRoute = rememberCurrentRoute(userNavController) // Gets the current route for navigation
 
@@ -57,6 +61,7 @@ fun NavHomeUser(rootNavController: NavController) { // Main navigation composabl
             onLogout = { // Logout callback
                 // Show logout confirmation dialog instead of immediate logout
                 showLogoutDialog = true
+                userSessionViewModel.clearSession()
             }
         )
     }
@@ -89,13 +94,3 @@ fun NavHomeUser(rootNavController: NavController) { // Main navigation composabl
     }
 }
 
-/**
- * Preview for Android Studio.
- * Uses a sample NavController to display the layout without actual navigation logic.
- */
-@Preview(showBackground = true) // Marks the function as a preview
-@Composable // Marks the function as a composable
-fun NavHomeUserPreview() { // Preview composable for NavHomeUser
-    val dummyController = rememberNavController() // Dummy NavController for preview
-    NavHomeUser(dummyController) // Call NavHomeUser with dummy controller
-}

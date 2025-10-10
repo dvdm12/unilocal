@@ -1,4 +1,4 @@
-package com.example.unilocal.viewmodel
+package com.example.unilocal.viewmodel.login
 
 enum class LoginResult {
     SUCCESS_USER,

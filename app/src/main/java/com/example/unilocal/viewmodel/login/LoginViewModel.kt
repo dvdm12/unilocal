@@ -1,18 +1,21 @@
-package com.example.unilocal.viewmodel
+package com.example.unilocal.viewmodel.login
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import com.example.unilocal.model.Role
 import com.example.unilocal.model.User
+import com.example.unilocal.viewmodel.data.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(application: Application) : AndroidViewModel(application), LoginViewModelBase {
 
     private val _uiState = MutableStateFlow(LoginUiState())
-    val uiState: StateFlow<LoginUiState> = _uiState
+    override val uiState: StateFlow<LoginUiState> = _uiState
 
-    // Usuarios de prueba (simulación de base de datos)
+    private val sessionManager = SessionManager(application.applicationContext)
+
     private val users = listOf(
         User(
             id = "1",
@@ -38,8 +41,7 @@ class LoginViewModel : ViewModel() {
         )
     )
 
-    // Actualiza el email y valida
-    fun onEmailChange(email: String) {
+    override fun onEmailChange(email: String) {
         _uiState.update {
             it.copy(
                 email = email,
@@ -48,8 +50,7 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    // Actualiza la contraseña y valida
-    fun onPasswordChange(password: String) {
+    override fun onPasswordChange(password: String) {
         _uiState.update {
             it.copy(
                 password = password,
@@ -58,13 +59,11 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    // Intenta iniciar sesión
-    fun onLoginClick() {
+    override fun onLoginClick() {
         val currentState = _uiState.value
         val emailError = validateEmail(currentState.email)
         val passwordError = validatePassword(currentState.password)
 
-        // Validación fallida
         if (emailError != null || passwordError != null) {
             _uiState.update {
                 it.copy(
@@ -76,14 +75,17 @@ class LoginViewModel : ViewModel() {
             return
         }
 
-        // Buscar usuario que coincida
         val matchedUser = users.find {
             it.email == currentState.email &&
                     it.password == currentState.password &&
                     it.isActive
         }
 
-        // Actualizar estado según el rol
+        // Guardar sesión si el login fue exitoso
+        matchedUser?.let {
+            sessionManager.saveUser(it)
+        }
+
         _uiState.update {
             it.copy(
                 currentUser = matchedUser,
@@ -96,21 +98,18 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    // Limpia el resultado del login
-    fun clearLoginResult() {
+    override fun clearLoginResult() {
         _uiState.update {
             it.copy(loginResult = null)
         }
     }
 
-    // Validación básica de email
     private fun validateEmail(email: String): String? {
         return if (!email.contains("@") || !email.contains(".com")) {
             "Correo inválido"
         } else null
     }
 
-    // Validación básica de contraseña
     private fun validatePassword(password: String): String? {
         return if (password.length < 6) {
             "Contraseña demasiado corta"

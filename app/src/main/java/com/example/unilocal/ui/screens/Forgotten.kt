@@ -19,13 +19,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.unilocal.R
 import com.example.unilocal.ui.components.home.*
-import com.example.unilocal.viewmodel.LoginViewModel
+import com.example.unilocal.viewmodel.login.LoginViewModelBase
+import com.example.unilocal.viewmodel.login.fake.FakeLoginViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForgotPasswordScreen(
-    viewModel: LoginViewModel,
+    viewModel: LoginViewModelBase,
     onGoogleClick: () -> Unit = {},
     onFacebookClick: () -> Unit = {},
     onBackToLogin: () -> Unit = {}
@@ -180,7 +181,7 @@ fun BackToLoginText(onClick: () -> Unit) {
 fun ForgotPasswordScreenPreview() {
     MaterialTheme {
         Surface {
-            ForgotPasswordScreen(viewModel = LoginViewModel())
+            ForgotPasswordScreen(FakeLoginViewModel())
         }
     }
 }
