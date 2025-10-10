@@ -22,7 +22,7 @@
     <string name="login_welcome">Bienvenido, por favor ingresa tus datos para continuar</string>
     <string name="login_email_label">Email o usuario</string>
     <string name="login_email_placeholder">Ingresa tu email o usuario</string>
-    <string name="login_email_error">Correo debe ser @gmail.com válido</string>
+    <string name="login_email_error">Correo contener un @ y un .com válido</string>
     <string name="login_password_label">Contraseña</string>
     <string name="login_password_placeholder">Ingresa tu contraseña</string>
     <string name="login_password_error">Contraseña mínimo 5 caracteres</string>
@@ -249,6 +249,10 @@
     <string name="map_icon">Ícono de mapa</string>
     <string name="placeholder_icon">Ícono de placeholder</string>
     <string name="map_berlin_icon">Ícono de mapa Berlín-Brandenburgo</string>
+
+    <!-- ViewModel Errors -->
+    <string name="error_unknown_viewmodel">Clase de ViewModel desconocida: %1$s</string>
+
 
 
 

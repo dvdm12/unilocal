@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -14,46 +15,43 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.unilocal.R
-import com.example.unilocal.ui.components.home.AuthFieldType
-import com.example.unilocal.ui.components.home.AuthTextField
-import com.example.unilocal.ui.components.home.DropdownField
-import com.example.unilocal.ui.components.home.SocialButton
-import com.example.unilocal.ui.components.home.UniPrimaryButton
+import com.example.unilocal.ui.components.home.*
+import com.example.unilocal.viewmodel.register.RegisterViewModel
 
 /**
- * Renders the full user registration screen.
- * Includes form fields, social login buttons, and top navigation.
- *
- * @param onRegisterClick Callback triggered when the user submits the form.
- * @param onGoogleClick Callback for Google login button.
- * @param onFacebookClick Callback for Facebook login button.
- * @param onBackClick Callback for back navigation icon.
+ * Pantalla de registro de usuario conectada al RegisterViewModel.
+ * Muestra validaciones en tiempo real y retroalimentación contextual.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Register(
-    onRegisterClick: () -> Unit = {},
-    onGoogleClick: () -> Unit = {},
-    onFacebookClick: () -> Unit = {},
+    viewModel: RegisterViewModel,
+    onRegisterSuccess: () -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
-    var name by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var country by remember { mutableStateOf("") }
-    var city by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsState()
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
 
-    val countries = listOf("Colombia", "México", "Argentina", "Perú")
-    val cities = listOf("Bogotá", "Medellín", "Cali", "Barranquilla")
+    // --- Relación País → Ciudades ---
+    val countryCities = mapOf(
+        "Colombia" to listOf("Armenia", "Bogotá", "Medellín", "Cali"),
+        "México" to listOf("CDMX", "Guadalajara", "Monterrey"),
+        "Argentina" to listOf("Buenos Aires", "Córdoba", "Rosario"),
+        "Perú" to listOf("Lima", "Cusco", "Arequipa")
+    )
 
-    val scrollState = rememberScrollState()
+    val countries = countryCities.keys.toList()
+    val cities = countryCities[uiState.country] ?: emptyList()
+
+    // --- Reacción ante éxito o error ---
+    LaunchedEffect(uiState.isSuccess, uiState.errorMessage) {
+        if (uiState.isSuccess) showSuccessDialog = true
+        if (uiState.errorMessage != null) showErrorDialog = true
+    }
 
     Scaffold(
         topBar = {
@@ -68,89 +66,108 @@ fun Register(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
-                            imageVector = Icons.Default.Home,
-                            contentDescription = ""
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back_content_desc)
                         )
                     }
                 }
             )
         }
-    ) { innerPadding ->
+    ) { padding ->
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(padding),
             color = MaterialTheme.colorScheme.background
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(24.dp)
-                    .verticalScroll(scrollState),
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
+                // --- Campos del formulario ---
                 RegisterFields(
-                    name = name,
-                    lastName = lastName,
-                    email = email,
-                    phone = phone,
-                    country = country,
-                    city = city,
-                    password = password,
-                    confirmPassword = confirmPassword,
-                    onNameChange = { name = it },
-                    onLastNameChange = { lastName = it },
-                    onEmailChange = { email = it },
-                    onPhoneChange = { phone = it },
-                    onCountryChange = { country = it },
-                    onCityChange = { city = it },
-                    onPasswordChange = { password = it },
-                    onConfirmPasswordChange = { confirmPassword = it },
+                    uiState = uiState,
                     countries = countries,
-                    cities = cities
+                    cities = cities,
+                    onNameChange = viewModel::onNameChange,
+                    onLastNameChange = viewModel::onLastNameChange,
+                    onEmailChange = viewModel::onEmailChange,
+                    onPhoneChange = viewModel::onPhoneChange,
+                    onCountryChange = viewModel::onCountryChange,
+                    onCityChange = viewModel::onCityChange,
+                    onPasswordChange = viewModel::onPasswordChange,
+                    onConfirmPasswordChange = viewModel::onConfirmPasswordChange
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // --- Botón principal ---
                 UniPrimaryButton(
                     text = stringResource(R.string.register_button),
-                    onClick = onRegisterClick
+                    onClick = {
+                        // Solo permitir el registro si el formulario es válido
+                        if (uiState.isValid) {
+                            viewModel.onRegisterClick()
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
                 )
 
                 Spacer(modifier = Modifier.height(28.dp))
-
                 DividerWithText(stringResource(R.string.register_or_social))
-
                 Spacer(modifier = Modifier.height(28.dp))
-
-                SocialLoginSection(
-                    onGoogleClick = onGoogleClick,
-                    onFacebookClick = onFacebookClick
-                )
-
+                SocialLoginSection()
                 Spacer(modifier = Modifier.height(36.dp))
             }
         }
     }
+
+    // --- Diálogo de error ---
+    if (showErrorDialog) {
+        AlertDialog(
+            onDismissRequest = { showErrorDialog = false },
+            title = { Text(stringResource(R.string.login_error_title)) },
+            text = { Text(uiState.errorMessage ?: "") },
+            confirmButton = {
+                TextButton(onClick = { showErrorDialog = false }) {
+                    Text(stringResource(R.string.login_error_accept))
+                }
+            }
+        )
+    }
+
+    // --- Diálogo de éxito ---
+    if (showSuccessDialog) {
+        AlertDialog(
+            onDismissRequest = { showSuccessDialog = false },
+            title = { Text(stringResource(R.string.register_create_account)) },
+            text = { Text(stringResource(R.string.snackbar_user_updated)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showSuccessDialog = false
+                    onRegisterSuccess()
+                }) {
+                    Text(stringResource(R.string.accept))
+                }
+            }
+        )
+    }
 }
 
 /**
- * Renders the form fields used in the registration screen.
- *
- * @param name, lastName, email, phone, country, city, password, confirmPassword: Current field values.
- * @param countries List of available countries for dropdown.
- * @param cities List of available cities for dropdown.
+ * Campos del formulario conectados al estado del ViewModel.
  */
 @Composable
 private fun RegisterFields(
-    name: String,
-    lastName: String,
-    email: String,
-    phone: String,
-    country: String,
-    city: String,
-    password: String,
-    confirmPassword: String,
+    uiState: com.example.unilocal.viewmodel.register.RegisterUiState,
+    countries: List<String>,
+    cities: List<String>,
     onNameChange: (String) -> Unit,
     onLastNameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
@@ -158,16 +175,12 @@ private fun RegisterFields(
     onCountryChange: (String) -> Unit,
     onCityChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
-    onConfirmPasswordChange: (String) -> Unit,
-    countries: List<String>,
-    cities: List<String>
+    onConfirmPasswordChange: (String) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -175,81 +188,80 @@ private fun RegisterFields(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             AuthTextField(
-                value = name,
+                value = uiState.name,
                 onValueChange = onNameChange,
                 label = stringResource(R.string.register_name),
                 placeholder = stringResource(R.string.register_name),
                 leadingIcon = Icons.Default.Person,
-                fieldType = AuthFieldType.Text
+                fieldType = AuthFieldType.Text,
+                errorMessage = uiState.nameError
             )
             AuthTextField(
-                value = lastName,
+                value = uiState.lastName,
                 onValueChange = onLastNameChange,
                 label = stringResource(R.string.register_lastname),
                 placeholder = stringResource(R.string.register_lastname),
                 leadingIcon = Icons.Default.Person,
-                fieldType = AuthFieldType.Text
+                fieldType = AuthFieldType.Text,
+                errorMessage = uiState.lastNameError
             )
             AuthTextField(
-                value = email,
+                value = uiState.email,
                 onValueChange = onEmailChange,
                 label = stringResource(R.string.register_email),
                 placeholder = stringResource(R.string.register_email),
                 leadingIcon = Icons.Default.Email,
-                fieldType = AuthFieldType.Email
+                fieldType = AuthFieldType.Email,
+                errorMessage = uiState.emailError
             )
             AuthTextField(
-                value = phone,
+                value = uiState.phone,
                 onValueChange = onPhoneChange,
                 label = stringResource(R.string.register_phone),
                 placeholder = stringResource(R.string.register_phone),
                 leadingIcon = Icons.Default.Phone,
-                fieldType = AuthFieldType.Text
+                fieldType = AuthFieldType.Text,
+                errorMessage = uiState.phoneError
             )
             DropdownField(
                 label = stringResource(R.string.register_country),
                 options = countries,
-                selectedOption = country,
+                selectedOption = uiState.country,
                 onOptionSelected = onCountryChange
             )
             DropdownField(
                 label = stringResource(R.string.register_city),
                 options = cities,
-                selectedOption = city,
+                selectedOption = uiState.city,
                 onOptionSelected = onCityChange
             )
             AuthTextField(
-                value = password,
+                value = uiState.password,
                 onValueChange = onPasswordChange,
                 label = stringResource(R.string.register_password),
                 placeholder = stringResource(R.string.register_password),
                 leadingIcon = Icons.Default.Lock,
-                fieldType = AuthFieldType.Password
+                fieldType = AuthFieldType.Password,
+                errorMessage = uiState.passwordError
             )
             AuthTextField(
-                value = confirmPassword,
+                value = uiState.confirmPassword,
                 onValueChange = onConfirmPasswordChange,
                 label = stringResource(R.string.register_confirm_password),
                 placeholder = stringResource(R.string.register_confirm_password),
                 leadingIcon = Icons.Default.Lock,
-                fieldType = AuthFieldType.Password
+                fieldType = AuthFieldType.Password,
+                errorMessage = uiState.confirmPasswordError
             )
         }
     }
 }
 
-
 /**
- * Renders a section with Google and Facebook login buttons.
- *
- * @param onGoogleClick Callback for Google login.
- * @param onFacebookClick Callback for Facebook login.
+ * Sección de botones sociales (Google y Facebook).
  */
 @Composable
-private fun SocialLoginSection(
-    onGoogleClick: () -> Unit,
-    onFacebookClick: () -> Unit
-) {
+private fun SocialLoginSection() {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -257,24 +269,22 @@ private fun SocialLoginSection(
         SocialButton(
             icon = painterResource(id = R.drawable.ic_launcher_foreground),
             text = stringResource(R.string.login_google),
-            containerColor = Color(0xFFDB4437), // Google red
+            containerColor = Color(0xFFDB4437),
             contentColor = Color.White,
-            onClick = onGoogleClick
+            onClick = {}
         )
         SocialButton(
             icon = painterResource(id = R.drawable.ic_launcher_foreground),
             text = stringResource(R.string.login_facebook),
-            containerColor = Color(0xFF1877F2), // Facebook blue
+            containerColor = Color(0xFF1877F2),
             contentColor = Color.White,
-            onClick = onFacebookClick
+            onClick = {}
         )
     }
 }
 
 /**
- * Displays a horizontal divider line with centered text in between.
- *
- * @param text The text to display between the dividers.
+ * Línea divisoria con texto centrado.
  */
 @Composable
 private fun DividerWithText(text: String) {
@@ -300,13 +310,4 @@ private fun DividerWithText(text: String) {
             thickness = 1.dp
         )
     }
-}
-
-/**
- * Preview for the Register screen, shown in Android Studio preview.
- */
-@Preview(showBackground = true)
-@Composable
-fun RegisterPreview() {
-    Register()
 }

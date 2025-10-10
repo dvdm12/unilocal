@@ -1,69 +1,51 @@
 package com.example.unilocal.viewmodel.login
 
+import android.annotation.SuppressLint
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import com.example.unilocal.R
 import com.example.unilocal.model.Role
-import com.example.unilocal.model.User
 import com.example.unilocal.viewmodel.data.SessionManager
+import com.example.unilocal.viewmodel.data.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-class LoginViewModel(application: Application) : AndroidViewModel(application), LoginViewModelBase {
+/**
+ * ViewModel encargado de manejar la lógica de inicio de sesión.
+ * Se apoya en el UserRepository para la autenticación y en SessionManager
+ * para persistir la sesión del usuario.
+ */
+class LoginViewModel(
+    application: Application,
+    private val userRepository: UserRepository = UserRepository
+) : AndroidViewModel(application), LoginViewModelBase {
 
     private val _uiState = MutableStateFlow(LoginUiState())
     override val uiState: StateFlow<LoginUiState> = _uiState
 
     private val sessionManager = SessionManager(application.applicationContext)
 
-    private val users = listOf(
-        User(
-            id = "1",
-            name = "Juan Pérez",
-            username = "juanp",
-            password = "123456",
-            email = "juan@correo.com",
-            country = "Colombia",
-            city = "Bogotá",
-            isActive = true,
-            role = Role.USER
-        ),
-        User(
-            id = "2",
-            name = "Laura Admin",
-            username = "lauraadmin",
-            password = "adminpass",
-            email = "laura@admin.com",
-            country = "Colombia",
-            city = "Medellín",
-            isActive = true,
-            role = Role.MODERATOR
-        )
-    )
+    @SuppressLint("StaticFieldLeak")
+    private val context = getApplication<Application>().applicationContext
+
+    // --- ACTUALIZACIÓN DE CAMPOS ---
 
     override fun onEmailChange(email: String) {
-        _uiState.update {
-            it.copy(
-                email = email,
-                emailError = validateEmail(email)
-            )
-        }
+        _uiState.update { it.copy(email = email, emailError = validateEmail(email)) }
     }
 
     override fun onPasswordChange(password: String) {
-        _uiState.update {
-            it.copy(
-                password = password,
-                passwordError = validatePassword(password)
-            )
-        }
+        _uiState.update { it.copy(password = password, passwordError = validatePassword(password)) }
     }
 
+    // --- ACCIÓN DE LOGIN ---
     override fun onLoginClick() {
-        val currentState = _uiState.value
-        val emailError = validateEmail(currentState.email)
-        val passwordError = validatePassword(currentState.password)
+        val state = _uiState.value
+        val emailError = validateEmail(state.email)
+        val passwordError = validatePassword(state.password)
 
+        // Si hay errores, actualiza el estado
         if (emailError != null || passwordError != null) {
             _uiState.update {
                 it.copy(
@@ -75,17 +57,14 @@ class LoginViewModel(application: Application) : AndroidViewModel(application), 
             return
         }
 
-        val matchedUser = users.find {
-            it.email == currentState.email &&
-                    it.password == currentState.password &&
-                    it.isActive
+        // Buscar usuario en el repositorio
+        val matchedUser = userRepository.findUser(state.email, state.password)
+
+        if (matchedUser != null) {
+            sessionManager.saveUser(matchedUser)
         }
 
-        // Guardar sesión si el login fue exitoso
-        matchedUser?.let {
-            sessionManager.saveUser(it)
-        }
-
+        // Determinar el resultado
         _uiState.update {
             it.copy(
                 currentUser = matchedUser,
@@ -98,21 +77,21 @@ class LoginViewModel(application: Application) : AndroidViewModel(application), 
         }
     }
 
+    // --- LIMPIAR RESULTADO ---
     override fun clearLoginResult() {
-        _uiState.update {
-            it.copy(loginResult = null)
-        }
+        _uiState.update { it.copy(loginResult = null) }
     }
 
+    // --- VALIDADORES ---
     private fun validateEmail(email: String): String? {
         return if (!email.contains("@") || !email.contains(".com")) {
-            "Correo inválido"
+            context.getString(R.string.login_email_error)
         } else null
     }
 
     private fun validatePassword(password: String): String? {
-        return if (password.length < 6) {
-            "Contraseña demasiado corta"
+        return if (password.length < 5) {
+            context.getString(R.string.login_password_error)
         } else null
     }
 }
