@@ -279,6 +279,7 @@
     <string name="no_places_message">Aún no has creado lugares</string>
     <string name="no_pending_places">No hay lugares pendientes en este momento</string>
     <string name="places_pending_title">Lugares pendientes de aprobación</string>
+    <string name="places_moderator">¿Estás seguro de que quieres cerrar sesión como moderador?</string>
 
 
 </resources>
