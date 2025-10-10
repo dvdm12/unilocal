@@ -1,5 +1,7 @@
 package com.example.unilocal.ui.screens.user.nav
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -10,19 +12,24 @@ import com.example.unilocal.ui.screens.user.create_places.PlaceDetailsScreen
 import com.example.unilocal.ui.screens.user.tabs.EditProfileScreen
 import com.example.unilocal.ui.screens.user.tabs.HomeUser
 import com.example.unilocal.ui.screens.user.tabs.SearchPlace
+import com.example.unilocal.viewmodel.user.UserViewModel
 
 /**
- * Manages navigation between the user's internal tabs (Home, Search, Add, Settings).
- * @param modifier Modifier for the NavHost composable.
- * @param navController Navigation controller for managing navigation actions.
- * @param startDestination Initial route to display.
- * @param onLogout Callback for logout action.
+ * Gestiona la navegación entre las pestañas internas del usuario (Home, Buscar, Agregar, Perfil).
+ *
+ * @param modifier Modifier para el contenedor del NavHost.
+ * @param navController Controlador de navegación local.
+ * @param startDestination Ruta inicial al cargar la vista.
+ * @param userViewModel ViewModel compartido que maneja los datos del usuario activo.
+ * @param onLogout Callback de cierre de sesión (invocado desde cualquier pantalla).
  */
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UserNavigation(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     startDestination: String = UserNavItem.HOME.route,
+    userViewModel: UserViewModel,
     onLogout: () -> Unit = {}
 ) {
     NavHost(
@@ -30,26 +37,34 @@ fun UserNavigation(
         startDestination = startDestination,
         modifier = modifier
     ) {
+        // --- Pantalla principal (inicio del usuario) ---
         composable(UserNavItem.HOME.route) {
             HomeUser(
+                userViewModel = userViewModel,
                 onBackClick = onLogout
             )
         }
 
+        // --- Crear nuevo lugar ---
         composable(UserNavItem.ADD.route) {
             PlaceDetailsScreen(
+                userViewModel = userViewModel,
                 onBackClick = onLogout
             )
         }
 
+        // --- Buscar lugares ---
         composable(UserNavItem.SEARCH.route) {
             SearchPlace(
+                //userViewModel = userViewModel,
                 onClose = onLogout
             )
         }
 
+        // --- Editar perfil ---
         composable(UserNavItem.SETTINGS.route) {
             EditProfileScreen(
+                //userViewModel = userViewModel,
                 onBackClick = onLogout
             )
         }
@@ -57,10 +72,11 @@ fun UserNavigation(
 }
 
 /**
- * Returns the current active route within the NavHost to highlight the active item
- * in the bottom navigation bar.
- * @param navController Navigation controller to observe the back stack.
- * @return The current route as a String, or null if not available.
+ * Retorna la ruta activa actual dentro del NavHost.
+ * Se usa para resaltar el ítem correspondiente en la barra de navegación inferior.
+ *
+ * @param navController Controlador de navegación.
+ * @return Ruta actual como String, o null si no hay una activa.
  */
 @Composable
 fun rememberCurrentRoute(navController: NavHostController): String? {

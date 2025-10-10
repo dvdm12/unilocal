@@ -12,6 +12,7 @@ data class User(
     val country: String,
     val city: String,
     val isActive: Boolean,
+    val places: MutableList<Place> = mutableListOf(),
     val role: Role
 )
 

@@ -1,13 +1,13 @@
 package com.example.unilocal.ui.screens.user.tabs
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -21,18 +21,27 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.unilocal.R
+import com.example.unilocal.model.User
 import com.example.unilocal.ui.components.users.SimpleTopBar
 import com.example.unilocal.ui.screens.user.create_places.PlaceCard
+import com.example.unilocal.viewmodel.user.UserViewModel
 
+/**
+ * Pantalla principal del usuario que muestra su perfil,
+ * permite buscar, filtrar y visualizar los lugares creados.
+ *
+ * @param userViewModel ViewModel compartido con los datos del usuario.
+ * @param onBackClick Callback para manejar el cierre de sesión o navegación atrás.
+ */
 @Composable
 fun HomeUser(
+    userViewModel: UserViewModel,
     onBackClick: () -> Unit = {}
 ) {
-    val scrollState = rememberScrollState()
     val filters = listOf(
         stringResource(R.string.filter_all),
         stringResource(R.string.filter_published),
@@ -43,64 +52,100 @@ fun HomeUser(
     var selectedFilter by remember { mutableStateOf(filters[0]) }
     var searchQuery by remember { mutableStateOf("") }
 
+    // --- Estado del usuario ---
+    val user by userViewModel.user.collectAsState()
+    val places = user?.places ?: emptyList()
+
+    // --- Lógica de filtrado ---
+    val filteredPlaces = when (selectedFilter) {
+        stringResource(R.string.filter_published) -> places.filter { it.status.name == "APPROVED" }
+        stringResource(R.string.filter_pending) -> places.filter { it.status.name == "PENDING" }
+        stringResource(R.string.filter_rejected) -> places.filter { it.status.name == "REJECTED" }
+        else -> places
+    }.filter { it.name.contains(searchQuery, ignoreCase = true) }
+
     Scaffold(
         topBar = { HomeTopBar(onBackClick = onBackClick) }
     ) { innerPadding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .verticalScroll(scrollState)
                 .background(MaterialTheme.colorScheme.background)
-                .padding(20.dp)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // User profile section with avatar and user info
-            UserProfileSection()
+            // --- Perfil de usuario ---
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+                UserProfileSection(user = user)
+            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            // --- Título de lugares ---
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.my_places),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+            }
 
-            // Section title
-            Text(
-                text = stringResource(R.string.my_places),
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
+            // --- Barra de búsqueda ---
+            item {
+                SearchBar(
+                    searchQuery = searchQuery,
+                    onSearchChange = { searchQuery = it },
+                    onSearchClear = { searchQuery = "" },
+                    onSearchApply = {
+                        println("Buscando: $searchQuery con filtro: $selectedFilter")
+                    }
+                )
+            }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            // --- Filtros ---
+            item {
+                FilterRow(
+                    filters = filters,
+                    selected = selectedFilter,
+                    onSelectedChange = { selectedFilter = it }
+                )
+            }
 
-            // Search bar
-            SearchBar(
-                searchQuery = searchQuery,
-                onSearchChange = { searchQuery = it },
-                onSearchClear = { searchQuery = "" },
-                onSearchApply = {
-                    println("Searching: $searchQuery with filter: $selectedFilter")
+            // --- Sección de ordenamiento (placeholder) ---
+            item {
+                SortSection()
+            }
+
+            // --- Lista de lugares filtrados ---
+            if (filteredPlaces.isEmpty()) {
+                item {
+                    Text(
+                        text = stringResource(R.string.no_places_message),
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 20.dp)
+                    )
                 }
-            )
+            } else {
+                items(filteredPlaces) { place ->
+                    PlaceCard(
+                        place = place,
+                        onView = { /* Navegar a detalle */ },
+                        onEdit = { /* Editar lugar */ },
+                        onDelete = { /* Eliminar lugar */ }
+                    )
+                }
+            }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Filter chips
-            FilterRow(
-                filters = filters,
-                selected = selectedFilter,
-                onSelectedChange = { selectedFilter = it }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Sorting section
-            SortSection()
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // List of places
-            PlacesList()
+            item { Spacer(modifier = Modifier.height(32.dp)) }
         }
     }
 }
 
-
+/**
+ * Barra superior con el título del perfil y opción de logout.
+ */
 @Composable
 fun HomeTopBar(onBackClick: () -> Unit) {
     SimpleTopBar(
@@ -109,8 +154,11 @@ fun HomeTopBar(onBackClick: () -> Unit) {
     )
 }
 
+/**
+ * Muestra la información básica del usuario (foto, nombre, username, ciudad).
+ */
 @Composable
-fun UserProfileSection() {
+fun UserProfileSection(user: User?) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
@@ -123,13 +171,28 @@ fun UserProfileSection() {
                     .background(Color.LightGray)
             )
             Spacer(modifier = Modifier.height(12.dp))
-            Text(stringResource(R.string.user_full_name), fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            Text(stringResource(R.string.user_username), color = Color.Gray, fontSize = 14.sp)
-            Text(stringResource(R.string.user_location), color = Color.Gray, fontSize = 14.sp)
+            Text(
+                text = user?.name ?: stringResource(R.string.default_user_name),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+            Text(
+                text = "@${user?.username ?: stringResource(R.string.default_user_username)}",
+                color = Color.Gray,
+                fontSize = 14.sp
+            )
+            Text(
+                text = "${user?.city ?: stringResource(R.string.default_user_city)}, ${user?.country ?: ""}",
+                color = Color.Gray,
+                fontSize = 14.sp
+            )
         }
     }
 }
 
+/**
+ * Barra de búsqueda con botones de acción.
+ */
 @Composable
 fun SearchBar(
     searchQuery: String,
@@ -160,15 +223,18 @@ fun SearchBar(
             Button(onClick = onSearchApply) {
                 Icon(Icons.Default.Search, contentDescription = null)
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Search")
+                Text(stringResource(R.string.search_action))
             }
             OutlinedButton(onClick = onSearchClear) {
-                Text("Clear")
+                Text(stringResource(R.string.clear_action))
             }
         }
     }
 }
 
+/**
+ * Fila horizontal de filtros para los lugares.
+ */
 @Composable
 fun FilterRow(
     filters: List<String>,
@@ -186,6 +252,9 @@ fun FilterRow(
     }
 }
 
+/**
+ * Placeholder para futuras opciones de ordenamiento.
+ */
 @Composable
 fun SortSection() {
     Row(
@@ -201,19 +270,10 @@ fun SortSection() {
     }
 }
 
-@Composable
-fun PlacesList() {
-    PlaceCard(
-        date = stringResource(R.string.play_card_message),
-        name = stringResource(R.string.place_name),
-        category = stringResource(R.string.place_category),
-        rating = 4.5f,
-        imageRes = R.drawable.ic_launcher_background
-    )
-}
-
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 fun HomeUserPreview() {
-    HomeUser()
+    val fakeViewModel = UserViewModel()
+    HomeUser(userViewModel = fakeViewModel)
 }

@@ -21,6 +21,7 @@ import com.example.unilocal.viewmodel.login.LoginViewModel
 import com.example.unilocal.viewmodel.login.LoginViewModelFactory
 import com.example.unilocal.viewmodel.register.RegisterViewModel
 import com.example.unilocal.viewmodel.register.RegisterViewModelFactory
+import com.example.unilocal.viewmodel.user.UserViewModel
 
 /**
  * Configuración del grafo de navegación principal de la app UniLocal.
@@ -36,6 +37,9 @@ fun Navigation() {
         factory = UserSessionViewModelFactory(context)
     )
 
+    // --- ViewModel de datos de usuario (plazas, perfil, etc.) ---
+    val userViewModel: UserViewModel = viewModel()
+
     val currentUser by userSessionViewModel.currentUser.collectAsState()
     val isSessionLoaded by userSessionViewModel.isSessionLoaded.collectAsState()
 
@@ -45,6 +49,11 @@ fun Navigation() {
         return
     }
 
+    // --- Vincular usuario actual al UserViewModel ---
+    LaunchedEffect(currentUser) {
+        currentUser?.let { userViewModel.setActiveUser(it) }
+    }
+
     // --- Determinar destino inicial según el rol ---
     val startDestination = when (currentUser?.role) {
         Role.USER -> RouteScreen.NavHomeUser
@@ -52,24 +61,20 @@ fun Navigation() {
         else -> RouteScreen.WelcomeScreen
     }
 
+    // --- Grafo principal de navegación ---
     NavHost(
         navController = navController,
         startDestination = startDestination
     ) {
-
-        // --- Bienvenida ---
+        // --- Pantalla de bienvenida ---
         composable<RouteScreen.WelcomeScreen> {
             WelcomeScreen(
-                onLoginClick = {
-                    navController.navigate(RouteScreen.Login)
-                },
-                onRegisterClick = {
-                    navController.navigate(RouteScreen.Register)
-                }
+                onLoginClick = { navController.navigate(RouteScreen.Login) },
+                onRegisterClick = { navController.navigate(RouteScreen.Register) }
             )
         }
 
-        // --- Login ---
+        // --- Pantalla de login ---
         composable<RouteScreen.Login> {
             val context = LocalContext.current
             val loginViewModel: LoginViewModel = viewModel(
@@ -92,19 +97,13 @@ fun Navigation() {
                         popUpTo(RouteScreen.Login) { inclusive = true }
                     }
                 },
-                onRegisterClick = {
-                    navController.navigate(RouteScreen.Register)
-                },
-                onBackClick = {
-                    navController.navigate(RouteScreen.WelcomeScreen)
-                },
-                onForgotPassword = {
-                    navController.navigate(RouteScreen.ForgotPasswordScreen)
-                }
+                onRegisterClick = { navController.navigate(RouteScreen.Register) },
+                onBackClick = { navController.navigate(RouteScreen.WelcomeScreen) },
+                onForgotPassword = { navController.navigate(RouteScreen.ForgotPasswordScreen) }
             )
         }
 
-        // --- Registro ---
+        // --- Pantalla de registro ---
         composable<RouteScreen.Register> {
             val context = LocalContext.current
             val registerViewModel: RegisterViewModel = viewModel(
@@ -116,9 +115,7 @@ fun Navigation() {
 
             Register(
                 viewModel = registerViewModel,
-                onBackClick = {
-                    navController.navigate(RouteScreen.WelcomeScreen)
-                },
+                onBackClick = { navController.navigate(RouteScreen.WelcomeScreen) },
                 onRegisterSuccess = {
                     // Al completar el registro, regresar al login
                     navController.navigate(RouteScreen.Login) {
@@ -128,7 +125,7 @@ fun Navigation() {
             )
         }
 
-        // --- Recuperar contraseña ---
+        // --- Pantalla de recuperación de contraseña ---
         composable<RouteScreen.ForgotPasswordScreen> {
             val context = LocalContext.current
             val loginViewModel: LoginViewModel = viewModel(
@@ -140,18 +137,20 @@ fun Navigation() {
 
             ForgotPasswordScreen(
                 viewModel = loginViewModel,
-                onBackToLogin = {
-                    navController.navigate(RouteScreen.Login)
-                }
+                onBackToLogin = { navController.navigate(RouteScreen.Login) }
             )
         }
 
-        // --- Home del usuario ---
+        // --- Navegación principal del usuario ---
         composable<RouteScreen.NavHomeUser> {
-            NavHomeUser(navController, userSessionViewModel)
+            NavHomeUser(
+                rootNavController = navController,
+                userSessionViewModel = userSessionViewModel,
+                userViewModel = userViewModel // 🔥 Inyectamos UserViewModel
+            )
         }
 
-        // --- Home del moderador ---
+        // --- Navegación del moderador ---
         composable<RouteScreen.ModeratorScreen> {
             ModeratorScreen()
         }

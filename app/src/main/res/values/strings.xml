@@ -254,6 +254,29 @@
     <string name="error_unknown_viewmodel">Clase de ViewModel desconocida: %1$s</string>
 
 
+    <!-- ⚠️ Mensajes y validaciones -->
+    <string name="toast_fill_all_fields">Por favor complete todos los campos.</string>
+    <string name="toast_invalid_time_format">Formato de hora inválido (use HH:mm).</string>
+    <string name="toast_open_time_invalid">La hora de apertura no puede ser mayor o igual a la de cierre.</string>
+    <string name="toast_image_removed">Imagen eliminada.</string>
+    <string name="toast_place_created">Lugar creado exitosamente.</string>
+
+    <!-- Mensaje: horario agregado correctamente -->
+    <string name="toast_schedule_added">Horario agregado correctamente.</string>
+
+    <!-- Texto del encabezado de la sección de información básica -->
+    <string name="place_details_basic_info">Información básica</string>
+
+    <string name="place_details_address_placeholder">Ej. Calle 10 #5-12, Armenia</string>
+    <string name="place_details_address">Direccion</string>
+
+    <string name="default_user_name">Usuario</string>
+    <string name="default_user_username">usuario</string>
+    <string name="default_user_city">Ciudad</string>
+    <string name="search_action">Buscar</string>
+    <string name="clear_action">Limpiar</string>
+    <string name="place_rating_desc">Calificación del lugar</string>
+    <string name="no_places_message">Aún no has creado lugares</string>
 
 
 </resources>
