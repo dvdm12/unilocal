@@ -25,44 +25,61 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.unilocal.R
+import com.example.unilocal.model.PlaceStatus
 import com.example.unilocal.model.User
 import com.example.unilocal.ui.components.users.SimpleTopBar
 import com.example.unilocal.ui.screens.user.create_places.PlaceCard
 import com.example.unilocal.viewmodel.user.UserViewModel
 
 /**
- * Pantalla principal del usuario que muestra su perfil,
- * permite buscar, filtrar y visualizar los lugares creados.
- *
- * @param userViewModel ViewModel compartido con los datos del usuario.
- * @param onBackClick Callback para manejar el cierre de sesión o navegación atrás.
+ * Pantalla principal del usuario con perfil, filtros y lista de lugares creados.
  */
 @Composable
 fun HomeUser(
     userViewModel: UserViewModel,
     onBackClick: () -> Unit = {}
 ) {
-    val filters = listOf(
-        stringResource(R.string.filter_all),
-        stringResource(R.string.filter_published),
-        stringResource(R.string.filter_pending),
-        stringResource(R.string.filter_rejected)
-    )
+    // ✅ Etiquetas traducibles dentro del contexto composable
+    val allLabel = stringResource(R.string.filter_all)
+    val publishedLabel = stringResource(R.string.filter_published)
+    val pendingLabel = stringResource(R.string.filter_pending)
+    val rejectedLabel = stringResource(R.string.filter_rejected)
 
-    var selectedFilter by remember { mutableStateOf(filters[0]) }
+    val filters = listOf(allLabel, publishedLabel, pendingLabel, rejectedLabel)
+
+    var selectedFilter by remember { mutableStateOf(allLabel) }
     var searchQuery by remember { mutableStateOf("") }
 
-    // --- Estado del usuario ---
+    // --- Estado reactivo del usuario ---
     val user by userViewModel.user.collectAsState()
     val places = user?.places ?: emptyList()
 
-    // --- Lógica de filtrado ---
-    val filteredPlaces = when (selectedFilter) {
-        stringResource(R.string.filter_published) -> places.filter { it.status.name == "APPROVED" }
-        stringResource(R.string.filter_pending) -> places.filter { it.status.name == "PENDING" }
-        stringResource(R.string.filter_rejected) -> places.filter { it.status.name == "REJECTED" }
-        else -> places
-    }.filter { it.name.contains(searchQuery, ignoreCase = true) }
+    // --- Filtro de búsqueda y estado dinámico ---
+    val filteredPlaces by remember(user, searchQuery, selectedFilter) {
+        derivedStateOf {
+            val normalizedQuery = searchQuery.trim().lowercase()
+
+            places.filter { place ->
+                val matchesStatus = when (selectedFilter) {
+                    publishedLabel -> place.status == PlaceStatus.APPROVED
+                    pendingLabel -> place.status == PlaceStatus.PENDING
+                    rejectedLabel -> place.status == PlaceStatus.REJECTED
+                    else -> true
+                }
+
+                // Mostrar todos si no hay texto
+                if (normalizedQuery.isEmpty()) return@filter matchesStatus
+
+                // Coincidencia directa o cercana por nombre
+                val nameMatch = place.name.lowercase().contains(normalizedQuery)
+                matchesStatus && nameMatch
+            }
+                // Ordenar coincidencias (las que empiezan igual primero)
+                .sortedByDescending { it.name.lowercase().startsWith(normalizedQuery) }
+                // Evitar duplicados
+                .distinctBy { it.id }
+        }
+    }
 
     Scaffold(
         topBar = { HomeTopBar(onBackClick = onBackClick) }
@@ -75,15 +92,15 @@ fun HomeUser(
                 .padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // --- Perfil de usuario ---
+
+            // --- Perfil ---
             item {
                 Spacer(modifier = Modifier.height(8.dp))
                 UserProfileSection(user = user)
             }
 
-            // --- Título de lugares ---
+            // --- Título ---
             item {
-                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.my_places),
                     fontWeight = FontWeight.Bold,
@@ -96,10 +113,7 @@ fun HomeUser(
                 SearchBar(
                     searchQuery = searchQuery,
                     onSearchChange = { searchQuery = it },
-                    onSearchClear = { searchQuery = "" },
-                    onSearchApply = {
-                        println("Buscando: $searchQuery con filtro: $selectedFilter")
-                    }
+                    onSearchClear = { searchQuery = "" }
                 )
             }
 
@@ -112,10 +126,8 @@ fun HomeUser(
                 )
             }
 
-            // --- Sección de ordenamiento (placeholder) ---
-            item {
-                SortSection()
-            }
+            // --- Ordenamiento (placeholder) ---
+            item { SortSection() }
 
             // --- Lista de lugares filtrados ---
             if (filteredPlaces.isEmpty()) {
@@ -131,9 +143,9 @@ fun HomeUser(
                 items(filteredPlaces) { place ->
                     PlaceCard(
                         place = place,
-                        onView = { /* Navegar a detalle */ },
-                        onEdit = { /* Editar lugar */ },
-                        onDelete = { /* Eliminar lugar */ }
+                        onView = { /* TODO: Navegar a detalles */ },
+                        onEdit = { /* TODO: Editar lugar */ },
+                        onDelete = { /* TODO: Eliminar lugar */ }
                     )
                 }
             }
@@ -191,49 +203,37 @@ fun UserProfileSection(user: User?) {
 }
 
 /**
- * Barra de búsqueda con botones de acción.
+ * Barra de búsqueda reactiva.
  */
 @Composable
 fun SearchBar(
     searchQuery: String,
     onSearchChange: (String) -> Unit,
-    onSearchClear: () -> Unit,
-    onSearchApply: () -> Unit
+    onSearchClear: () -> Unit
 ) {
-    Column {
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = onSearchChange,
-            placeholder = {
-                Text(stringResource(R.string.search_placeholder), style = TextStyle(fontSize = 15.sp))
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            trailingIcon = {
-                if (searchQuery.isNotEmpty()) {
-                    IconButton(onClick = onSearchClear) {
-                        Icon(Icons.Default.Close, contentDescription = "Clear search")
-                    }
+    OutlinedTextField(
+        value = searchQuery,
+        onValueChange = onSearchChange,
+        placeholder = {
+            Text(stringResource(R.string.search_placeholder), style = TextStyle(fontSize = 15.sp))
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp),
+        trailingIcon = {
+            if (searchQuery.isNotEmpty()) {
+                IconButton(onClick = onSearchClear) {
+                    Icon(Icons.Default.Close, contentDescription = "Clear search")
                 }
-            }
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Button(onClick = onSearchApply) {
+            } else {
                 Icon(Icons.Default.Search, contentDescription = null)
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(stringResource(R.string.search_action))
-            }
-            OutlinedButton(onClick = onSearchClear) {
-                Text(stringResource(R.string.clear_action))
             }
         }
-    }
+    )
 }
 
 /**
- * Fila horizontal de filtros para los lugares.
+ * Fila horizontal de filtros.
  */
 @Composable
 fun FilterRow(

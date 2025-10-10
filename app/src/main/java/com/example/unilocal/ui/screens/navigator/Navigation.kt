@@ -152,7 +152,15 @@ fun Navigation() {
 
         // --- Navegación del moderador ---
         composable<RouteScreen.ModeratorScreen> {
-            ModeratorScreen()
+            ModeratorScreen(
+                userSessionViewModel,
+                userViewModel = userViewModel, // ✅ Se inyecta para mostrar y actualizar todos los lugares
+                onLogoutConfirmed = {
+                    navController.navigate(RouteScreen.WelcomeScreen) {
+                        popUpTo(0)
+                    }
+                }
+            )
         }
     }
 }

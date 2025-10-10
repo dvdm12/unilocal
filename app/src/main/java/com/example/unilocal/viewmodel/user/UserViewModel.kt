@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.unilocal.model.Place
+import com.example.unilocal.model.PlaceStatus
 import com.example.unilocal.model.Schedule
 import com.example.unilocal.model.User
 import com.example.unilocal.viewmodel.data.UserRepository
@@ -118,6 +119,46 @@ class UserViewModel(
     fun getAllSchedules(): List<Schedule> {
         val currentUser = _user.value ?: return emptyList()
         return currentUser.places.flatMap { it.schedules }
+    }
+
+    // -------------------------------------------------------------------------
+    // 🔹 NUEVAS FUNCIONES PARA EL MODERADOR
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns all users from the repository.
+     * Used by moderators to review all places.
+     */
+    fun getAllUsers(): List<User> {
+        return userRepository.getAllUsers()
+    }
+
+    /**
+     * Updates the status of a given place (Approved, Rejected, Pending)
+     * and persists the change in the corresponding user.
+     */
+    fun updatePlaceStatus(place: Place, newStatus: PlaceStatus) {
+        val users = userRepository.getAllUsers().toMutableList()
+        var updatedUser: User? = null
+
+        // Buscar el usuario propietario y actualizar su lugar
+        val updatedUsers = users.map { user ->
+            if (user.id == place.owner.id) {
+                val updatedPlaces = user.places.map {
+                    if (it.id == place.id) it.copy(status = newStatus) else it
+                }
+                updatedUser = user.copy(places = updatedPlaces as MutableList<Place>)
+                updatedUser!!
+            } else user
+        }
+
+        // Persistir cambios si se encontró el usuario
+        updatedUser?.let {
+            viewModelScope.launch {
+                userRepository.updateUser(it)
+                _message.value = "Place status updated to $newStatus"
+            }
+        }
     }
 
     /**
