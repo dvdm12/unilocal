@@ -18,7 +18,6 @@ De esta forma, UniLocal se convierte en una plataforma comunitaria que celebra y
 
 - **David Mantilla Avilés** – 240220212015  
 - **Mariana Osorio Hernandez** – 24020211026  
-- **Juan Caicedo** – 240220232033  
 - **Jhovanny Quiceno** – 240220221047  
 
 ---
