@@ -1,48 +1,56 @@
-<h1 align="center">UniLocal Mobile App</h1>
+<!-- ====================================================== -->
+<!-- 🌎 README: UniLocal Mobile App -->
+<!-- ====================================================== -->
+
+<h1 align="center">
+  <img src="./assets/unilocal.jpg" alt="UniLocal Logo" width="120"><br>
+  UniLocal Mobile App
+</h1>
 
 <p align="center">
-  <img src="./assets/unilocal.jpg" alt="Logo de UniLocal" width="300">
-</p>
-
-<p align="center">
-  <b>Aplicación móvil que promueve el comercio local y la gastronomía regional</b><br>
-  Descubre, comparte y califica los mejores lugares en tu ciudad
+  <b>Descubre, comparte y apoya los negocios locales de tu ciudad</b><br>
+  <sub>Aplicación móvil desarrollada con Kotlin y Jetpack Compose</sub>
 </p>
 
 <hr>
 
 <h2>
-  <img src="https://cdn-icons-png.flaticon.com/512/484/484167.png" width="24" alt="Compass Icon">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/android/android-original.svg" width="24" alt="Android Icon">
   Descripción general
 </h2>
 
 <p>
-  <b>UniLocal</b> es una aplicación móvil que promueve el comercio local y la gastronomía regional al ayudar a los usuarios a descubrir lugares cercanos como restaurantes, cafeterías, sitios de comida rápida, museos y hoteles.
+  <b>UniLocal</b> es una aplicación móvil que promueve el comercio local y la gastronomía regional, permitiendo a los usuarios
+  descubrir lugares cercanos como restaurantes, cafeterías, sitios de comida rápida, museos y hoteles.  
+  A través de una interfaz moderna e intuitiva, la aplicación ofrece un <b>mapa interactivo</b>, búsqueda y filtros por nombre,
+  categoría o distancia, además de la posibilidad de dejar reseñas y calificaciones sobre los lugares visitados.
 </p>
 
 <p>
-  La app ofrece un <b>mapa interactivo</b>, búsqueda y filtros por nombre, categoría o distancia, así como la posibilidad de dejar calificaciones y comentarios.  
-  Solo los usuarios registrados pueden crear nuevos lugares y participar en la comunidad, mientras que un equipo de moderadores revisa y aprueba los envíos para garantizar la calidad y autenticidad del contenido.
+  Solo los usuarios registrados pueden crear y administrar nuevos lugares, mientras que un equipo de moderadores garantiza
+  la autenticidad del contenido publicado.
 </p>
 
-<p>Entre sus principales funcionalidades se incluyen:</p>
-
+<h3>Funciones destacadas:</h3>
 <ul>
-  <li><img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" width="18"> Geolocalización en tiempo real</li>
-  <li><img src="https://cdn-icons-png.flaticon.com/512/2920/2920244.png" width="18"> Carga de imágenes</li>
-  <li><img src="https://cdn-icons-png.flaticon.com/512/1250/1250689.png" width="18"> Contenido generado por usuarios</li>
-  <li><img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" width="18"> Filtros avanzados de búsqueda</li>
+  <li>📍 Geolocalización en tiempo real</li>
+  <li>🗺️ Mapa interactivo con marcadores dinámicos</li>
+  <li>💬 Calificaciones y comentarios verificados</li>
+  <li>🧭 Filtros avanzados de búsqueda</li>
+  <li>📸 Carga de imágenes para cada lugar</li>
+  <li>👥 Moderación de contenido generada por usuarios</li>
 </ul>
 
 <hr>
 
 <h2>
-  <img src="https://cdn-icons-png.flaticon.com/512/1077/1077012.png" width="24"> Equipo del proyecto
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" width="24" alt="Team Icon">
+  Equipo del proyecto
 </h2>
 
-<table>
+<table align="center">
   <tr>
-    <th>Nombre</th>
+    <th>Integrante</th>
     <th>Código</th>
   </tr>
   <tr>
@@ -62,37 +70,34 @@
 <hr>
 
 <h2>
-  <img src="https://cdn-icons-png.flaticon.com/512/3003/3003984.png" width="24">
-  Tech Stack
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kotlin/kotlin-original.svg" width="24" alt="Tech Icon">
+  Stack tecnológico
 </h2>
 
 <table align="center">
   <tr>
     <td align="center" width="200">
-      <img src="https://cdn-icons-png.flaticon.com/512/226/226777.png" width="80"><br>
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kotlin/kotlin-original.svg" width="60"><br>
       <b>Kotlin</b><br>
-      <small>v2.2.0</small>
+      <sub>v2.2.0</sub>
     </td>
     <td align="center" width="200">
-      <img src="https://developer.android.com/static/images/logos/android.svg" width="70"><br>
+      <img src="https://developer.android.com/static/images/logos/android.svg" width="55"><br>
       <b>Jetpack Compose</b><br>
-      <small>v1.11.0 (Activity Compose)</small>
+      <sub>v1.11.0</sub>
     </td>
     <td align="center" width="200">
-      <img src="https://cdn-icons-png.flaticon.com/512/906/906324.png" width="70"><br>
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/androidstudio/androidstudio-original.svg" width="55"><br>
       <b>Android Studio</b><br>
-      <small>AGP 8.13.0</small>
+      <sub>AGP 8.13.0</sub>
     </td>
   </tr>
 </table>
 
-<p align="center"><i>Dependencias adicionales:</i></p>
+<h3>Dependencias principales</h3>
 
 <table>
-  <tr>
-    <th>Dependencia</th>
-    <th>Versión</th>
-  </tr>
+  <tr><th>Dependencia</th><th>Versión</th></tr>
   <tr><td>Core KTX</td><td>1.17.0</td></tr>
   <tr><td>JUnit (unit tests)</td><td>4.13.2</td></tr>
   <tr><td>JUnit (AndroidX)</td><td>1.3.0</td></tr>
@@ -106,23 +111,35 @@
 <hr>
 
 <h2>
-  <img src="https://cdn-icons-png.flaticon.com/512/907/907050.png" width="24">
-  Características principales
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" width="24" alt="Feature Icon">
+  Características clave
 </h2>
 
-<ul>
-  <li><img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" width="18"> <b>Mapa interactivo</b> para ubicar restaurantes, hoteles, museos y más.</li>
-  <li><img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" width="18"> <b>Búsqueda y filtros</b> por nombre, categoría y distancia.</li>
-  <li><img src="https://cdn-icons-png.flaticon.com/512/929/929564.png" width="18"> <b>Sistema de calificaciones y comentarios</b>.</li>
-  <li><img src="https://cdn-icons-png.flaticon.com/512/1250/1250689.png" width="18"> <b>Gestión de contenido generado por usuarios</b> con revisión de moderadores.</li>
-  <li><img src="https://cdn-icons-png.flaticon.com/512/2920/2920244.png" width="18"> <b>Subida de imágenes</b> para cada lugar.</li>
-  <li><img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" width="18"> <b>Soporte de ubicación en tiempo real</b>.</li>
-</ul>
+<table align="center">
+  <tr>
+    <td align="center" width="180">
+      <img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" width="40"><br>
+      <b>Mapa interactivo</b>
+    </td>
+    <td align="center" width="180">
+      <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" width="40"><br>
+      <b>Búsqueda avanzada</b>
+    </td>
+    <td align="center" width="180">
+      <img src="https://cdn-icons-png.flaticon.com/512/929/929564.png" width="40"><br>
+      <b>Calificaciones</b>
+    </td>
+    <td align="center" width="180">
+      <img src="https://cdn-icons-png.flaticon.com/512/2920/2920244.png" width="40"><br>
+      <b>Subida de imágenes</b>
+    </td>
+  </tr>
+</table>
 
 <hr>
 
 <h2>
-  <img src="https://cdn-icons-png.flaticon.com/512/1828/1828911.png" width="24">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/android/android-plain.svg" width="24" alt="Folder Icon">
   Estructura del proyecto
 </h2>
 
@@ -142,37 +159,40 @@ unilocal/
 <hr>
 
 <h2>
-  <img src="https://cdn-icons-png.flaticon.com/512/484/484096.png" width="24">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" width="24" alt="Design Icon">
   Filosofía de diseño
 </h2>
 
 <p>
-  UniLocal promueve la idea de una comunidad que <b>valora lo local</b>, integrando tecnología moderna con valores sociales.  
-  Cada componente fue desarrollado siguiendo principios de:
+  UniLocal promueve una comunidad que <b>valora lo local</b>, integrando tecnología moderna con propósito social.  
+  El desarrollo se guía por tres principios esenciales:
 </p>
 
 <ul>
-  <li><b>Simplicidad</b> en la interfaz.</li>
-  <li><b>Escalabilidad</b> en la arquitectura.</li>
-  <li><b>Accesibilidad</b> en la experiencia de usuario.</li>
+  <li><b>Simplicidad:</b> interfaz clara, minimalista y directa.</li>
+  <li><b>Escalabilidad:</b> arquitectura modular basada en ViewModel y Compose Navigation.</li>
+  <li><b>Accesibilidad:</b> experiencia inclusiva, fluida y coherente.</li>
 </ul>
 
 <hr>
 
 <h2>
-  <img src="https://cdn-icons-png.flaticon.com/512/942/942799.png" width="24">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original-wordmark.svg" width="24" alt="License Icon">
   Licencia
 </h2>
 
 <p>
   Este proyecto fue desarrollado con fines académicos por estudiantes del programa de Ingeniería de Software.  
-  Puedes usarlo y modificarlo libremente para fines educativos o demostrativos.
+  Puedes usarlo, estudiarlo y adaptarlo libremente con fines educativos o demostrativos.
 </p>
 
 <hr>
 
 <p align="center">
-  <img src="https://cdn-icons-png.flaticon.com/512/888/888879.png" width="20">
-  <b>Hecho con ❤️ usando Kotlin + Jetpack Compose</b>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kotlin/kotlin-original.svg" width="20">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/android/android-original.svg" width="20">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" width="20">
+  <br>
+  <b>Made with ❤️ using Kotlin + Jetpack Compose</b>
 </p>
 
