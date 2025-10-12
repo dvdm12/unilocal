@@ -1,6 +1,9 @@
 package com.example.unilocal.ui.screens.navigator
 
+import android.annotation.SuppressLint
 import android.app.Application
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,54 +22,84 @@ import com.example.unilocal.viewmodel.data.UserSessionViewModel
 import com.example.unilocal.viewmodel.data.UserSessionViewModelFactory
 import com.example.unilocal.viewmodel.login.LoginViewModel
 import com.example.unilocal.viewmodel.login.LoginViewModelFactory
+import com.example.unilocal.viewmodel.place.PlaceViewModel
 import com.example.unilocal.viewmodel.register.RegisterViewModel
 import com.example.unilocal.viewmodel.register.RegisterViewModelFactory
+import com.example.unilocal.viewmodel.schedule.ScheduleViewModel
+import com.example.unilocal.viewmodel.schedule.ScheduleViewModelFactory
 import com.example.unilocal.viewmodel.user.UserViewModel
 
 /**
- * Configuración del grafo de navegación principal de la app UniLocal.
- * Gestiona los flujos de autenticación, registro, usuario y moderador.
+ * Main navigation graph configuration for the UniLocal application.
+ *
+ * Manages authentication, registration, user, and moderator flows,
+ * depending on the current user role.
  */
+@SuppressLint("ViewModelConstructorInComposable")
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
     val context = LocalContext.current.applicationContext
 
-    // --- ViewModel global de sesión ---
+    // -------------------------------------------------------------------------
+    // 🔹 GLOBAL SESSION VIEWMODEL
+    // -------------------------------------------------------------------------
     val userSessionViewModel: UserSessionViewModel = viewModel(
         factory = UserSessionViewModelFactory(context)
     )
 
-    // --- ViewModel de datos de usuario (plazas, perfil, etc.) ---
+    // -------------------------------------------------------------------------
+    // 🔹 MAIN APP VIEWMODELS
+    // -------------------------------------------------------------------------
     val userViewModel: UserViewModel = viewModel()
 
+    val scheduleViewModel: ScheduleViewModel = viewModel(
+        factory = ScheduleViewModelFactory(context as Application)
+    )
+
+    val placeViewModel: PlaceViewModel = viewModel(
+        factory = PlaceViewModel.Factory(context as Application)
+    )
+
+    // -------------------------------------------------------------------------
+    // 🔹 SESSION STATE
+    // -------------------------------------------------------------------------
     val currentUser by userSessionViewModel.currentUser.collectAsState()
     val isSessionLoaded by userSessionViewModel.isSessionLoaded.collectAsState()
 
-    // --- Mostrar pantalla de carga mientras se recupera la sesión ---
+    // -------------------------------------------------------------------------
+    // 🔹 SPLASH SCREEN (WHILE LOADING SESSION)
+    // -------------------------------------------------------------------------
     if (!isSessionLoaded) {
         SplashScreen()
         return
     }
 
-    // --- Vincular usuario actual al UserViewModel ---
+    // -------------------------------------------------------------------------
+    // 🔹 LINK CURRENT USER TO USER VIEWMODEL
+    // -------------------------------------------------------------------------
     LaunchedEffect(currentUser) {
         currentUser?.let { userViewModel.setActiveUser(it) }
     }
 
-    // --- Determinar destino inicial según el rol ---
+    // -------------------------------------------------------------------------
+    // 🔹 DETERMINE INITIAL DESTINATION BASED ON USER ROLE
+    // -------------------------------------------------------------------------
     val startDestination = when (currentUser?.role) {
         Role.USER -> RouteScreen.NavHomeUser
         Role.MODERATOR -> RouteScreen.ModeratorScreen
         else -> RouteScreen.WelcomeScreen
     }
 
-    // --- Grafo principal de navegación ---
+    // -------------------------------------------------------------------------
+    // 🔹 MAIN NAVIGATION GRAPH
+    // -------------------------------------------------------------------------
     NavHost(
         navController = navController,
         startDestination = startDestination
     ) {
-        // --- Pantalla de bienvenida ---
+        // --- Welcome Screen ---
         composable<RouteScreen.WelcomeScreen> {
             WelcomeScreen(
                 onLoginClick = { navController.navigate(RouteScreen.Login) },
@@ -74,7 +107,7 @@ fun Navigation() {
             )
         }
 
-        // --- Pantalla de login ---
+        // --- Login Screen ---
         composable<RouteScreen.Login> {
             val context = LocalContext.current
             val loginViewModel: LoginViewModel = viewModel(
@@ -103,7 +136,7 @@ fun Navigation() {
             )
         }
 
-        // --- Pantalla de registro ---
+        // --- Registration Screen ---
         composable<RouteScreen.Register> {
             val context = LocalContext.current
             val registerViewModel: RegisterViewModel = viewModel(
@@ -117,7 +150,6 @@ fun Navigation() {
                 viewModel = registerViewModel,
                 onBackClick = { navController.navigate(RouteScreen.WelcomeScreen) },
                 onRegisterSuccess = {
-                    // Al completar el registro, regresar al login
                     navController.navigate(RouteScreen.Login) {
                         popUpTo(RouteScreen.Register) { inclusive = true }
                     }
@@ -125,7 +157,7 @@ fun Navigation() {
             )
         }
 
-        // --- Pantalla de recuperación de contraseña ---
+        // --- Forgot Password Screen ---
         composable<RouteScreen.ForgotPasswordScreen> {
             val context = LocalContext.current
             val loginViewModel: LoginViewModel = viewModel(
@@ -141,20 +173,22 @@ fun Navigation() {
             )
         }
 
-        // --- Navegación principal del usuario ---
+        // --- User Navigation Graph ---
         composable<RouteScreen.NavHomeUser> {
             NavHomeUser(
                 rootNavController = navController,
                 userSessionViewModel = userSessionViewModel,
-                userViewModel = userViewModel // 🔥 Inyectamos UserViewModel
+                userViewModel = userViewModel,
+                scheduleViewModel = scheduleViewModel,
+                placeViewModel = placeViewModel
             )
         }
 
-        // --- Navegación del moderador ---
+        // --- Moderator Navigation Graph ---
         composable<RouteScreen.ModeratorScreen> {
             ModeratorScreen(
-                userSessionViewModel,
-                userViewModel = userViewModel, // ✅ Se inyecta para mostrar y actualizar todos los lugares
+                userSessionViewModel = userSessionViewModel,
+                userViewModel = userViewModel,
                 onLogoutConfirmed = {
                     navController.navigate(RouteScreen.WelcomeScreen) {
                         popUpTo(0)
@@ -166,7 +200,7 @@ fun Navigation() {
 }
 
 /**
- * Pantalla de carga mientras se inicializa la sesión del usuario.
+ * Displays a loading indicator while the user session is being initialized.
  */
 @Composable
 fun SplashScreen() {

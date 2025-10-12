@@ -1,12 +1,9 @@
 package com.example.unilocal.viewmodel.user
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.unilocal.model.Place
 import com.example.unilocal.model.PlaceStatus
-import com.example.unilocal.model.Schedule
 import com.example.unilocal.model.User
 import com.example.unilocal.viewmodel.data.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,12 +11,22 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel responsible for managing user-related data and validation logic.
- * Includes schedule validation and synchronization with UserRepository.
+ * ViewModel responsible for managing user data and synchronizing it with the UserRepository.
+ *
+ * This class follows the single responsibility principle:
+ * - Handles user session and persistence.
+ * - Manages places associated with the active user.
+ * - Allows moderators to update place statuses.
+ *
+ * Schedule-related logic has been fully delegated to ScheduleViewModel.
  */
 class UserViewModel(
     private val userRepository: UserRepository = UserRepository
 ) : ViewModel() {
+
+    // -------------------------------------------------------------------------
+    // 🔹 USER STATE
+    // -------------------------------------------------------------------------
 
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
@@ -27,107 +34,72 @@ class UserViewModel(
     private val _message = MutableStateFlow<String?>(null)
     val message: StateFlow<String?> = _message
 
+    // -------------------------------------------------------------------------
+    // 🔹 USER MANAGEMENT
+    // -------------------------------------------------------------------------
+
     /**
-     * Sets the current active user.
+     * Sets the currently active user.
      */
     fun setActiveUser(user: User) {
         _user.value = user
     }
 
     /**
-     * Adds a place to the active user and persists it.
+     * Clears the current active user (logout operation).
+     */
+    fun clearUser() {
+        _user.value = null
+    }
+
+    // -------------------------------------------------------------------------
+    // 🔹 PLACES MANAGEMENT
+    // -------------------------------------------------------------------------
+
+    /**
+     * Adds a new place to the active user and persists the update.
      */
     fun addPlace(place: Place) {
         val currentUser = _user.value ?: return
-        val newPlace = place.copy(owner = currentUser)
 
-        val updatedPlaces = currentUser.places.toMutableList().apply { add(newPlace) }
+        val updatedPlaces = currentUser.places.toMutableList().apply { add(place.copy(owner = currentUser)) }
         val updatedUser = currentUser.copy(places = updatedPlaces)
 
         _user.value = updatedUser
         viewModelScope.launch { userRepository.updateUser(updatedUser) }
 
-        _message.value = "Place successfully added."
+        _message.value = "Lugar agregado exitosamente."
     }
 
     /**
-     * Validates and adds a schedule to a specific place.
+     * Removes a place from the active user based on its ID.
      */
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun addScheduleToPlace(placeId: String, schedule: Schedule) {
+    fun removePlace(placeId: String) {
         val currentUser = _user.value ?: return
 
-        // --- Validation ---
-        if (schedule.dayStart !in 1..7 || schedule.dayEnd !in 1..7) {
-            _message.value = "Days must be between 1 (Monday) and 7 (Sunday)."
-            return
-        }
-        if (schedule.dayStart > schedule.dayEnd) {
-            _message.value = "Start day cannot be after end day."
-            return
-        }
-        if (schedule.start >= schedule.end) {
-            _message.value = "Opening time must be earlier than closing time."
-            return
-        }
-
-        // --- Update logic ---
-        val updatedPlaces = currentUser.places.map { place ->
-            if (place.id == placeId) {
-                val overlap = place.schedules.any { existing ->
-                    !(schedule.end <= existing.start || schedule.start >= existing.end)
-                }
-                if (overlap) {
-                    _message.value = "Schedule overlaps with an existing one."
-                    return
-                }
-                place.copy(schedules = place.schedules + schedule)
-            } else place
-        }.toMutableList() // ✅ convert to MutableList<Place>
-
+        val updatedPlaces = currentUser.places.filterNot { it.id == placeId }.toMutableList()
         val updatedUser = currentUser.copy(places = updatedPlaces)
-        _user.value = updatedUser
 
+        _user.value = updatedUser
         viewModelScope.launch { userRepository.updateUser(updatedUser) }
-        _message.value = "Schedule successfully added."
+
+        _message.value = "Lugar eliminado correctamente."
     }
 
     /**
-     * Removes a schedule by matching day range.
+     * Returns all places associated with the current user.
      */
-    fun removeSchedule(placeId: String, dayStart: Int, dayEnd: Int) {
-        val currentUser = _user.value ?: return
-
-        val updatedPlaces = currentUser.places.map { place ->
-            if (place.id == placeId)
-                place.copy(schedules = place.schedules.filterNot {
-                    it.dayStart == dayStart && it.dayEnd == dayEnd
-                })
-            else place
-        }.toMutableList() // ✅ convert to MutableList<Place>
-
-        val updatedUser = currentUser.copy(places = updatedPlaces)
-        _user.value = updatedUser
-
-        viewModelScope.launch { userRepository.updateUser(updatedUser) }
-        _message.value = "Schedule removed successfully."
-    }
-
-    /**
-     * Returns all schedules from all user's places.
-     */
-    fun getAllSchedules(): List<Schedule> {
-        val currentUser = _user.value ?: return emptyList()
-        return currentUser.places.flatMap { it.schedules }
+    fun getUserPlaces(): List<Place> {
+        return _user.value?.places ?: emptyList()
     }
 
     // -------------------------------------------------------------------------
-    // 🔹 NUEVAS FUNCIONES PARA EL MODERADOR
+    // 🔹 MODERATOR FEATURES
     // -------------------------------------------------------------------------
 
     /**
-     * Returns all users from the repository.
-     * Used by moderators to review all places.
+     * Returns all registered users from the repository.
+     * Used by moderators to review all available places.
      */
     fun getAllUsers(): List<User> {
         return userRepository.getAllUsers()
@@ -135,41 +107,37 @@ class UserViewModel(
 
     /**
      * Updates the status of a given place (Approved, Rejected, Pending)
-     * and persists the change in the corresponding user.
+     * and persists the change in the corresponding user's record.
      */
     fun updatePlaceStatus(place: Place, newStatus: PlaceStatus) {
         val users = userRepository.getAllUsers().toMutableList()
         var updatedUser: User? = null
 
-        // Buscar el usuario propietario y actualizar su lugar
         val updatedUsers = users.map { user ->
             if (user.id == place.owner.id) {
                 val updatedPlaces = user.places.map {
                     if (it.id == place.id) it.copy(status = newStatus) else it
-                }
-                updatedUser = user.copy(places = updatedPlaces as MutableList<Place>)
+                }.toMutableList()
+
+                updatedUser = user.copy(places = updatedPlaces)
                 updatedUser!!
             } else user
         }
 
-        // Persistir cambios si se encontró el usuario
         updatedUser?.let {
             viewModelScope.launch {
                 userRepository.updateUser(it)
-                _message.value = "Place status updated to $newStatus"
+                _message.value = "El estado del lugar fue actualizado a $newStatus"
             }
         }
     }
 
-    /**
-     * Clears the current user data.
-     */
-    fun clearUser() {
-        _user.value = null
-    }
+    // -------------------------------------------------------------------------
+    // 🔹 UTILITIES
+    // -------------------------------------------------------------------------
 
     /**
-     * Clears current message (after displaying it).
+     * Clears the current message after displaying it on the UI.
      */
     fun clearMessage() {
         _message.value = null

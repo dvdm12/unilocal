@@ -1,5 +1,7 @@
 package com.example.unilocal.ui.screens.user
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding // Import for padding modifier
 import androidx.compose.material3.* // Import Material3 components
 import androidx.compose.runtime.* // Import Compose runtime
@@ -14,6 +16,8 @@ import com.example.unilocal.ui.screens.user.nav.UserNavigation // Import user na
 import com.example.unilocal.ui.screens.user.nav.UserNavItem // Import navigation items for user
 import com.example.unilocal.ui.screens.user.nav.rememberCurrentRoute // Import helper to remember current route
 import com.example.unilocal.viewmodel.data.UserSessionViewModel // Import user session ViewModel
+import com.example.unilocal.viewmodel.place.PlaceViewModel
+import com.example.unilocal.viewmodel.schedule.ScheduleViewModel
 import com.example.unilocal.viewmodel.user.UserViewModel // Import user data ViewModel
 
 /**
@@ -29,11 +33,14 @@ import com.example.unilocal.viewmodel.user.UserViewModel // Import user data Vie
  * @param userSessionViewModel ViewModel for managing user session state
  * @param userViewModel ViewModel for managing user data (places, profile, etc.)
  */
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavHomeUser(
     rootNavController: NavController, // Global navigation controller
     userSessionViewModel: UserSessionViewModel, // Session state ViewModel
-    userViewModel: UserViewModel // User data ViewModel
+    userViewModel: UserViewModel, // User data ViewModel
+    scheduleViewModel: ScheduleViewModel,
+    placeViewModel: PlaceViewModel
 ) {
     // Local navigation controller for user area
     val userNavController = rememberNavController()
@@ -64,7 +71,9 @@ fun NavHomeUser(
             navController = userNavController,
             startDestination = UserNavItem.HOME.route,
             modifier = Modifier.padding(innerPadding),
-            userViewModel = userViewModel, // Inject UserViewModel
+            userViewModel = userViewModel,
+            scheduleViewModel = scheduleViewModel,
+            placeViewModel = placeViewModel,
             onLogout = { showLogoutDialog = true }
         )
     }

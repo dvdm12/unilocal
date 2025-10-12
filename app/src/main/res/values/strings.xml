@@ -281,5 +281,98 @@
     <string name="places_pending_title">Lugares pendientes de aprobación</string>
     <string name="places_moderator">¿Estás seguro de que quieres cerrar sesión como moderador?</string>
 
+    <!-- ===================================================== -->
+    <!-- 🔹 General UI -->
+    <!-- ===================================================== -->
+    <string name="action_back">Volver</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_add">Agregar</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_confirm">Confirmar</string>
+    <string name="action_publish">Publicar lugar</string>
+
+    <!-- ===================================================== -->
+    <!-- 🔹 Place creation / details -->
+    <!-- ===================================================== -->
+    <string name="place_new_title">Nuevo lugar</string>
+    <string name="place_basic_info_title">Información básica</string>
+    <string name="place_location_title">Ubicación</string>
+    <string name="place_schedule_title">Horarios (Lunes a Viernes)</string>
+    <string name="place_images_title">Imágenes</string>
+
+    <!-- ===================================================== -->
+    <!-- 🔹 Place form fields -->
+    <!-- ===================================================== -->
+    <string name="place_field_name">Nombre</string>
+    <string name="place_field_name_placeholder">Ej: Café Central</string>
+
+    <string name="place_field_description">Descripción</string>
+    <string name="place_field_description_placeholder">Describe el lugar</string>
+
+    <string name="place_field_category">Categoría</string>
+
+    <string name="place_field_phone">Teléfono</string>
+    <string name="place_field_phone_placeholder">Ej: 3201234567</string>
+
+    <string name="place_field_address">Dirección</string>
+    <string name="place_field_address_placeholder">Ej: Calle 10 #5-23</string>
+
+    <!-- ===================================================== -->
+    <!-- 🔹 Schedule section -->
+    <!-- ===================================================== -->
+    <string name="schedule_label_start_day">Día inicial</string>
+    <string name="schedule_label_end_day">Día final</string>
+    <string name="schedule_label_opening">Hora de apertura</string>
+    <string name="schedule_label_closing">Hora de cierre</string>
+    <string name="schedule_label_hour">Hora</string>
+    <string name="schedule_label_minute">Minutos</string>
+    <string name="schedule_label_period">Periodo</string>
+    <string name="schedule_button_add">Agregar horario</string>
+
+    <!-- ===================================================== -->
+    <!-- 🔹 Messages & validation -->
+    <!-- ===================================================== -->
+    <string name="msg_field_required">Por favor complete todos los campos.</string>
+    <string name="msg_phone_digits_only">El número de teléfono solo puede contener dígitos.</string>
+    <string name="msg_schedule_required">Debe agregar al menos un horario antes de publicar.</string>
+    <string name="msg_schedule_added">Horario agregado correctamente.</string>
+    <string name="msg_schedule_removed">Horario eliminado.</string>
+    <string name="msg_schedule_invalid_days">El día inicial no puede ser posterior al final.</string>
+    <string name="msg_schedule_invalid_hours">La hora de apertura no puede ser igual o posterior a la de cierre.</string>
+    <string name="msg_place_created">Lugar creado exitosamente.</string>
+    <string name="msg_place_deleted">Lugar eliminado correctamente.</string>
+    <string name="msg_place_updated">Lugar actualizado correctamente.</string>
+    <string name="msg_image_added">Imagen agregada correctamente.</string>
+    <string name="msg_image_removed">Imagen eliminada.</string>
+    <string name="msg_validation_name">El nombre no puede estar vacío.</string>
+    <string name="msg_validation_description">La descripción no puede estar vacía.</string>
+    <string name="msg_validation_address">Debe ingresar una dirección.</string>
+    <string name="msg_validation_phone">Debe ingresar un número telefónico.</string>
+    <string name="msg_validation_schedule">Debe agregar al menos un horario.</string>
+
+    <!-- ===================================================== -->
+    <!-- 🔹 Days of week -->
+    <!-- ===================================================== -->
+    <string name="day_monday">Lunes</string>
+    <string name="day_tuesday">Martes</string>
+    <string name="day_wednesday">Miércoles</string>
+    <string name="day_thursday">Jueves</string>
+    <string name="day_friday">Viernes</string>
+    <string name="day_saturday">Sábado</string>
+    <string name="day_sunday">Domingo</string>
+
+    <!-- ===================================================== -->
+    <!-- 🔹 Time periods -->
+    <!-- ===================================================== -->
+    <string name="period_am">AM</string>
+    <string name="period_pm">PM</string>
+
+    <!-- ===================================================== -->
+    <!-- 🔹 Place icons content description -->
+    <!-- ===================================================== -->
+    <string name="cd_place_image">Imagen del lugar</string>
+    <string name="cd_delete_image">Eliminar imagen</string>
+
 
 </resources>
