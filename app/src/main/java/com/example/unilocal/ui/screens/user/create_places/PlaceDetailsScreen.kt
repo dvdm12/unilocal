@@ -76,7 +76,7 @@ fun PlaceDetailsScreen(
     val message by placeViewModel.message.collectAsState()
     val user = userViewModel.user.collectAsState().value
 
-    // Displays short Toast messages when validation or success messages are emitted from ViewModel.
+    // --- Message observer ---
     LaunchedEffect(message) {
         message?.let {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
@@ -99,7 +99,7 @@ fun PlaceDetailsScreen(
                 .fillMaxSize()
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
-            // --- Basic Information Section ---
+            // --- Basic Information ---
             PlaceBasicInfoSection(
                 name = name,
                 onNameChange = placeViewModel::updateName,
@@ -113,7 +113,7 @@ fun PlaceDetailsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // --- Location Section ---
+            // --- Location ---
             PlaceLocationSection(
                 address = address,
                 onAddressChange = placeViewModel::updateAddress
@@ -121,7 +121,7 @@ fun PlaceDetailsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // --- Schedule Section ---
+            // --- Schedules ---
             PlaceScheduleSection(
                 scheduleViewModel = scheduleViewModel,
                 onScheduleAdded = { schedule ->
@@ -131,7 +131,7 @@ fun PlaceDetailsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // --- Images Section ---
+            // --- Images ---
             PlaceImagesSection(
                 imageUrls = imageUrls,
                 onAddImage = { placeViewModel.addImage(it) },
@@ -140,32 +140,28 @@ fun PlaceDetailsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // --- Publish Button ---
+            // --- Publish ---
             UniPrimaryButton(
                 text = stringResource(R.string.action_publish),
                 onClick = {
                     val owner = user ?: return@UniPrimaryButton
                     val place = placeViewModel.createPlace(owner)
-
                     if (place != null) {
-                        //Add place to user's list
                         userViewModel.addPlace(place)
-
-                        //Show confirmation
                         Toast.makeText(
                             context,
                             context.getString(R.string.msg_place_created),
                             Toast.LENGTH_LONG
                         ).show()
-
-                        // ✅ Reset all form fields and schedules
                         placeViewModel.resetPlaceForm()
+                        scheduleViewModel.clearSchedules()
                     }
                 }
             )
         }
     }
 }
+
 
 /**
  * Displays a form for entering the basic information of the place:
@@ -253,12 +249,14 @@ fun PlaceLocationSection(address: String, onAddressChange: (String) -> Unit) {
 }
 
 /**
- * Manages and displays the section for adding schedules to the place.
+ * Displays the schedule management section for the place creation form.
  *
- * Observes the list of schedules from [ScheduleViewModel] and
- * renders a [ScheduleForm] for adding new ones.
+ * Includes:
+ * - A [ScheduleForm] to create new schedules.
+ * - A scrollable list of all added schedules, each displayed in a card.
+ * - Each schedule can be removed instantly by tapping the close icon.
  *
- * @param scheduleViewModel ViewModel responsible for schedule management.
+ * @param scheduleViewModel ViewModel responsible for managing schedule state.
  * @param onScheduleAdded Callback invoked when a new schedule is added.
  */
 @RequiresApi(Build.VERSION_CODES.O)
@@ -271,6 +269,7 @@ fun PlaceScheduleSection(
     val schedules by scheduleViewModel.schedules.collectAsState()
     val message by scheduleViewModel.message.collectAsState()
 
+    // Show schedule messages
     LaunchedEffect(message) {
         message?.let {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
@@ -278,18 +277,70 @@ fun PlaceScheduleSection(
         }
     }
 
-    ScheduleForm(
-        scheduleViewModel = scheduleViewModel,
-        onAddSchedule = onScheduleAdded
-    )
+    // --- Add form ---
+    ScheduleForm(scheduleViewModel, onScheduleAdded)
 
+    // --- List of schedules ---
     if (schedules.isNotEmpty()) {
-        Spacer(modifier = Modifier.height(12.dp))
-        schedules.forEach {
-            Text(
-                text = scheduleViewModel.formatSchedule(it),
-                style = MaterialTheme.typography.bodyMedium
-            )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = stringResource(R.string.place_schedule_list_title),
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 220.dp)
+                .background(MaterialTheme.colorScheme.surfaceVariant, shape = MaterialTheme.shapes.small)
+                .padding(8.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                schedules.forEach { schedule ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.medium,
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = scheduleViewModel.formatSchedule(schedule),
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 8.dp)
+                            )
+                            IconButton(
+                                onClick = { scheduleViewModel.removeSchedule(schedule) },
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .background(MaterialTheme.colorScheme.errorContainer, CircleShape)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Close,
+                                    contentDescription = stringResource(R.string.cd_delete_schedule),
+                                    tint = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -317,8 +368,11 @@ fun ScheduleForm(
         stringResource(R.string.day_tuesday),
         stringResource(R.string.day_wednesday),
         stringResource(R.string.day_thursday),
-        stringResource(R.string.day_friday)
+        stringResource(R.string.day_friday),
+        stringResource(R.string.day_saturday),
+        stringResource(R.string.day_sunday)
     )
+
     val hours = (1..12).map { it.toString().padStart(2, '0') }
     val minutes = listOf("00", "15", "30", "45")
     val periods = listOf(
@@ -340,6 +394,7 @@ fun ScheduleForm(
         fontWeight = FontWeight.Bold,
         fontSize = 18.sp
     )
+
     Spacer(modifier = Modifier.height(12.dp))
 
     DropdownField(
@@ -470,7 +525,7 @@ fun PlaceImagesSection(
             }
         }
     }
-
 }
+
 
 

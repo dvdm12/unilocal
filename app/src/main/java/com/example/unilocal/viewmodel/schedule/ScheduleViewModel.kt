@@ -16,10 +16,11 @@ import java.time.format.DateTimeFormatter
 /**
  * ViewModel responsible for managing weekly schedules for places.
  *
- * Responsibilities:
+ * Features:
  * - Validates, adds, removes, and formats schedules.
- * - Provides reactive state for the UI.
- * - Uses localized string resources for user messages.
+ * - Enforces logical constraints (max 2 schedules, no duplicates, no overlaps).
+ * - Integrates a directed graph [ScheduleGraph] to ensure consistency.
+ * - Provides reactive state via [StateFlow] for Compose UI.
  */
 @SuppressLint("StaticFieldLeak")
 @RequiresApi(Build.VERSION_CODES.O)
@@ -35,6 +36,12 @@ class ScheduleViewModel(application: Application) : AndroidViewModel(application
 
     private val _message = MutableStateFlow<String?>(null)
     val message: StateFlow<String?> = _message
+
+    // -------------------------------------------------------------------------
+    // 🔹 GRAPH MANAGEMENT
+    // -------------------------------------------------------------------------
+    private val graph = ScheduleGraph()
+    private var nodeIdCounter = 0
 
     // -------------------------------------------------------------------------
     // 🔹 DAYS MAP AND UTILITIES
@@ -63,7 +70,12 @@ class ScheduleViewModel(application: Application) : AndroidViewModel(application
     // -------------------------------------------------------------------------
 
     /**
-     * Adds a new schedule after validating input values.
+     * Adds a new schedule after validating:
+     * - Non-empty days
+     * - Valid start/end days
+     * - Valid hour ranges
+     * - Maximum of 2 schedules allowed
+     * - No duplicates or overlaps
      */
     fun addSchedule(
         startDay: String,
@@ -74,7 +86,8 @@ class ScheduleViewModel(application: Application) : AndroidViewModel(application
         closeHour: String,
         closeMinute: String,
         closePeriod: String
-    ): Unit {
+    ) {
+        // --- Validate day selection ---
         if (startDay.isBlank() || endDay.isBlank()) {
             _message.value = context.getString(R.string.msg_field_required)
             return
@@ -83,16 +96,12 @@ class ScheduleViewModel(application: Application) : AndroidViewModel(application
         val startNum = dayToNum[startDay]
         val endNum = dayToNum[endDay]
 
-        if (startNum == null || endNum == null) {
+        if (startNum == null || endNum == null || startNum > endNum) {
             _message.value = context.getString(R.string.msg_schedule_invalid_days)
             return
         }
 
-        if (startNum > endNum) {
-            _message.value = context.getString(R.string.msg_schedule_invalid_days)
-            return
-        }
-
+        // --- Convert to LocalTime ---
         val open24 = convertTo24(openHour.toInt(), openPeriod)
         val close24 = convertTo24(closeHour.toInt(), closePeriod)
         val startTime = LocalTime.of(open24, openMinute.toInt())
@@ -103,45 +112,77 @@ class ScheduleViewModel(application: Application) : AndroidViewModel(application
             return
         }
 
-        val overlap = _schedules.value.any { existing ->
-            !(endTime <= existing.start || startTime >= existing.end)
-        }
-        if (overlap) {
-            _message.value = context.getString(R.string.msg_schedule_invalid_hours)
-            return
-        }
-
-        val schedule = Schedule(
+        // --- Create new schedule ---
+        val newSchedule = Schedule(
             dayStart = startNum,
             dayEnd = endNum,
             start = startTime,
             end = endTime
         )
 
-        _schedules.update { it + schedule }
+        // --- Enforce max 2 schedules ---
+        if (_schedules.value.size >= 2) {
+            _message.value = context.getString(R.string.msg_max_two_schedules)
+            return
+        }
+
+        // --- Prevent duplicates ---
+        if (_schedules.value.any { it == newSchedule }) {
+            _message.value = context.getString(R.string.msg_duplicate_schedule)
+            return
+        }
+
+        // --- Detect overlaps using graph ---
+        if (graph.hasOverlap(newSchedule)) {
+            _message.value = context.getString(R.string.msg_schedule_overlap)
+            return
+        }
+
+        // --- Add schedule and update graph ---
+        val node = ScheduleGraph.ScheduleNode(++nodeIdCounter, newSchedule)
+        graph.addNode(node)
+        graph.buildEdges()
+
+        _schedules.update { it + newSchedule }
         _message.value = context.getString(R.string.msg_schedule_added)
     }
 
     /**
-     * Removes a specific schedule from the list.
+     * Removes a specific schedule from the list and rebuilds the graph.
      */
-    fun removeSchedule(schedule: Schedule): Unit {
+    fun removeSchedule(schedule: Schedule) {
         _schedules.update { it - schedule }
+        rebuildGraph()
         _message.value = context.getString(R.string.msg_schedule_removed)
     }
 
     /**
-     * Clears all stored schedules.
+     * Clears all stored schedules and resets the graph.
      */
-    fun clearSchedules(): Unit {
+    fun clearSchedules() {
         _schedules.value = emptyList()
+        graph.clear()
+        nodeIdCounter = 0
         _message.value = context.getString(R.string.msg_schedule_removed)
     }
 
     /**
-     * Clears the current message.
+     * Reconstructs the schedule graph after deletions.
      */
-    fun clearMessage(): Unit {
+    private fun rebuildGraph() {
+        graph.clear()
+        nodeIdCounter = 0
+        _schedules.value.forEach {
+            val node = ScheduleGraph.ScheduleNode(++nodeIdCounter, it)
+            graph.addNode(node)
+        }
+        graph.buildEdges()
+    }
+
+    /**
+     * Clears the current message (to avoid repeated Toasts).
+     */
+    fun clearMessage() {
         _message.value = null
     }
 
@@ -150,8 +191,8 @@ class ScheduleViewModel(application: Application) : AndroidViewModel(application
     // -------------------------------------------------------------------------
 
     /**
-     * Returns a human-readable schedule representation.
-     * Example: "Lunes a Viernes | 🕒 08:00 - 17:00"
+     * Returns a human-readable schedule string.
+     * Example: "Monday to Friday | 🕒 08:00 - 17:00"
      */
     fun formatSchedule(schedule: Schedule): String {
         val startDay = reverseDays[schedule.dayStart] ?: "?"

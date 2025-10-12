@@ -298,7 +298,7 @@
     <string name="place_new_title">Nuevo lugar</string>
     <string name="place_basic_info_title">Información básica</string>
     <string name="place_location_title">Ubicación</string>
-    <string name="place_schedule_title">Horarios (Lunes a Viernes)</string>
+    <string name="place_schedule_title">Horarios (Lunes a Domingo)</string>
     <string name="place_images_title">Imágenes</string>
 
     <!-- ===================================================== -->
@@ -373,6 +373,11 @@
     <!-- ===================================================== -->
     <string name="cd_place_image">Imagen del lugar</string>
     <string name="cd_delete_image">Eliminar imagen</string>
+    <string name="place_schedule_list_title">Horarios</string>
+    <string name="cd_delete_schedule">Eliminar horario</string>
+    <string name="msg_max_two_schedules">Solo puedes agregar un máximo de dos horarios</string>
+    <string name="msg_duplicate_schedule">Este horario ya existe</string>
+    <string name="msg_schedule_overlap">El horario seleccionado se solapa con uno existente</string>
 
 
 </resources>
