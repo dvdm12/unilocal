@@ -12,6 +12,8 @@ import com.example.unilocal.ui.screens.user.create_places.PlaceDetailsScreen
 import com.example.unilocal.ui.screens.user.tabs.EditProfileScreen
 import com.example.unilocal.ui.screens.user.tabs.HomeUser
 import com.example.unilocal.ui.screens.user.tabs.SearchPlace
+import com.example.unilocal.viewmodel.place.PlaceViewModel
+import com.example.unilocal.viewmodel.schedule.ScheduleViewModel
 import com.example.unilocal.viewmodel.user.UserViewModel
 
 /**
@@ -30,6 +32,8 @@ fun UserNavigation(
     navController: NavHostController,
     startDestination: String = UserNavItem.HOME.route,
     userViewModel: UserViewModel,
+    scheduleViewModel: ScheduleViewModel,
+    placeViewModel: PlaceViewModel,
     onLogout: () -> Unit = {}
 ) {
     NavHost(
@@ -49,6 +53,8 @@ fun UserNavigation(
         composable(UserNavItem.ADD.route) {
             PlaceDetailsScreen(
                 userViewModel = userViewModel,
+                placeViewModel= placeViewModel,
+                scheduleViewModel,
                 onBackClick = onLogout
             )
         }
