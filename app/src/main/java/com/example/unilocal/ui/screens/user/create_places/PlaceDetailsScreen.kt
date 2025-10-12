@@ -160,7 +160,6 @@ fun PlaceDetailsScreen(
 
                         // ✅ Reset all form fields and schedules
                         placeViewModel.resetPlaceForm()
-                        scheduleViewModel.clearSchedules()
                     }
                 }
             )
