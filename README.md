@@ -1,4 +1,4 @@
-<h1 align="center">📱 UniLocal Mobile App</h1>
+<h1 align="center">UniLocal Mobile App</h1>
 
 <p align="center">
   <img src="./assets/unilocal.jpg" alt="Logo de UniLocal" width="300">
@@ -6,12 +6,15 @@
 
 <p align="center">
   <b>Aplicación móvil que promueve el comercio local y la gastronomía regional</b><br>
-  Descubre, comparte y califica los mejores lugares en tu ciudad 🍽️☕🏨
+  Descubre, comparte y califica los mejores lugares en tu ciudad
 </p>
 
 <hr>
 
-<h2>🧭 Descripción general</h2>
+<h2>
+  <img src="https://cdn-icons-png.flaticon.com/512/484/484167.png" width="24" alt="Compass Icon">
+  Descripción general
+</h2>
 
 <p>
   <b>UniLocal</b> es una aplicación móvil que promueve el comercio local y la gastronomía regional al ayudar a los usuarios a descubrir lugares cercanos como restaurantes, cafeterías, sitios de comida rápida, museos y hoteles.
@@ -25,15 +28,17 @@
 <p>Entre sus principales funcionalidades se incluyen:</p>
 
 <ul>
-  <li>📍 Geolocalización en tiempo real</li>
-  <li>📸 Carga de imágenes</li>
-  <li>🗣️ Contenido generado por usuarios</li>
-  <li>🔎 Filtros avanzados de búsqueda y exploración</li>
+  <li><img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" width="18"> Geolocalización en tiempo real</li>
+  <li><img src="https://cdn-icons-png.flaticon.com/512/2920/2920244.png" width="18"> Carga de imágenes</li>
+  <li><img src="https://cdn-icons-png.flaticon.com/512/1250/1250689.png" width="18"> Contenido generado por usuarios</li>
+  <li><img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" width="18"> Filtros avanzados de búsqueda</li>
 </ul>
 
 <hr>
 
-<h2>👥 Equipo del proyecto</h2>
+<h2>
+  <img src="https://cdn-icons-png.flaticon.com/512/1077/1077012.png" width="24"> Equipo del proyecto
+</h2>
 
 <table>
   <tr>
@@ -56,7 +61,10 @@
 
 <hr>
 
-<h2>⚙️ Tech Stack</h2>
+<h2>
+  <img src="https://cdn-icons-png.flaticon.com/512/3003/3003984.png" width="24">
+  Tech Stack
+</h2>
 
 <table align="center">
   <tr>
@@ -97,20 +105,26 @@
 
 <hr>
 
-<h2>🚀 Características principales</h2>
+<h2>
+  <img src="https://cdn-icons-png.flaticon.com/512/907/907050.png" width="24">
+  Características principales
+</h2>
 
 <ul>
-  <li>🗺️ <b>Mapa interactivo</b> para ubicar restaurantes, hoteles, museos y más.</li>
-  <li>🔎 <b>Búsqueda y filtros</b> por nombre, categoría y distancia.</li>
-  <li>⭐ <b>Sistema de calificaciones y comentarios</b>.</li>
-  <li>📝 <b>Gestión de contenido generado por usuarios</b> con revisión de moderadores.</li>
-  <li>📸 <b>Subida de imágenes</b> para cada lugar.</li>
-  <li>📍 <b>Soporte de ubicación en tiempo real</b>.</li>
+  <li><img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" width="18"> <b>Mapa interactivo</b> para ubicar restaurantes, hoteles, museos y más.</li>
+  <li><img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" width="18"> <b>Búsqueda y filtros</b> por nombre, categoría y distancia.</li>
+  <li><img src="https://cdn-icons-png.flaticon.com/512/929/929564.png" width="18"> <b>Sistema de calificaciones y comentarios</b>.</li>
+  <li><img src="https://cdn-icons-png.flaticon.com/512/1250/1250689.png" width="18"> <b>Gestión de contenido generado por usuarios</b> con revisión de moderadores.</li>
+  <li><img src="https://cdn-icons-png.flaticon.com/512/2920/2920244.png" width="18"> <b>Subida de imágenes</b> para cada lugar.</li>
+  <li><img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" width="18"> <b>Soporte de ubicación en tiempo real</b>.</li>
 </ul>
 
 <hr>
 
-<h2>🧩 Estructura del proyecto</h2>
+<h2>
+  <img src="https://cdn-icons-png.flaticon.com/512/1828/1828911.png" width="24">
+  Estructura del proyecto
+</h2>
 
 <pre>
 unilocal/
@@ -127,7 +141,10 @@ unilocal/
 
 <hr>
 
-<h2>🧠 Filosofía de diseño</h2>
+<h2>
+  <img src="https://cdn-icons-png.flaticon.com/512/484/484096.png" width="24">
+  Filosofía de diseño
+</h2>
 
 <p>
   UniLocal promueve la idea de una comunidad que <b>valora lo local</b>, integrando tecnología moderna con valores sociales.  
@@ -142,7 +159,10 @@ unilocal/
 
 <hr>
 
-<h2>📜 Licencia</h2>
+<h2>
+  <img src="https://cdn-icons-png.flaticon.com/512/942/942799.png" width="24">
+  Licencia
+</h2>
 
 <p>
   Este proyecto fue desarrollado con fines académicos por estudiantes del programa de Ingeniería de Software.  
@@ -152,6 +172,7 @@ unilocal/
 <hr>
 
 <p align="center">
-  <b>Made with ❤️ using Kotlin + Jetpack Compose</b>
+  <img src="https://cdn-icons-png.flaticon.com/512/888/888879.png" width="20">
+  <b>Hecho con ❤️ usando Kotlin + Jetpack Compose</b>
 </p>
 
