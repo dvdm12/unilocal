@@ -24,11 +24,13 @@ import com.example.unilocal.ui.components.home.AuthFieldType
 import com.example.unilocal.ui.components.home.DropdownField
 import com.example.unilocal.ui.components.home.UniPrimaryButton
 import com.example.unilocal.ui.components.users.SimpleTopBar
+import com.example.unilocal.viewmodel.user.UserViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
+    userViewModel: UserViewModel = UserViewModel(),
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {

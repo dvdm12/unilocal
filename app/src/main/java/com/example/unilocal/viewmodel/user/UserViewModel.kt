@@ -110,27 +110,20 @@ class UserViewModel(
      * and persists the change in the corresponding user's record.
      */
     fun updatePlaceStatus(place: Place, newStatus: PlaceStatus) {
-        val users = userRepository.getAllUsers().toMutableList()
-        var updatedUser: User? = null
+        val users = userRepository.getAllUsers()
 
-        val updatedUsers = users.map { user ->
-            if (user.id == place.owner.id) {
-                val updatedPlaces = user.places.map {
-                    if (it.id == place.id) it.copy(status = newStatus) else it
-                }.toMutableList()
-
-                updatedUser = user.copy(places = updatedPlaces)
-                updatedUser!!
-            } else user
+        val user = users.find { it.id == place.owner.id } ?: return
+        val updatedPlaces = user.places.map {
+            if (it.id == place.id) it.copy(status = newStatus) else it
         }
+        val updatedUser = user.copy(places = updatedPlaces as MutableList<Place>)
 
-        updatedUser?.let {
-            viewModelScope.launch {
-                userRepository.updateUser(it)
-                _message.value = "El estado del lugar fue actualizado a $newStatus"
-            }
+        viewModelScope.launch {
+            userRepository.updateUser(updatedUser)
+            _message.value = "El estado del lugar fue actualizado a $newStatus"
         }
     }
+
 
     // -------------------------------------------------------------------------
     // 🔹 UTILITIES

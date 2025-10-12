@@ -70,7 +70,7 @@ fun UserNavigation(
         // --- Editar perfil ---
         composable(UserNavItem.SETTINGS.route) {
             EditProfileScreen(
-                //userViewModel = userViewModel,
+                userViewModel = userViewModel,
                 onBackClick = onLogout
             )
         }
