@@ -1,4 +1,4 @@
-package com.example.unilocal.viewmodel.register
+package com.example.unilocal.viewmodel.user.register
 
 import android.app.Application
 import androidx.lifecycle.ViewModel

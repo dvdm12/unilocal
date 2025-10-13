@@ -19,7 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.unilocal.R
 import com.example.unilocal.ui.components.home.*
-import com.example.unilocal.viewmodel.register.RegisterViewModel
+import com.example.unilocal.viewmodel.user.register.RegisterUiState
+import com.example.unilocal.viewmodel.user.register.RegisterViewModel
 
 /**
  * Pantalla de registro de usuario conectada al RegisterViewModel.
@@ -165,7 +166,7 @@ fun Register(
  */
 @Composable
 private fun RegisterFields(
-    uiState: com.example.unilocal.viewmodel.register.RegisterUiState,
+    uiState: RegisterUiState,
     countries: List<String>,
     cities: List<String>,
     onNameChange: (String) -> Unit,

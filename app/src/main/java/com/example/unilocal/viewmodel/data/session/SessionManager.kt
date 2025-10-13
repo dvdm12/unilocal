@@ -1,8 +1,7 @@
-package com.example.unilocal.viewmodel.data
+package com.example.unilocal.viewmodel.data.session
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import com.example.unilocal.model.User
 import kotlinx.serialization.json.Json
 import androidx.core.content.edit

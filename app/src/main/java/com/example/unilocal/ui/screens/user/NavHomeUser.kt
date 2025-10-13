@@ -15,10 +15,11 @@ import com.example.unilocal.ui.config.RouteScreen // Import route screen configu
 import com.example.unilocal.ui.screens.user.nav.UserNavigation // Import user navigation graph
 import com.example.unilocal.ui.screens.user.nav.UserNavItem // Import navigation items for user
 import com.example.unilocal.ui.screens.user.nav.rememberCurrentRoute // Import helper to remember current route
-import com.example.unilocal.viewmodel.data.UserSessionViewModel // Import user session ViewModel
+import com.example.unilocal.viewmodel.data.session.UserSessionViewModel // Import user session ViewModel
 import com.example.unilocal.viewmodel.place.PlaceViewModel
 import com.example.unilocal.viewmodel.schedule.ScheduleViewModel
 import com.example.unilocal.viewmodel.user.UserViewModel // Import user data ViewModel
+import com.example.unilocal.viewmodel.user.update.UserUpdateViewModel
 
 /**
  * Main screen for authenticated user navigation.
@@ -39,6 +40,7 @@ fun NavHomeUser(
     rootNavController: NavController, // Global navigation controller
     userSessionViewModel: UserSessionViewModel, // Session state ViewModel
     userViewModel: UserViewModel, // User data ViewModel
+    userUpdateViewModel: UserUpdateViewModel,
     scheduleViewModel: ScheduleViewModel,
     placeViewModel: PlaceViewModel
 ) {
@@ -72,6 +74,8 @@ fun NavHomeUser(
             startDestination = UserNavItem.HOME.route,
             modifier = Modifier.padding(innerPadding),
             userViewModel = userViewModel,
+            userUpdateViewModel = userUpdateViewModel,
+            userSessionViewModel = userSessionViewModel,
             scheduleViewModel = scheduleViewModel,
             placeViewModel = placeViewModel,
             onLogout = { showLogoutDialog = true }

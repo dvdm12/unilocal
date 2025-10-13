@@ -30,7 +30,7 @@ import com.example.unilocal.ui.components.home.SocialButton
 import com.example.unilocal.ui.components.home.UniPrimaryButton
 import com.example.unilocal.viewmodel.login.LoginResult
 import com.example.unilocal.viewmodel.login.LoginViewModel
-import com.example.unilocal.viewmodel.data.UserSessionViewModel
+import com.example.unilocal.viewmodel.data.session.UserSessionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -193,7 +193,7 @@ fun Login(
         }
     }
 
-    // ⚠️ Diálogo de error para credenciales inválidas
+    // Diálogo de error para credenciales inválidas
     LoginErrorDialog(
         show = uiState.loginResult == LoginResult.INVALID_CREDENTIALS,
         onDismiss = { viewModel.clearLoginResult() }

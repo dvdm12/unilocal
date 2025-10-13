@@ -1,4 +1,4 @@
-package com.example.unilocal.viewmodel.data
+package com.example.unilocal.viewmodel.data.session
 
 import android.content.Context
 import androidx.lifecycle.ViewModel

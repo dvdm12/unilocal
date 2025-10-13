@@ -12,9 +12,11 @@ import com.example.unilocal.ui.screens.user.create_places.PlaceDetailsScreen
 import com.example.unilocal.ui.screens.user.tabs.EditProfileScreen
 import com.example.unilocal.ui.screens.user.tabs.HomeUser
 import com.example.unilocal.ui.screens.user.tabs.SearchPlace
+import com.example.unilocal.viewmodel.data.session.UserSessionViewModel
 import com.example.unilocal.viewmodel.place.PlaceViewModel
 import com.example.unilocal.viewmodel.schedule.ScheduleViewModel
 import com.example.unilocal.viewmodel.user.UserViewModel
+import com.example.unilocal.viewmodel.user.update.UserUpdateViewModel
 
 /**
  * Gestiona la navegación entre las pestañas internas del usuario (Home, Buscar, Agregar, Perfil).
@@ -32,6 +34,8 @@ fun UserNavigation(
     navController: NavHostController,
     startDestination: String = UserNavItem.HOME.route,
     userViewModel: UserViewModel,
+    userUpdateViewModel: UserUpdateViewModel,
+    userSessionViewModel: UserSessionViewModel,
     scheduleViewModel: ScheduleViewModel,
     placeViewModel: PlaceViewModel,
     onLogout: () -> Unit = {}
@@ -70,7 +74,8 @@ fun UserNavigation(
         // --- Editar perfil ---
         composable(UserNavItem.SETTINGS.route) {
             EditProfileScreen(
-                userViewModel = userViewModel,
+                userSessionViewModel=userSessionViewModel,
+                userUpdateViewModel=userUpdateViewModel,
                 onBackClick = onLogout
             )
         }

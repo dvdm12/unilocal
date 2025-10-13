@@ -5,7 +5,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.example.unilocal.R
 import com.example.unilocal.model.Role
-import com.example.unilocal.viewmodel.data.SessionManager
+import com.example.unilocal.viewmodel.data.session.SessionManager
 import com.example.unilocal.viewmodel.data.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

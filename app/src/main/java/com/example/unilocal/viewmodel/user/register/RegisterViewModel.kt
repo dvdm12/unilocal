@@ -1,5 +1,6 @@
-package com.example.unilocal.viewmodel.register
+package com.example.unilocal.viewmodel.user.register
 
+import android.annotation.SuppressLint
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.example.unilocal.R
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.update
  * ViewModel responsable del registro de usuarios.
  * Realiza validaciones en tiempo real y actualiza el estado de la UI.
  */
+@SuppressLint("StaticFieldLeak")
 class RegisterViewModel(
     application: Application,
     private val userRepository: UserRepository = UserRepository

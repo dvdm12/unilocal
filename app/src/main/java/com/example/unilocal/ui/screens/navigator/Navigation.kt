@@ -18,16 +18,17 @@ import com.example.unilocal.ui.screens.*
 import com.example.unilocal.ui.screens.moderator.ModeratorScreen
 import com.example.unilocal.ui.screens.user.NavHomeUser
 import com.example.unilocal.viewmodel.data.UserRepository
-import com.example.unilocal.viewmodel.data.UserSessionViewModel
-import com.example.unilocal.viewmodel.data.UserSessionViewModelFactory
+import com.example.unilocal.viewmodel.data.session.UserSessionViewModel
+import com.example.unilocal.viewmodel.data.session.UserSessionViewModelFactory
 import com.example.unilocal.viewmodel.login.LoginViewModel
 import com.example.unilocal.viewmodel.login.LoginViewModelFactory
 import com.example.unilocal.viewmodel.place.PlaceViewModel
-import com.example.unilocal.viewmodel.register.RegisterViewModel
-import com.example.unilocal.viewmodel.register.RegisterViewModelFactory
+import com.example.unilocal.viewmodel.user.register.RegisterViewModel
+import com.example.unilocal.viewmodel.user.register.RegisterViewModelFactory
 import com.example.unilocal.viewmodel.schedule.ScheduleViewModel
 import com.example.unilocal.viewmodel.schedule.ScheduleViewModelFactory
 import com.example.unilocal.viewmodel.user.UserViewModel
+import com.example.unilocal.viewmodel.user.update.UserUpdateViewModel
 
 /**
  * Main navigation graph configuration for the UniLocal application.
@@ -59,7 +60,11 @@ fun Navigation() {
     )
 
     val placeViewModel: PlaceViewModel = viewModel(
-        factory = PlaceViewModel.Factory(context as Application)
+        factory = PlaceViewModel.Factory(context)
+    )
+
+    val userUpdateViewModel: UserUpdateViewModel = viewModel(
+        factory = UserUpdateViewModel.Factory(context)
     )
 
     // -------------------------------------------------------------------------
@@ -179,6 +184,7 @@ fun Navigation() {
                 rootNavController = navController,
                 userSessionViewModel = userSessionViewModel,
                 userViewModel = userViewModel,
+                userUpdateViewModel= userUpdateViewModel,
                 scheduleViewModel = scheduleViewModel,
                 placeViewModel = placeViewModel
             )

@@ -378,6 +378,11 @@
     <string name="msg_max_two_schedules">Solo puedes agregar un máximo de dos horarios</string>
     <string name="msg_duplicate_schedule">Este horario ya existe</string>
     <string name="msg_schedule_overlap">El horario seleccionado se solapa con uno existente</string>
+    <string name="msg_user_updated">El usuario fue actualizado con exito</string>
+    <string name="msg_error_generic">Ocurrio un error inesperado</string>
+    <string name="msg_error_phone_invalid">El número de teléfono debe contener solo dígitos y tener al menos 7 caracteres.</string>
+    <string name="msg_error_current_password_required">Debes ingresar tu contraseña actual para poder cambiarla</string>
+    <string name="edit_profile_email_placeholder">Editar perfil</string>
 
 
 </resources>
