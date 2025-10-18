@@ -29,7 +29,21 @@ import com.example.unilocal.R
 import com.example.unilocal.model.*
 
 /**
- * Tarjeta visual mejorada que muestra la información de un lugar con diseño moderno.
+ * A modern and responsive composable card that displays detailed
+ * information about a [Place].
+ *
+ * The component is designed for reuse across user-related screens
+ * where places are listed, edited, or viewed.
+ *
+ * Structure:
+ * - Image section with overlay and status badge.
+ * - Textual information (name, category, address, rating).
+ * - Action buttons for viewing, editing, and deleting the place.
+ *
+ * @param place The [Place] object whose details will be displayed.
+ * @param onView Callback executed when the user wants to view the place.
+ * @param onEdit Callback executed when the user wants to edit the place.
+ * @param onDelete Callback executed when the user wants to delete the place.
  */
 @Composable
 fun PlaceCard(
@@ -51,7 +65,7 @@ fun PlaceCard(
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
         ) {
-            // --- Imagen principal con overlay ---
+            // --- Main image section with overlay ---
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -60,6 +74,7 @@ fun PlaceCard(
             ) {
                 val mainImage = place.images.firstOrNull()
 
+                // Display network image if available, otherwise fallback image
                 if (!mainImage.isNullOrBlank()) {
                     AsyncImage(
                         model = mainImage,
@@ -83,7 +98,7 @@ fun PlaceCard(
                     )
                 }
 
-                // --- Overlay degradado ---
+                // --- Gradient overlay for better text contrast ---
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -98,7 +113,7 @@ fun PlaceCard(
                         )
                 )
 
-                // --- Badge de estado en la esquina superior ---
+                // --- Status badge in the top-right corner ---
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
@@ -116,9 +131,9 @@ fun PlaceCard(
                 ) {
                     Text(
                         text = when (place.status) {
-                            PlaceStatus.APPROVED -> "Aprobado"
-                            PlaceStatus.PENDING -> "Pendiente"
-                            PlaceStatus.REJECTED -> "Rechazado"
+                            PlaceStatus.APPROVED -> "Approved"
+                            PlaceStatus.PENDING -> "Pending"
+                            PlaceStatus.REJECTED -> "Rejected"
                         },
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
@@ -126,7 +141,7 @@ fun PlaceCard(
                     )
                 }
 
-                // --- Rating en la esquina inferior izquierda ---
+                // --- Average rating at the bottom-left corner ---
                 Row(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
@@ -152,12 +167,13 @@ fun PlaceCard(
                 }
             }
 
-            // --- Información textual ---
+            // --- Textual content section ---
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
+                // Place name
                 Text(
                     text = place.name,
                     style = MaterialTheme.typography.titleMedium,
@@ -168,14 +184,14 @@ fun PlaceCard(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
+                // Category chip
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Surface(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp)),
+                        modifier = Modifier.clip(RoundedCornerShape(6.dp)),
                         color = MaterialTheme.colorScheme.primaryContainer
                     ) {
                         Text(
@@ -190,6 +206,7 @@ fun PlaceCard(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+                // Address
                 Text(
                     text = place.address,
                     style = MaterialTheme.typography.labelSmall,
@@ -199,18 +216,17 @@ fun PlaceCard(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // --- Botones de acción mejorados con scroll ---
+                // --- Action buttons (scrollable row) ---
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Botón Ver
+                    // View button
                     Button(
                         onClick = onView,
-                        modifier = Modifier
-                            .height(40.dp),
+                        modifier = Modifier.height(40.dp),
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary
@@ -231,16 +247,12 @@ fun PlaceCard(
                         )
                     }
 
-                    // Botón Editar
+                    // Edit button
                     OutlinedButton(
                         onClick = onEdit,
-                        modifier = Modifier
-                            .height(40.dp),
+                        modifier = Modifier.height(40.dp),
                         shape = RoundedCornerShape(10.dp),
-                        border = BorderStroke(
-                            1.5.dp,
-                            MaterialTheme.colorScheme.primary
-                        )
+                        border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
@@ -257,16 +269,12 @@ fun PlaceCard(
                         )
                     }
 
-                    // Botón Eliminar
+                    // Delete button
                     OutlinedButton(
                         onClick = onDelete,
-                        modifier = Modifier
-                            .height(40.dp),
+                        modifier = Modifier.height(40.dp),
                         shape = RoundedCornerShape(10.dp),
-                        border = BorderStroke(
-                            1.5.dp,
-                            MaterialTheme.colorScheme.error
-                        )
+                        border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.error)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
@@ -289,7 +297,10 @@ fun PlaceCard(
 }
 
 /**
- * Vista previa con datos simulados.
+ * Preview displaying a mock [Place] for UI testing purposes.
+ *
+ * This preview simulates a realistic card example that can be rendered
+ * directly in Android Studio’s Compose Preview window.
  */
 @Preview(showBackground = true)
 @Composable
@@ -297,7 +308,7 @@ fun PlaceCardPreview() {
     val fakePlace = Place(
         id = "1",
         name = "Café El Paraíso",
-        description = "Café artesanal con vista al valle.",
+        description = "Artisanal coffee shop with a view of the valley.",
         category = PlaceCategory.CAFE,
         address = "Carrera 12 #5-67, Armenia",
         phone = "+57 310 555 1234",
