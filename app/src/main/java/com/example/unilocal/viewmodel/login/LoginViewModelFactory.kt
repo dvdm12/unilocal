@@ -4,7 +4,7 @@ import android.app.Application // Import Application class for context
 import androidx.lifecycle.ViewModel // Import ViewModel base class
 import androidx.lifecycle.ViewModelProvider // Import ViewModelProvider for factory
 import com.example.unilocal.R // Import resources for error messages
-import com.example.unilocal.viewmodel.data.UserRepository // Import UserRepository for dependency injection
+import com.example.unilocal.repository.UserRepository // Import UserRepository for dependency injection
 
 /**
  * Factory for creating instances of [LoginViewModel] with dependency injection.

@@ -5,23 +5,24 @@ import androidx.lifecycle.viewModelScope
 import com.example.unilocal.model.Place
 import com.example.unilocal.model.PlaceStatus
 import com.example.unilocal.model.User
-import com.example.unilocal.viewmodel.data.UserRepository
+import com.example.unilocal.repository.PlaceRepository
+import com.example.unilocal.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel responsible for managing user data and synchronizing it with the UserRepository.
+ * ViewModel responsible for managing user data and synchronizing it
+ * with [UserRepository] and [PlaceRepository].
  *
- * This class follows the single responsibility principle:
+ * Responsibilities:
  * - Handles user session and persistence.
- * - Manages places associated with the active user.
+ * - Coordinates the relationship between users and places.
  * - Allows moderators to update place statuses.
- *
- * Schedule-related logic has been fully delegated to ScheduleViewModel.
  */
 class UserViewModel(
-    private val userRepository: UserRepository = UserRepository
+    private val userRepository: UserRepository = UserRepository,
+    private val placeRepository: PlaceRepository = PlaceRepository
 ) : ViewModel() {
 
     // -------------------------------------------------------------------------
@@ -38,16 +39,12 @@ class UserViewModel(
     // 🔹 USER MANAGEMENT
     // -------------------------------------------------------------------------
 
-    /**
-     * Sets the currently active user.
-     */
+    /** Sets the currently active user. */
     fun setActiveUser(user: User) {
         _user.value = user
     }
 
-    /**
-     * Clears the current active user (logout operation).
-     */
+    /** Clears the current active user (logout). */
     fun clearUser() {
         _user.value = null
     }
@@ -58,37 +55,54 @@ class UserViewModel(
 
     /**
      * Adds a new place to the active user and persists the update.
+     * The place is also registered globally in [PlaceRepository].
      */
     fun addPlace(place: Place) {
         val currentUser = _user.value ?: return
 
-        val updatedPlaces = currentUser.places.toMutableList().apply { add(place.copy(owner = currentUser)) }
-        val updatedUser = currentUser.copy(places = updatedPlaces)
+        viewModelScope.launch {
+            // 1️⃣ Registrar el lugar en el repositorio global
+            placeRepository.addPlace(place.copy(owner = currentUser))
 
-        _user.value = updatedUser
-        viewModelScope.launch { userRepository.updateUser(updatedUser) }
+            // 2️⃣ Actualizar la lista local del usuario
+            val updatedPlaces = currentUser.places.toMutableList().apply {
+                add(place.copy(owner = currentUser))
+            }
+            val updatedUser = currentUser.copy(places = updatedPlaces)
 
-        _message.value = "Lugar agregado exitosamente."
+            // 3️⃣ Persistir en UserRepository
+            _user.value = updatedUser
+            userRepository.updateUser(updatedUser)
+
+            _message.value = "Lugar agregado exitosamente."
+        }
     }
 
     /**
-     * Removes a place from the active user based on its ID.
+     * Removes a place from the active user and from the system globally.
      */
     fun removePlace(placeId: String) {
         val currentUser = _user.value ?: return
 
-        val updatedPlaces = currentUser.places.filterNot { it.id == placeId }.toMutableList()
-        val updatedUser = currentUser.copy(places = updatedPlaces)
+        viewModelScope.launch {
+            // 1️⃣ Eliminar del sistema global
+            val removedFromSystem = placeRepository.removePlace(placeId)
 
-        _user.value = updatedUser
-        viewModelScope.launch { userRepository.updateUser(updatedUser) }
+            // 2️⃣ Eliminar de la lista del usuario
+            val updatedPlaces = currentUser.places.filterNot { it.id == placeId }.toMutableList()
+            val updatedUser = currentUser.copy(places = updatedPlaces)
 
-        _message.value = "Lugar eliminado correctamente."
+            _user.value = updatedUser
+            userRepository.updateUser(updatedUser)
+
+            _message.value = if (removedFromSystem)
+                "Lugar eliminado correctamente."
+            else
+                "Lugar no encontrado en el sistema global."
+        }
     }
 
-    /**
-     * Returns all places associated with the current user.
-     */
+    /** Returns all places associated with the current user. */
     fun getUserPlaces(): List<Place> {
         return _user.value?.places ?: emptyList()
     }
@@ -97,41 +111,49 @@ class UserViewModel(
     // 🔹 MODERATOR FEATURES
     // -------------------------------------------------------------------------
 
-    /**
-     * Returns all registered users from the repository.
-     * Used by moderators to review all available places.
-     */
+    /** Returns all registered users (used by moderators). */
     fun getAllUsers(): List<User> {
         return userRepository.getAllUsers()
     }
 
     /**
      * Updates the status of a given place (Approved, Rejected, Pending)
-     * and persists the change in the corresponding user's record.
+     * and persists the change globally and for the place’s owner.
      */
     fun updatePlaceStatus(place: Place, newStatus: PlaceStatus) {
-        val users = userRepository.getAllUsers()
-
-        val user = users.find { it.id == place.owner.id } ?: return
-        val updatedPlaces = user.places.map {
-            if (it.id == place.id) it.copy(status = newStatus) else it
-        }
-        val updatedUser = user.copy(places = updatedPlaces as MutableList<Place>)
-
         viewModelScope.launch {
+            // 1️⃣ Actualizar estado global
+            val updatedPlace = place.copy(status = newStatus)
+            val updatedInRepo = placeRepository.updatePlace(updatedPlace)
+
+            if (!updatedInRepo) {
+                _message.value = "No se encontró el lugar para actualizar."
+                return@launch
+            }
+
+            // 2️⃣ Actualizar la lista del usuario propietario
+            val owner = userRepository.getUserById(place.owner.id) ?: return@launch
+            val updatedPlaces = owner.places.map {
+                if (it.id == place.id) updatedPlace else it
+            }
+            val updatedUser = owner.copy(places = updatedPlaces.toMutableList())
+
             userRepository.updateUser(updatedUser)
+
+            // 3️⃣ Refrescar el usuario activo si corresponde
+            if (_user.value?.id == owner.id) {
+                _user.value = updatedUser
+            }
+
             _message.value = "El estado del lugar fue actualizado a $newStatus"
         }
     }
-
 
     // -------------------------------------------------------------------------
     // 🔹 UTILITIES
     // -------------------------------------------------------------------------
 
-    /**
-     * Clears the current message after displaying it on the UI.
-     */
+    /** Clears the current message after displaying it on the UI. */
     fun clearMessage() {
         _message.value = null
     }

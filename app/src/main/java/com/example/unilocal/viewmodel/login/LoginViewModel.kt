@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import com.example.unilocal.R
 import com.example.unilocal.model.Role
 import com.example.unilocal.viewmodel.data.session.SessionManager
-import com.example.unilocal.viewmodel.data.UserRepository
+import com.example.unilocal.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update

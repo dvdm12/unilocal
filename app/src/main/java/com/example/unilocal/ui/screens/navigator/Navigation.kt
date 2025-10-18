@@ -17,7 +17,7 @@ import com.example.unilocal.ui.config.RouteScreen
 import com.example.unilocal.ui.screens.*
 import com.example.unilocal.ui.screens.moderator.ModeratorScreen
 import com.example.unilocal.ui.screens.user.NavHomeUser
-import com.example.unilocal.viewmodel.data.UserRepository
+import com.example.unilocal.repository.UserRepository
 import com.example.unilocal.viewmodel.data.session.UserSessionViewModel
 import com.example.unilocal.viewmodel.data.session.UserSessionViewModelFactory
 import com.example.unilocal.viewmodel.login.LoginViewModel

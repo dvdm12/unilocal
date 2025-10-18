@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,6 +31,7 @@ import com.example.unilocal.viewmodel.user.update.UserUpdateViewModel
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UserNavigation(
+    rootNavController: NavController,
     modifier: Modifier = Modifier,
     navController: NavHostController,
     startDestination: String = UserNavItem.HOME.route,

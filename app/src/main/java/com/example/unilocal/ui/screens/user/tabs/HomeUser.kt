@@ -37,7 +37,9 @@ import com.example.unilocal.viewmodel.user.UserViewModel
 @Composable
 fun HomeUser(
     userViewModel: UserViewModel,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onView: () -> Unit = {},
+    onEdit: () -> Unit = {}
 ) {
     // ✅ Etiquetas traducibles dentro del contexto composable
     val allLabel = stringResource(R.string.filter_all)
@@ -143,8 +145,8 @@ fun HomeUser(
                 items(filteredPlaces) { place ->
                     PlaceCard(
                         place = place,
-                        onView = { /* TODO: Navegar a detalles */ },
-                        onEdit = { /* TODO: Editar lugar */ },
+                        onView = onView,
+                        onEdit = onEdit,
                         onDelete = { /* TODO: Eliminar lugar */ }
                     )
                 }

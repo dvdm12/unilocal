@@ -1,6 +1,5 @@
-package com.example.unilocal.viewmodel.data
+package com.example.unilocal.repository
 
-import com.example.unilocal.model.Place
 import com.example.unilocal.model.Role
 import com.example.unilocal.model.User
 import java.util.UUID
@@ -9,14 +8,20 @@ import java.util.UUID
  * In-memory repository that manages application users.
  *
  * Responsibilities:
- * - Stores default simulated users.
- * - Allows registration of new users.
- * - Provides search and validation methods.
- * - Supports place status updates for moderators.
+ * - Stores simulated default users.
+ * - Allows registration and updates of user data.
+ * - Provides user search and validation utilities.
+ *
+ * ❌ This class no longer manages Place operations.
+ * ✅ All place management is delegated to PlaceRepository or coordinated from UserViewModel.
  */
 object UserRepository {
 
-    // Internal mutable list of users (in memory)
+    // -------------------------------------------------------------------------
+    // 🔹 INTERNAL STATE
+    // -------------------------------------------------------------------------
+
+    /** Internal list of users stored in memory. */
     private val _users = mutableListOf(
         User(
             id = "1",
@@ -42,27 +47,36 @@ object UserRepository {
         )
     )
 
-    // Returns all current users as an immutable list
+    /** Public immutable view of users. */
     val users: List<User>
         get() = _users.toList()
 
-    /**
-     * Returns all current users.
-     * Used by moderators to list all user data.
-     */
+    // -------------------------------------------------------------------------
+    // 🔹 READ OPERATIONS
+    // -------------------------------------------------------------------------
+
+    /** Returns all users (used mainly by moderators). */
     fun getAllUsers(): List<User> = _users.toList()
 
-    // Finds a user by email and password, only if active
+    /** Finds a user by credentials if active. */
     fun findUser(email: String, password: String): User? =
         _users.find { it.email == email && it.password == password && it.isActive }
 
-    // Checks if a user with the given email already exists
+    /** Checks if an email is already registered. */
     fun userExists(email: String): Boolean =
         _users.any { it.email.equals(email, ignoreCase = true) }
 
+    /** Finds a user by ID. */
+    fun getUserById(userId: String): User? =
+        _users.find { it.id == userId }
+
+    // -------------------------------------------------------------------------
+    // 🔹 CREATION
+    // -------------------------------------------------------------------------
+
     /**
-     * Registers a new user and adds it to the repository.
-     * @return true if added successfully, false if email is already in use.
+     * Registers a new user.
+     * @return true if successful, false if email already exists.
      */
     fun registerUser(
         name: String,
@@ -89,42 +103,38 @@ object UserRepository {
         return true
     }
 
+    // -------------------------------------------------------------------------
+    // 🔹 UPDATE OPERATIONS
+    // -------------------------------------------------------------------------
+
     /**
-     * Updates an existing user by matching its ID.
-     * Replaces the old instance with the new one, preserving the list order.
-     * @return true if the user was found and updated, false otherwise.
+     * Updates an existing user by ID.
+     * @return true if updated, false otherwise.
      */
     fun updateUser(updatedUser: User): Boolean {
         val index = _users.indexOfFirst { it.id == updatedUser.id }
         return if (index != -1) {
             _users[index] = updatedUser
             true
-        } else {
-            false
-        }
+        } else false
     }
 
+    // -------------------------------------------------------------------------
+    // 🔹 DELETE OPERATIONS
+    // -------------------------------------------------------------------------
+
     /**
-     * Updates the status of a specific place for a given user.
-     * @return true if the place was found and updated, false otherwise.
+     * Removes a user by ID.
+     * @return true if removed, false otherwise.
      */
-    fun updatePlaceStatus(userId: String, placeId: String, updatedPlace: Place): Boolean {
-        val userIndex = _users.indexOfFirst { it.id == userId }
-        if (userIndex == -1) return false
-
-        val user = _users[userIndex]
-        val updatedPlaces = user.places.map { place ->
-            if (place.id == placeId) updatedPlace else place
-        }
-
-        _users[userIndex] = user.copy(places = updatedPlaces as MutableList<Place>)
+    fun removeUser(userId: String): Boolean {
+        val index = _users.indexOfFirst { it.id == userId }
+        if (index == -1) return false
+        _users.removeAt(index)
         return true
     }
 
-    /**
-     * Removes all users from the repository.
-     * (Useful for testing or resetting data.)
-     */
+    /** Clears all users (useful for testing or resets). */
     fun clear() {
         _users.clear()
     }

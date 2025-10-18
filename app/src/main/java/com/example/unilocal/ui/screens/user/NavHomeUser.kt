@@ -70,6 +70,7 @@ fun NavHomeUser(
     ) { innerPadding ->
         // Main user navigation content
         UserNavigation(
+            rootNavController= rootNavController,
             navController = userNavController,
             startDestination = UserNavItem.HOME.route,
             modifier = Modifier.padding(innerPadding),

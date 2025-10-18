@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.unilocal.R
-import com.example.unilocal.viewmodel.data.UserRepository
+import com.example.unilocal.repository.UserRepository
 
 /**
  * Factory para crear instancias de RegisterViewModel con dependencias inyectadas.

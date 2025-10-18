@@ -49,7 +49,8 @@ enum class PlaceCategory {
     CAFE,
     MUSEUM,
     STORE,
-    THEATER
+    THEATER,
+    OTHER
 }
 
 enum class PlaceStatus {
