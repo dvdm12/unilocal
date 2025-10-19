@@ -41,7 +41,7 @@ fun HomeUser(
     onView: () -> Unit = {},
     onEdit: () -> Unit = {}
 ) {
-    // ✅ Etiquetas traducibles dentro del contexto composable
+    // --- UI Strings ---
     val allLabel = stringResource(R.string.filter_all)
     val publishedLabel = stringResource(R.string.filter_published)
     val pendingLabel = stringResource(R.string.filter_pending)
@@ -52,11 +52,16 @@ fun HomeUser(
     var selectedFilter by remember { mutableStateOf(allLabel) }
     var searchQuery by remember { mutableStateOf("") }
 
-    // --- Estado reactivo del usuario ---
+    // --- Reactive user state ---
     val user by userViewModel.user.collectAsState()
     val places = user?.places ?: emptyList()
 
-    // --- Filtro de búsqueda y estado dinámico ---
+    // --- Delete dialog state ---
+    val showDeleteDialog = remember { mutableStateOf(false) }
+    var selectedPlaceId by remember { mutableStateOf<String?>(null) }
+    var selectedPlaceName by remember { mutableStateOf("") }
+
+    // --- Filter logic ---
     val filteredPlaces by remember(user, searchQuery, selectedFilter) {
         derivedStateOf {
             val normalizedQuery = searchQuery.trim().lowercase()
@@ -69,16 +74,12 @@ fun HomeUser(
                     else -> true
                 }
 
-                // Mostrar todos si no hay texto
                 if (normalizedQuery.isEmpty()) return@filter matchesStatus
 
-                // Coincidencia directa o cercana por nombre
                 val nameMatch = place.name.lowercase().contains(normalizedQuery)
                 matchesStatus && nameMatch
             }
-                // Ordenar coincidencias (las que empiezan igual primero)
                 .sortedByDescending { it.name.lowercase().startsWith(normalizedQuery) }
-                // Evitar duplicados
                 .distinctBy { it.id }
         }
     }
@@ -95,13 +96,13 @@ fun HomeUser(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            // --- Perfil ---
+            // --- User profile ---
             item {
                 Spacer(modifier = Modifier.height(8.dp))
                 UserProfileSection(user = user)
             }
 
-            // --- Título ---
+            // --- Title ---
             item {
                 Text(
                     text = stringResource(R.string.my_places),
@@ -110,7 +111,7 @@ fun HomeUser(
                 )
             }
 
-            // --- Barra de búsqueda ---
+            // --- Search bar ---
             item {
                 SearchBar(
                     searchQuery = searchQuery,
@@ -119,7 +120,7 @@ fun HomeUser(
                 )
             }
 
-            // --- Filtros ---
+            // --- Filter chips ---
             item {
                 FilterRow(
                     filters = filters,
@@ -128,10 +129,10 @@ fun HomeUser(
                 )
             }
 
-            // --- Ordenamiento (placeholder) ---
+            // --- Sort placeholder ---
             item { SortSection() }
 
-            // --- Lista de lugares filtrados ---
+            // --- List of filtered places ---
             if (filteredPlaces.isEmpty()) {
                 item {
                     Text(
@@ -147,7 +148,11 @@ fun HomeUser(
                         place = place,
                         onView = onView,
                         onEdit = onEdit,
-                        onDelete = { /* TODO: Eliminar lugar */ }
+                        onDelete = {
+                            selectedPlaceId = place.id
+                            selectedPlaceName = place.name
+                            showDeleteDialog.value = true
+                        }
                     )
                 }
             }
@@ -155,7 +160,18 @@ fun HomeUser(
             item { Spacer(modifier = Modifier.height(32.dp)) }
         }
     }
+
+    // --- Confirmation Dialog ---
+    if (showDeleteDialog.value && selectedPlaceId != null) {
+        ConfirmDeleteDialog(
+            userViewModel = userViewModel,
+            placeId = selectedPlaceId!!,
+            placeName = selectedPlaceName,
+            showDialog = showDeleteDialog
+        )
+    }
 }
+
 
 /**
  * Barra superior con el título del perfil y opción de logout.

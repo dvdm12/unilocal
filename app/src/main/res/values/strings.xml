@@ -384,5 +384,8 @@
     <string name="msg_error_current_password_required">Debes ingresar tu contraseña actual para poder cambiarla</string>
     <string name="edit_profile_email_placeholder">Editar perfil</string>
 
+    <string name="dialog_delete_title">¿Eliminar lugar?</string>
+    <string name="dialog_delete_message">¿Estás seguro de eliminar "%1$s"? Esta acción no se puede deshacer.</string>
+
 
 </resources>

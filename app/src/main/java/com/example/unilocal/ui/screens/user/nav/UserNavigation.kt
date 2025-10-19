@@ -31,7 +31,6 @@ import com.example.unilocal.viewmodel.user.update.UserUpdateViewModel
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UserNavigation(
-    rootNavController: NavController,
     modifier: Modifier = Modifier,
     navController: NavHostController,
     startDestination: String = UserNavItem.HOME.route,
