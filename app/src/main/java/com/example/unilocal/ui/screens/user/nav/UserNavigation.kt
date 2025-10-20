@@ -50,6 +50,7 @@ fun UserNavigation(
         composable(UserNavItem.HOME.route) {
             HomeUser(
                 userViewModel = userViewModel,
+                placeViewModel = placeViewModel,
                 onBackClick = onLogout
             )
         }

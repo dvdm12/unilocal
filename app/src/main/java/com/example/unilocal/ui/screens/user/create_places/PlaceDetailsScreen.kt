@@ -38,21 +38,11 @@ import com.example.unilocal.viewmodel.schedule.ScheduleViewModel
 import com.example.unilocal.viewmodel.user.UserViewModel
 
 /**
- * Composable screen for creating a new **Place** within the UniLocal application.
+ * Screen for creating a new Place within UniLocal.
  *
- * This screen allows users to:
- *  - Enter general place information (name, description, category, phone, address)
- *  - Configure business schedules (using AM/PM format)
- *  - Upload and remove preview images
- *  - Publish the place after passing all validation checks
- *
- * The function observes reactive state from [PlaceViewModel] and [ScheduleViewModel],
- * ensuring UI updates are immediately reflected when ViewModel data changes.
- *
- * @param userViewModel Handles user-specific actions such as adding a new place.
- * @param placeViewModel Manages the current place creation form fields and validation logic.
- * @param scheduleViewModel Handles schedule creation, validation, and formatting.
- * @param onBackClick Lambda triggered when the user presses the back button in the top bar.
+ * - Uses PlaceViewModel for field validation and persistence.
+ * - Uses UserViewModel only to get the active user.
+ * - Handles reactive UI state with proper Compose flows.
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("MutableCollectionMutableState")
@@ -67,6 +57,7 @@ fun PlaceDetailsScreen(
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
+    // --- Reactive states ---
     val name by placeViewModel.name.collectAsState()
     val description by placeViewModel.description.collectAsState()
     val category by placeViewModel.category.collectAsState()
@@ -74,7 +65,7 @@ fun PlaceDetailsScreen(
     val address by placeViewModel.address.collectAsState()
     val imageUrls by placeViewModel.imageUrls.collectAsState()
     val message by placeViewModel.message.collectAsState()
-    val user = userViewModel.user.collectAsState().value
+    val user by userViewModel.user.collectAsState()
 
     // --- Message observer ---
     LaunchedEffect(message) {
@@ -140,28 +131,40 @@ fun PlaceDetailsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // --- Publish ---
+            // --- Publish Button ---
             UniPrimaryButton(
                 text = stringResource(R.string.action_publish),
                 onClick = {
-                    val owner = user ?: return@UniPrimaryButton
-                    val place = placeViewModel.createPlace(owner)
+                    val currentUser = user ?: run {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.msg_user_not_found),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@UniPrimaryButton
+                    }
+
+                    val place = placeViewModel.createPlace(currentUser)
+
                     if (place != null) {
-                        userViewModel.addPlace(place)
+
+                        userViewModel.addPlaceToUser(place)
+
                         Toast.makeText(
                             context,
                             context.getString(R.string.msg_place_created),
                             Toast.LENGTH_LONG
                         ).show()
+
                         placeViewModel.resetPlaceForm()
                         scheduleViewModel.clearSchedules()
                     }
                 }
             )
+
         }
     }
 }
-
 
 /**
  * Displays a form for entering the basic information of the place:

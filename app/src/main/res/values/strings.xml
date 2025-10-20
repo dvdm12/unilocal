@@ -386,6 +386,8 @@
 
     <string name="dialog_delete_title">¿Eliminar lugar?</string>
     <string name="dialog_delete_message">¿Estás seguro de eliminar "%1$s"? Esta acción no se puede deshacer.</string>
+    <string name="msg_place_not_found">Lugar no encontrado.</string>
+    <string name="msg_user_not_found">Usuario no encontrado</string>
 
 
 </resources>

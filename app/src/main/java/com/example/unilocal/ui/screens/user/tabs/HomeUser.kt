@@ -1,7 +1,5 @@
 package com.example.unilocal.ui.screens.user.tabs
 
-import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,18 +15,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.unilocal.R
+import com.example.unilocal.model.Place
 import com.example.unilocal.model.PlaceStatus
 import com.example.unilocal.model.User
 import com.example.unilocal.ui.components.users.SimpleTopBar
 import com.example.unilocal.ui.screens.user.create_places.PlaceCard
+import com.example.unilocal.viewmodel.place.PlaceViewModel
 import com.example.unilocal.viewmodel.user.UserViewModel
 
 /**
@@ -37,55 +38,45 @@ import com.example.unilocal.viewmodel.user.UserViewModel
 @Composable
 fun HomeUser(
     userViewModel: UserViewModel,
+    placeViewModel: PlaceViewModel,
     onBackClick: () -> Unit = {},
-    onView: () -> Unit = {},
-    onEdit: () -> Unit = {}
+    onView: (Place) -> Unit = {},
+    onEdit: (Place) -> Unit = {}
 ) {
-    // --- UI Strings ---
     val allLabel = stringResource(R.string.filter_all)
     val publishedLabel = stringResource(R.string.filter_published)
     val pendingLabel = stringResource(R.string.filter_pending)
     val rejectedLabel = stringResource(R.string.filter_rejected)
-
     val filters = listOf(allLabel, publishedLabel, pendingLabel, rejectedLabel)
 
     var selectedFilter by remember { mutableStateOf(allLabel) }
     var searchQuery by remember { mutableStateOf("") }
 
-    // --- Reactive user state ---
     val user by userViewModel.user.collectAsState()
     val places = user?.places ?: emptyList()
 
-    // --- Delete dialog state ---
     val showDeleteDialog = remember { mutableStateOf(false) }
-    var selectedPlaceId by remember { mutableStateOf<String?>(null) }
-    var selectedPlaceName by remember { mutableStateOf("") }
+    var selectedPlace by remember { mutableStateOf<Place?>(null) }
 
-    // --- Filter logic ---
+    // Filtrado reactivo
     val filteredPlaces by remember(user, searchQuery, selectedFilter) {
         derivedStateOf {
-            val normalizedQuery = searchQuery.trim().lowercase()
-
+            val normalized = searchQuery.trim().lowercase()
             places.filter { place ->
-                val matchesStatus = when (selectedFilter) {
+                val matchStatus = when (selectedFilter) {
                     publishedLabel -> place.status == PlaceStatus.APPROVED
                     pendingLabel -> place.status == PlaceStatus.PENDING
                     rejectedLabel -> place.status == PlaceStatus.REJECTED
                     else -> true
                 }
-
-                if (normalizedQuery.isEmpty()) return@filter matchesStatus
-
-                val nameMatch = place.name.lowercase().contains(normalizedQuery)
-                matchesStatus && nameMatch
+                val matchQuery = normalized.isEmpty() || place.name.lowercase().contains(normalized)
+                matchStatus && matchQuery
             }
-                .sortedByDescending { it.name.lowercase().startsWith(normalizedQuery) }
-                .distinctBy { it.id }
         }
     }
 
     Scaffold(
-        topBar = { HomeTopBar(onBackClick = onBackClick) }
+        topBar = { HomeTopBar(onBackClick) }
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
@@ -95,14 +86,12 @@ fun HomeUser(
                 .padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            item { Spacer(modifier = Modifier.height(8.dp)) }
 
-            // --- User profile ---
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-                UserProfileSection(user = user)
-            }
+            // Perfil de usuario
+            item { UserProfileSection(user) }
 
-            // --- Title ---
+            // Título
             item {
                 Text(
                     text = stringResource(R.string.my_places),
@@ -111,7 +100,7 @@ fun HomeUser(
                 )
             }
 
-            // --- Search bar ---
+            // Barra de búsqueda
             item {
                 SearchBar(
                     searchQuery = searchQuery,
@@ -120,7 +109,7 @@ fun HomeUser(
                 )
             }
 
-            // --- Filter chips ---
+            // Filtros
             item {
                 FilterRow(
                     filters = filters,
@@ -129,10 +118,10 @@ fun HomeUser(
                 )
             }
 
-            // --- Sort placeholder ---
+            // Sección de ordenamiento (placeholder)
             item { SortSection() }
 
-            // --- List of filtered places ---
+            // Lista de lugares
             if (filteredPlaces.isEmpty()) {
                 item {
                     Text(
@@ -146,11 +135,10 @@ fun HomeUser(
                 items(filteredPlaces) { place ->
                     PlaceCard(
                         place = place,
-                        onView = onView,
-                        onEdit = onEdit,
+                        onView = { onView(place) },
+                        onEdit = { onEdit(place) },
                         onDelete = {
-                            selectedPlaceId = place.id
-                            selectedPlaceName = place.name
+                            selectedPlace = place
                             showDeleteDialog.value = true
                         }
                     )
@@ -161,21 +149,18 @@ fun HomeUser(
         }
     }
 
-    // --- Confirmation Dialog ---
-    if (showDeleteDialog.value && selectedPlaceId != null) {
+    // Diálogo de confirmación
+    if (showDeleteDialog.value && selectedPlace != null) {
         ConfirmDeleteDialog(
+            placeViewModel = placeViewModel,
             userViewModel = userViewModel,
-            placeId = selectedPlaceId!!,
-            placeName = selectedPlaceName,
+            place = selectedPlace!!,
             showDialog = showDeleteDialog
         )
     }
 }
 
-
-/**
- * Barra superior con el título del perfil y opción de logout.
- */
+/** Barra superior con título y botón de logout */
 @Composable
 fun HomeTopBar(onBackClick: () -> Unit) {
     SimpleTopBar(
@@ -184,15 +169,16 @@ fun HomeTopBar(onBackClick: () -> Unit) {
     )
 }
 
-/**
- * Muestra la información básica del usuario (foto, nombre, username, ciudad).
- */
+/** Información del perfil del usuario */
 @Composable
 fun UserProfileSection(user: User?) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(R.drawable.ic_launcher_foreground)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = stringResource(R.string.user_avatar_desc),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -220,15 +206,9 @@ fun UserProfileSection(user: User?) {
     }
 }
 
-/**
- * Barra de búsqueda reactiva.
- */
+/** Campo de búsqueda */
 @Composable
-fun SearchBar(
-    searchQuery: String,
-    onSearchChange: (String) -> Unit,
-    onSearchClear: () -> Unit
-) {
+fun SearchBar(searchQuery: String, onSearchChange: (String) -> Unit, onSearchClear: () -> Unit) {
     OutlinedTextField(
         value = searchQuery,
         onValueChange = onSearchChange,
@@ -241,24 +221,18 @@ fun SearchBar(
         trailingIcon = {
             if (searchQuery.isNotEmpty()) {
                 IconButton(onClick = onSearchClear) {
-                    Icon(Icons.Default.Close, contentDescription = "Clear search")
+                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.clear_action))
                 }
             } else {
-                Icon(Icons.Default.Search, contentDescription = null)
+                Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search_action))
             }
         }
     )
 }
 
-/**
- * Fila horizontal de filtros.
- */
+/** Fila de filtros de estado */
 @Composable
-fun FilterRow(
-    filters: List<String>,
-    selected: String,
-    onSelectedChange: (String) -> Unit
-) {
+fun FilterRow(filters: List<String>, selected: String, onSelectedChange: (String) -> Unit) {
     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         items(filters) { filter ->
             FilterChip(
@@ -270,15 +244,10 @@ fun FilterRow(
     }
 }
 
-/**
- * Placeholder para futuras opciones de ordenamiento.
- */
+/** Placeholder de ordenamiento */
 @Composable
 fun SortSection() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Start
-    ) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
         Icon(
             imageVector = Icons.Default.KeyboardArrowDown,
             contentDescription = stringResource(R.string.sort_content_desc),
@@ -288,10 +257,45 @@ fun SortSection() {
     }
 }
 
-@SuppressLint("ViewModelConstructorInComposable")
-@Preview(showBackground = true)
+/** Diálogo para confirmar la eliminación de un lugar */
 @Composable
-fun HomeUserPreview() {
-    val fakeViewModel = UserViewModel()
-    HomeUser(userViewModel = fakeViewModel)
+fun ConfirmDeleteDialog(
+    placeViewModel: PlaceViewModel,
+    userViewModel: UserViewModel,
+    place: Place,
+    showDialog: MutableState<Boolean>
+) {
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        placeViewModel.removePlace(place.id)
+                        userViewModel.removePlaceFromUserList(place.id)
+                        showDialog.value = false
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.action_delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog.value = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+            title = { Text(stringResource(R.string.dialog_delete_title)) },
+            text = {
+                Text(
+                    stringResource(
+                        R.string.dialog_delete_message,
+                        place.name
+                    )
+                )
+            }
+        )
+    }
 }

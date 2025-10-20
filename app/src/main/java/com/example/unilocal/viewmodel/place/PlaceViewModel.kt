@@ -7,11 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.unilocal.R
-import com.example.unilocal.model.Place
-import com.example.unilocal.model.PlaceCategory
-import com.example.unilocal.model.Schedule
-import com.example.unilocal.model.User
-import com.example.unilocal.model.buildPlace
+import com.example.unilocal.model.*
+import com.example.unilocal.repository.PlaceRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -19,22 +16,33 @@ import kotlinx.coroutines.launch
 import java.net.URL
 
 /**
- * ViewModel responsible for managing the creation, validation, and image handling
- * of Place entities within the UniLocal app.
+ * ViewModel responsible for managing [Place] creation, validation, and persistence.
  *
  * Responsibilities:
- * - Manages reactive UI states for all Place fields.
- * - Validates user inputs before creating a Place.
- * - Builds a valid Place instance ready to be saved through UserViewModel.
+ * - Manages reactive UI states for place creation/editing.
+ * - Validates user input and constructs [Place] entities via the [buildPlace] DSL.
+ * - Delegates all persistence operations to [PlaceRepository].
+ *
+ * The builder [buildPlace] automatically initializes missing attributes
+ * with default values defined in [PlaceBuilderDSL].
  */
 class PlaceViewModel(application: Application) : AndroidViewModel(application) {
 
     @SuppressLint("StaticFieldLeak")
     private val context = application.applicationContext
 
+    private val placeRepository = PlaceRepository
+
     // -------------------------------------------------------------------------
-    // 🔹 STATE MANAGEMENT
+    // STATE MANAGEMENT
     // -------------------------------------------------------------------------
+
+    private val _places = MutableStateFlow<List<Place>>(emptyList())
+    val places: StateFlow<List<Place>> = _places
+
+    private val _message = MutableStateFlow<String?>(null)
+    val message: StateFlow<String?> = _message
+
     private val _name = MutableStateFlow("")
     val name: StateFlow<String> = _name
 
@@ -56,12 +64,10 @@ class PlaceViewModel(application: Application) : AndroidViewModel(application) {
     private val _imageUrls = MutableStateFlow<List<String>>(emptyList())
     val imageUrls: StateFlow<List<String>> = _imageUrls
 
-    private val _message = MutableStateFlow<String?>(null)
-    val message: StateFlow<String?> = _message
+    // -------------------------------------------------------------------------
+    // FIELD UPDATES
+    // -------------------------------------------------------------------------
 
-    // -------------------------------------------------------------------------
-    // 🔹 FIELD UPDATES
-    // -------------------------------------------------------------------------
     fun updateName(value: String) = _name.update { value }
 
     fun updateDescription(value: String) = _description.update { value }
@@ -109,11 +115,12 @@ class PlaceViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // -------------------------------------------------------------------------
-    // 🔹 VALIDATION LOGIC
+    // VALIDATION LOGIC
     // -------------------------------------------------------------------------
+
     /**
-     * Validates that all fields have valid values before creating a Place.
-     * Returns `true` if all validations pass, otherwise `false`.
+     * Validates the current field values before creating or updating a [Place].
+     * @return `true` if all required fields are valid; otherwise, `false`.
      */
     private fun validateFields(): Boolean {
         return when {
@@ -143,44 +150,100 @@ class PlaceViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // -------------------------------------------------------------------------
-    // 🔹 PLACE CREATION
+    // PLACE CREATION
     // -------------------------------------------------------------------------
+
     /**
-     * Builds and returns a valid Place instance if all fields are valid.
-     * Returns `null` if validation fails.
+     * Creates and registers a [Place] for the given [User].
+     * The [buildPlace] DSL automatically fills in default values
+     * for unspecified attributes.
+     *
+     * @param currentOwner The [User] who owns this place.
+     * @return The created [Place], or `null` if validation fails.
      */
-    fun createPlace(owner: User): Place? {
+    fun createPlace(currentOwner: User): Place? {
         if (!validateFields()) return null
 
         return try {
-            buildPlace {
-                this.name = _name.value
-                this.description = _description.value
-                this.category = _category.value
-                this.address = _address.value
-                this.phone = _phone.value
-                this.owner = owner
-                this.schedules = _schedules.value
+            val newPlace = buildPlace {
+                name = _name.value
+                description = _description.value
+                category = _category.value
+                address = _address.value
+                phone = _phone.value
+                owner = currentOwner
+                schedules = _schedules.value
                 setImageUrls(_imageUrls.value.mapNotNull { runCatching { URL(it) }.getOrNull() })
-            }.also {
+            }
+
+            viewModelScope.launch {
+                placeRepository.addPlace(newPlace)
+                _places.value = placeRepository.getAllPlaces()
                 _message.value = context.getString(R.string.msg_place_created)
             }
+
+            newPlace
         } catch (e: Exception) {
-            _message.value = e.message ?: "Error desconocido al crear el lugar."
+            _message.value = e.message ?: "Unknown error while creating the place."
             null
         }
     }
 
-    // ---------------------------------------------------------
-    // Reset logic
-    // ---------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // CRUD OPERATIONS
+    // -------------------------------------------------------------------------
 
-    /**
-     * Resets all form fields and UI state to their default values.
-     *
-     * This method is typically invoked after successfully creating a place,
-     * allowing the user to start entering a new one without residual data.
-     */
+    /** Updates an existing [Place]. */
+    fun updatePlace(place: Place) {
+        viewModelScope.launch {
+            val updated = placeRepository.updatePlace(place)
+            if (updated) {
+                _places.value = placeRepository.getAllPlaces()
+                _message.value = context.getString(R.string.msg_place_updated)
+            } else {
+                _message.value = context.getString(R.string.msg_place_not_found)
+            }
+        }
+    }
+
+    /** Removes a [Place] by its unique ID. */
+    fun removePlace(placeId: String) {
+        viewModelScope.launch {
+            val removed = placeRepository.removePlace(placeId)
+            if (removed) {
+                _places.value = placeRepository.getAllPlaces()
+                _message.value = context.getString(R.string.msg_place_deleted)
+            } else {
+                _message.value = context.getString(R.string.msg_place_not_found)
+            }
+        }
+    }
+
+    /** Updates the status of a [Place] (e.g., approved, rejected). */
+    fun updatePlaceStatus(placeId: String, newStatus: PlaceStatus) {
+        viewModelScope.launch {
+            val updated = placeRepository.updatePlaceStatus(placeId, newStatus)
+            if (updated) {
+                _places.value = placeRepository.getAllPlaces()
+                _message.value = "Place status updated to $newStatus"
+            } else {
+                _message.value = context.getString(R.string.msg_place_not_found)
+            }
+        }
+    }
+
+    /** Refreshes the list of places from the repository. */
+    fun refreshPlaces() {
+        viewModelScope.launch {
+            _places.value = placeRepository.getAllPlaces()
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // RESET LOGIC
+    // -------------------------------------------------------------------------
+
+    /** Resets all input fields to their default state. */
     fun resetPlaceForm() {
         viewModelScope.launch {
             _name.value = ""
@@ -194,11 +257,12 @@ class PlaceViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    /**
-     * Companion object providing a [ViewModelProvider.Factory] for creating instances
-     * of [PlaceViewModel] with an [Application] context.
-     */
+    // -------------------------------------------------------------------------
+    // FACTORY
+    // -------------------------------------------------------------------------
+
     companion object {
+        /** Factory for creating [PlaceViewModel] instances with an [Application] context. */
         fun Factory(application: Application): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -211,5 +275,3 @@ class PlaceViewModel(application: Application) : AndroidViewModel(application) {
             }
     }
 }
-
-
