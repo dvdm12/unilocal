@@ -389,5 +389,23 @@
     <string name="msg_place_not_found">Lugar no encontrado.</string>
     <string name="msg_user_not_found">Usuario no encontrado</string>
 
+    <!-- ===================================================== -->
+    <!-- 🔹 ViewPlaceScreen: detalles del lugar -->
+    <!-- ===================================================== -->
+    <string name="place_detail_title">Detalles del lugar</string>
+    <string name="place_detail_info_title">Información del lugar</string>
+    <string name="place_detail_contact_title">Contacto y dirección</string>
+    <string name="place_detail_schedule_title">Horarios</string>
+    <string name="msg_no_images">Sin imágenes disponibles</string>
+
+    <!-- Descripciones de íconos -->
+    <string name="cd_owner_icon">Ícono del propietario</string>
+    <string name="cd_location_icon">Ícono de ubicación</string>
+    <string name="cd_phone_icon">Ícono de teléfono</string>
+
+    <!-- Mensaje de error genérico al cargar -->
+    <string name="msg_error_loading_place">Error al cargar la información del lugar.</string>
+
+
 
 </resources>

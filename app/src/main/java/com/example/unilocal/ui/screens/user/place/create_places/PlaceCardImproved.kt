@@ -1,4 +1,4 @@
-package com.example.unilocal.ui.screens.user.create_places
+package com.example.unilocal.ui.screens.user.place.create_places
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

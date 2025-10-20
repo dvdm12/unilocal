@@ -2,6 +2,7 @@ package com.example.unilocal.viewmodel.place
 
 import android.annotation.SuppressLint
 import android.app.Application
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

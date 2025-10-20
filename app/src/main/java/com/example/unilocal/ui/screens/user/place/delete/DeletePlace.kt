@@ -1,4 +1,4 @@
-package com.example.unilocal.ui.screens.user.tabs
+package com.example.unilocal.ui.screens.user.place.delete
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable

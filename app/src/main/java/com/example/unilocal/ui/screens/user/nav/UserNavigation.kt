@@ -4,12 +4,14 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.unilocal.ui.screens.user.create_places.PlaceDetailsScreen
+import androidx.navigation.toRoute
+import com.example.unilocal.ui.config.RoutePlace
+import com.example.unilocal.ui.screens.user.place.create_places.PlaceDetailsScreen
+import com.example.unilocal.ui.screens.user.place.details.ViewPlaceScreen
 import com.example.unilocal.ui.screens.user.tabs.EditProfileScreen
 import com.example.unilocal.ui.screens.user.tabs.HomeUser
 import com.example.unilocal.ui.screens.user.tabs.SearchPlace
@@ -51,7 +53,24 @@ fun UserNavigation(
             HomeUser(
                 userViewModel = userViewModel,
                 placeViewModel = placeViewModel,
+                onView = { placeId ->
+                    navController.navigate(RoutePlace.ViewPlaceScreen(placeId))
+                },
                 onBackClick = onLogout
+            )
+        }
+
+        // --- Ver detalles de un lugar ---
+        composable<RoutePlace.ViewPlaceScreen> { backStackEntry ->
+            val args = backStackEntry.toRoute<RoutePlace.ViewPlaceScreen>()
+
+            ViewPlaceScreen(
+                placeId = args.placeId,
+                placeViewModel = placeViewModel,
+                scheduleViewModel = scheduleViewModel,
+                onBackClick = {
+                    navController.popBackStack(UserNavItem.HOME.route, inclusive = false)
+                }
             )
         }
 

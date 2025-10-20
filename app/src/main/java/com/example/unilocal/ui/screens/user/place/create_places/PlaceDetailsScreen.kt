@@ -1,4 +1,4 @@
-package com.example.unilocal.ui.screens.user.create_places
+package com.example.unilocal.ui.screens.user.place.create_places
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -281,7 +281,10 @@ fun PlaceScheduleSection(
     }
 
     // --- Add form ---
-    ScheduleForm(scheduleViewModel, onScheduleAdded)
+    ScheduleForm(
+        scheduleViewModel=scheduleViewModel,
+        onScheduleAdded
+    )
 
     // --- List of schedules ---
     if (schedules.isNotEmpty()) {
@@ -366,25 +369,22 @@ fun ScheduleForm(
 ) {
     val context = LocalContext.current
 
-    val days = listOf(
-        stringResource(R.string.day_monday),
-        stringResource(R.string.day_tuesday),
-        stringResource(R.string.day_wednesday),
-        stringResource(R.string.day_thursday),
-        stringResource(R.string.day_friday),
-        stringResource(R.string.day_saturday),
-        stringResource(R.string.day_sunday)
-    )
+    // --- Retrieve localized day names from ScheduleViewModel ---
+    val days = scheduleViewModel.getLocalizedDays()
 
+    // --- Time options: 12-hour format and 5-minute increments ---
     val hours = (1..12).map { it.toString().padStart(2, '0') }
-    val minutes = listOf("00", "15", "30", "45")
+    val minutes = (0..55 step 5).map { it.toString().padStart(2, '0') }
+
+    // --- AM/PM periods ---
     val periods = listOf(
         stringResource(R.string.period_am),
         stringResource(R.string.period_pm)
     )
 
-    var startDay by remember { mutableStateOf(days.first()) }
-    var endDay by remember { mutableStateOf(days.last()) }
+    // --- Local state for form selections ---
+    var startDay by remember { mutableStateOf(days.firstOrNull() ?: "") }
+    var endDay by remember { mutableStateOf(days.lastOrNull() ?: "") }
     var openHour by remember { mutableStateOf("08") }
     var openMinute by remember { mutableStateOf("00") }
     var openPeriod by remember { mutableStateOf(periods.first()) }
@@ -392,6 +392,7 @@ fun ScheduleForm(
     var closeMinute by remember { mutableStateOf("00") }
     var closePeriod by remember { mutableStateOf(periods.last()) }
 
+    // --- Section title ---
     Text(
         text = stringResource(R.string.place_schedule_title),
         fontWeight = FontWeight.Bold,
@@ -400,13 +401,17 @@ fun ScheduleForm(
 
     Spacer(modifier = Modifier.height(12.dp))
 
+    // --- Start day dropdown ---
     DropdownField(
         label = stringResource(R.string.schedule_label_start_day),
         options = days,
         selectedOption = startDay,
         onOptionSelected = { startDay = it }
     )
+
     Spacer(modifier = Modifier.height(8.dp))
+
+    // --- End day dropdown ---
     DropdownField(
         label = stringResource(R.string.schedule_label_end_day),
         options = days,
@@ -415,30 +420,86 @@ fun ScheduleForm(
     )
 
     Spacer(modifier = Modifier.height(16.dp))
-    Text(stringResource(R.string.schedule_label_opening), fontWeight = FontWeight.SemiBold)
+
+    // --- Opening time section ---
+    Text(
+        text = stringResource(R.string.schedule_label_opening),
+        fontWeight = FontWeight.SemiBold
+    )
+
     Spacer(modifier = Modifier.height(8.dp))
 
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-        DropdownField(label = stringResource(R.string.schedule_label_hour), options = hours, selectedOption = openHour, onOptionSelected = { openHour = it }, modifier = Modifier.weight(1f))
-        DropdownField(label = stringResource(R.string.schedule_label_minute), options = minutes, selectedOption = openMinute, onOptionSelected = { openMinute = it }, modifier = Modifier.weight(1f))
-        DropdownField(label = stringResource(R.string.schedule_label_period), options = periods, selectedOption = openPeriod, onOptionSelected = { openPeriod = it }, modifier = Modifier.weight(1f))
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        DropdownField(
+            label = stringResource(R.string.schedule_label_hour),
+            options = hours,
+            selectedOption = openHour,
+            onOptionSelected = { openHour = it },
+            modifier = Modifier.weight(1f)
+        )
+        DropdownField(
+            label = stringResource(R.string.schedule_label_minute),
+            options = minutes,
+            selectedOption = openMinute,
+            onOptionSelected = { openMinute = it },
+            modifier = Modifier.weight(1f)
+        )
+        DropdownField(
+            label = stringResource(R.string.schedule_label_period),
+            options = periods,
+            selectedOption = openPeriod,
+            onOptionSelected = { openPeriod = it },
+            modifier = Modifier.weight(1f)
+        )
     }
 
     Spacer(modifier = Modifier.height(16.dp))
-    Text(stringResource(R.string.schedule_label_closing), fontWeight = FontWeight.SemiBold)
+
+    // --- Closing time section ---
+    Text(
+        text = stringResource(R.string.schedule_label_closing),
+        fontWeight = FontWeight.SemiBold
+    )
+
     Spacer(modifier = Modifier.height(8.dp))
 
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-        DropdownField(label = stringResource(R.string.schedule_label_hour), options = hours, selectedOption = closeHour, onOptionSelected = { closeHour = it }, modifier = Modifier.weight(1f))
-        DropdownField(label = stringResource(R.string.schedule_label_minute), options = minutes, selectedOption = closeMinute, onOptionSelected = { closeMinute = it }, modifier = Modifier.weight(1f))
-        DropdownField(label = stringResource(R.string.schedule_label_period), options = periods, selectedOption = closePeriod, onOptionSelected = { closePeriod = it }, modifier = Modifier.weight(1f))
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        DropdownField(
+            label = stringResource(R.string.schedule_label_hour),
+            options = hours,
+            selectedOption = closeHour,
+            onOptionSelected = { closeHour = it },
+            modifier = Modifier.weight(1f)
+        )
+        DropdownField(
+            label = stringResource(R.string.schedule_label_minute),
+            options = minutes,
+            selectedOption = closeMinute,
+            onOptionSelected = { closeMinute = it },
+            modifier = Modifier.weight(1f)
+        )
+        DropdownField(
+            label = stringResource(R.string.schedule_label_period),
+            options = periods,
+            selectedOption = closePeriod,
+            onOptionSelected = { closePeriod = it },
+            modifier = Modifier.weight(1f)
+        )
     }
 
     Spacer(modifier = Modifier.height(16.dp))
 
+    // --- Button to add schedule entry ---
     UniPrimaryButton(
         text = stringResource(R.string.schedule_button_add),
         onClick = {
+            // Add schedule using ScheduleViewModel logic
             scheduleViewModel.addSchedule(
                 startDay = startDay,
                 endDay = endDay,
@@ -449,14 +510,22 @@ fun ScheduleForm(
                 closeMinute = closeMinute,
                 closePeriod = closePeriod
             )
+
+            // Retrieve last added schedule and pass it to parent callback
             val lastSchedule = scheduleViewModel.schedules.value.lastOrNull()
             if (lastSchedule != null) {
                 onAddSchedule(lastSchedule)
-                Toast.makeText(context, context.getString(R.string.msg_schedule_added), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.msg_schedule_added),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     )
 }
+
+
 
 /**
  * Displays the image upload and preview section for a place.

@@ -58,12 +58,21 @@ class ScheduleViewModel(application: Application) : AndroidViewModel(application
 
     private val reverseDays = dayToNum.entries.associate { (k, v) -> v to k }
 
+    /**
+     * Converts 12-hour format to 24-hour integer hour.
+     */
     private fun convertTo24(hour: Int, period: String): Int =
         when (period) {
             context.getString(R.string.period_am) -> if (hour == 12) 0 else hour
             context.getString(R.string.period_pm) -> if (hour == 12) 12 else hour + 12
             else -> hour
         }
+
+    /**
+     * Returns a localized list of day names (Monday to Sunday).
+     * Used by UI components such as ScheduleForm.
+     */
+    fun getLocalizedDays(): List<String> = dayToNum.keys.toList()
 
     // -------------------------------------------------------------------------
     // 🔹 CORE LOGIC
@@ -192,12 +201,12 @@ class ScheduleViewModel(application: Application) : AndroidViewModel(application
 
     /**
      * Returns a human-readable schedule string.
-     * Example: "Monday to Friday | 🕒 08:00 - 17:00"
+     * Example: "Lunes a Viernes | 08:00 - 17:00"
      */
     fun formatSchedule(schedule: Schedule): String {
         val startDay = reverseDays[schedule.dayStart] ?: "?"
         val endDay = reverseDays[schedule.dayEnd] ?: "?"
         val formatter = DateTimeFormatter.ofPattern("HH:mm")
-        return "$startDay a $endDay | 🕒 ${schedule.start.format(formatter)} - ${schedule.end.format(formatter)}"
+        return "$startDay a $endDay | ${schedule.start.format(formatter)} - ${schedule.end.format(formatter)}"
     }
 }

@@ -1,4 +1,4 @@
-package com.example.unilocal.ui.screens.user.create_places
+package com.example.unilocal.ui.screens.user.place.create_places
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -103,7 +104,7 @@ fun PlaceCard(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
-                            brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                            brush = Brush.verticalGradient(
                                 colors = listOf(
                                     Color.Transparent,
                                     Color.Black.copy(alpha = 0.4f)

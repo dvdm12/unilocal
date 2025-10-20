@@ -1,5 +1,6 @@
 package com.example.unilocal.ui.config
 
+import com.example.unilocal.model.Place
 import kotlinx.serialization.Serializable
 
 /**
@@ -10,11 +11,17 @@ import kotlinx.serialization.Serializable
  */
 sealed class RoutePlace {
 
-    /** Displays details of a specific place selected by the user. */
+    /**
+     * Displays the details of a specific place selected by the user.
+     * Example: navigate(RoutePlace.ViewPlaceScreen(placeId))
+     */
     @Serializable
-    data object ViewPlaceScreen : RoutePlace()
+    data class ViewPlaceScreen(val placeId: String) : RoutePlace()
 
-    /** Opens the edit screen for a specific place. */
+    /**
+     * Opens the edit screen for a specific place.
+     * Example: navigate(RoutePlace.EditPlaceScreen(placeId))
+     */
     @Serializable
-    data object EditPlaceScreen : RoutePlace()
+    data class EditPlaceScreen(val placeId: String) : RoutePlace()
 }

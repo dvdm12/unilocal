@@ -28,7 +28,7 @@ import com.example.unilocal.model.Place
 import com.example.unilocal.model.PlaceStatus
 import com.example.unilocal.model.User
 import com.example.unilocal.ui.components.users.SimpleTopBar
-import com.example.unilocal.ui.screens.user.create_places.PlaceCard
+import com.example.unilocal.ui.screens.user.place.create_places.PlaceCard
 import com.example.unilocal.viewmodel.place.PlaceViewModel
 import com.example.unilocal.viewmodel.user.UserViewModel
 
@@ -40,8 +40,8 @@ fun HomeUser(
     userViewModel: UserViewModel,
     placeViewModel: PlaceViewModel,
     onBackClick: () -> Unit = {},
-    onView: (Place) -> Unit = {},
-    onEdit: (Place) -> Unit = {}
+    onView: (String) -> Unit = {},   // ✅ recibe solo el ID del lugar
+    onEdit: (String) -> Unit = {}    // ✅ idem
 ) {
     val allLabel = stringResource(R.string.filter_all)
     val publishedLabel = stringResource(R.string.filter_published)
@@ -58,7 +58,7 @@ fun HomeUser(
     val showDeleteDialog = remember { mutableStateOf(false) }
     var selectedPlace by remember { mutableStateOf<Place?>(null) }
 
-    // Filtrado reactivo
+    // 🔹 Filtrado reactivo
     val filteredPlaces by remember(user, searchQuery, selectedFilter) {
         derivedStateOf {
             val normalized = searchQuery.trim().lowercase()
@@ -88,10 +88,10 @@ fun HomeUser(
         ) {
             item { Spacer(modifier = Modifier.height(8.dp)) }
 
-            // Perfil de usuario
+            // 🔹 Perfil del usuario
             item { UserProfileSection(user) }
 
-            // Título
+            // 🔹 Título de sección
             item {
                 Text(
                     text = stringResource(R.string.my_places),
@@ -100,7 +100,7 @@ fun HomeUser(
                 )
             }
 
-            // Barra de búsqueda
+            // 🔹 Barra de búsqueda
             item {
                 SearchBar(
                     searchQuery = searchQuery,
@@ -109,7 +109,7 @@ fun HomeUser(
                 )
             }
 
-            // Filtros
+            // 🔹 Filtros de estado
             item {
                 FilterRow(
                     filters = filters,
@@ -118,10 +118,10 @@ fun HomeUser(
                 )
             }
 
-            // Sección de ordenamiento (placeholder)
+            // 🔹 Placeholder de ordenamiento
             item { SortSection() }
 
-            // Lista de lugares
+            // 🔹 Lista de lugares
             if (filteredPlaces.isEmpty()) {
                 item {
                     Text(
@@ -135,8 +135,8 @@ fun HomeUser(
                 items(filteredPlaces) { place ->
                     PlaceCard(
                         place = place,
-                        onView = { onView(place) },
-                        onEdit = { onEdit(place) },
+                        onView = { onView(place.id) },  // ✅ envía solo el ID
+                        onEdit = { onEdit(place.id) },  // ✅ idem
                         onDelete = {
                             selectedPlace = place
                             showDeleteDialog.value = true
@@ -149,7 +149,7 @@ fun HomeUser(
         }
     }
 
-    // Diálogo de confirmación
+    // 🔹 Diálogo de confirmación de eliminación
     if (showDeleteDialog.value && selectedPlace != null) {
         ConfirmDeleteDialog(
             placeViewModel = placeViewModel,
