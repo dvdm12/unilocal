@@ -263,24 +263,3 @@ fun RegisterButton(
     }
 }
 
-@SuppressLint("ViewModelConstructorInComposable")
-@Preview(showBackground = true, name = "Login Screen")
-@Composable
-fun SimpleLoginPreview() {
-    MaterialTheme {
-        Surface {
-            Login(
-                userSessionViewModel = UserSessionViewModel(
-                    context = LocalContext.current
-                ),
-                onBackClick = {},
-                onLoginSuccessUser = {},
-                onLoginSuccessModerator = {},
-                onGoogleLogin = {},
-                onFacebookLogin = {},
-                onRegisterClick = {},
-                onForgotPassword = {}
-            )
-        }
-    }
-}

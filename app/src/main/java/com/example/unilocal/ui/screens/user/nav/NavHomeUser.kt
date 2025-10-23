@@ -1,4 +1,4 @@
-package com.example.unilocal.ui.screens.user
+package com.example.unilocal.ui.screens.user.nav
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -12,9 +12,6 @@ import androidx.navigation.compose.rememberNavController // Import for rememberi
 import com.example.unilocal.R // Import app resources
 import com.example.unilocal.ui.components.users.BottomNavBar // Import custom bottom navigation bar
 import com.example.unilocal.ui.config.RouteScreen // Import route screen configuration
-import com.example.unilocal.ui.screens.user.nav.UserNavigation // Import user navigation graph
-import com.example.unilocal.ui.screens.user.nav.UserNavItem // Import navigation items for user
-import com.example.unilocal.ui.screens.user.nav.rememberCurrentRoute // Import helper to remember current route
 import com.example.unilocal.viewmodel.data.session.UserSessionViewModel // Import user session ViewModel
 import com.example.unilocal.viewmodel.place.PlaceViewModel
 import com.example.unilocal.viewmodel.schedule.ScheduleViewModel
@@ -93,7 +90,6 @@ fun NavHomeUser(
                     onClick = {
                         showLogoutDialog = false
                         userSessionViewModel.clearSession() // Clear session state
-                        userViewModel.clearUser() // Clear user data
                         rootNavController.navigate(RouteScreen.Login) {
                             popUpTo(RouteScreen.NavHomeUser) { inclusive = true }
                         }

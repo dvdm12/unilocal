@@ -16,7 +16,7 @@ class PlaceBuilderDSL {
     var status: PlaceStatus = PlaceStatus.PENDING
     var avgRating: Double = 0.0
     var images: List<String> = emptyList()
-    var owner: User = dummyUser()
+    var owner: User? = null // 🔹 ahora opcional (coincide con Place.kt)
     var reviews: List<Review> = emptyList()
     var schedules: List<Schedule> = emptyList()
     var motive: String = ""
@@ -39,24 +39,12 @@ class PlaceBuilderDSL {
             status = status,
             avgRating = avgRating,
             images = images,
-            owner = owner,
+            owner = owner, // 🔹 puede ser null sin problema
             reviews = reviews,
             schedules = schedules,
             motive = motive
         )
     }
-
-    private fun dummyUser(): User = User(
-        id = "user-default",
-        name = "Anonymous",
-        username = "anon",
-        password = "password",
-        email = "anon@example.com",
-        country = "Unknown",
-        city = "Nowhere",
-        isActive = true,
-        role = Role.USER
-    )
 }
 
 /**

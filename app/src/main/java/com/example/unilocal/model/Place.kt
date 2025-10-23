@@ -31,7 +31,7 @@ data class Place(
     val status: PlaceStatus,
     val avgRating: Double,
     val images: List<String>,
-    val owner: User,
+    @Transient val owner: User? = null,
     val reviews: List<Review> = emptyList(),
     val schedules: List<Schedule> = emptyList(),
     val motive: String

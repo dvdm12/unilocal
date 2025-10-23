@@ -16,10 +16,9 @@ import com.example.unilocal.model.Role
 import com.example.unilocal.ui.config.RouteScreen
 import com.example.unilocal.ui.screens.*
 import com.example.unilocal.ui.screens.moderator.ModeratorScreen
-import com.example.unilocal.ui.screens.user.NavHomeUser
+import com.example.unilocal.ui.screens.user.nav.NavHomeUser
 import com.example.unilocal.repository.UserRepository
 import com.example.unilocal.viewmodel.data.session.UserSessionViewModel
-import com.example.unilocal.viewmodel.data.session.UserSessionViewModelFactory
 import com.example.unilocal.viewmodel.login.LoginViewModel
 import com.example.unilocal.viewmodel.login.LoginViewModelFactory
 import com.example.unilocal.viewmodel.place.PlaceViewModel
@@ -42,18 +41,26 @@ import com.example.unilocal.viewmodel.user.update.UserUpdateViewModel
 fun Navigation() {
     val navController = rememberNavController()
     val context = LocalContext.current.applicationContext
+    val userRepository = UserRepository
 
     // -------------------------------------------------------------------------
     // 🔹 GLOBAL SESSION VIEWMODEL
     // -------------------------------------------------------------------------
     val userSessionViewModel: UserSessionViewModel = viewModel(
-        factory = UserSessionViewModelFactory(context)
+        factory = UserSessionViewModel.provideFactory(
+            application = context.applicationContext as Application,
+            userRepository = userRepository
+        )
     )
+
 
     // -------------------------------------------------------------------------
     // 🔹 MAIN APP VIEWMODELS
     // -------------------------------------------------------------------------
-    val userViewModel: UserViewModel = viewModel()
+    val userViewModel: UserViewModel = viewModel(
+        factory = UserViewModel.provideFactory(userRepository)
+    )
+
 
     val scheduleViewModel: ScheduleViewModel = viewModel(
         factory = ScheduleViewModelFactory(context as Application)
@@ -79,13 +86,6 @@ fun Navigation() {
     if (!isSessionLoaded) {
         SplashScreen()
         return
-    }
-
-    // -------------------------------------------------------------------------
-    // 🔹 LINK CURRENT USER TO USER VIEWMODEL
-    // -------------------------------------------------------------------------
-    LaunchedEffect(currentUser) {
-        currentUser?.let { userViewModel.setActiveUser(it) }
     }
 
     // -------------------------------------------------------------------------

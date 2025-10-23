@@ -405,7 +405,12 @@
 
     <!-- Mensaje de error genérico al cargar -->
     <string name="msg_error_loading_place">Error al cargar la información del lugar.</string>
-
+    <string name="msg_error_current_password_invalid">Contraseña no compatible</string>
+    <string name="msg_error_current_password_incorrect">Contraseña incorrecta</string>
+    <string name="msg_error_password_mismatch">Contraseña incompatible</string>
+    <string name="msg_error_field_required">Campo nombre requerido</string>
+    <string name="msg_user_activated">Usuario activado correctamente.</string>
+    <string name="msg_user_deactivated">Usuario desactivado correctamente.</string>
 
 
 </resources>

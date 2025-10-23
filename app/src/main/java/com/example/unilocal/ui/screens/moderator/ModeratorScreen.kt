@@ -152,7 +152,7 @@ fun PlaceCardModeration(
         Column(modifier = Modifier.padding(16.dp)) {
             // 👤 Información del creador
             Text(
-                text = "Creado por: @${place.owner.username}",
+                text = "Creado por: @${place.owner?.username}",
                 style = MaterialTheme.typography.labelMedium,
                 color = Color.Gray
             )

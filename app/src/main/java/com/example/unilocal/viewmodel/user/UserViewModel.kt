@@ -1,100 +1,163 @@
 package com.example.unilocal.viewmodel.user
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.unilocal.R
 import com.example.unilocal.model.Place
 import com.example.unilocal.model.User
-import com.example.unilocal.repository.UserRepository
+import com.example.unilocal.repository.IUserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel responsible for managing user data and synchronizing it
- * with [UserRepository].
+ * ViewModel responsible for managing user data and synchronizing it with [IUserRepository].
  *
- * Responsibilities:
- * - Manage user session and persistence.
- * - Maintain and update user-specific information.
- * - Update the local list of places owned by the user (without direct global access).
- * - Provide user-related functionalities for the UI layer.
+ * ✅ Fully decoupled from Android Context.
+ * ✅ Does NOT manage session persistence
+ * ✅ Manages user operations such as updating, activation, and place management.
  */
 class UserViewModel(
-    private val userRepository: UserRepository = UserRepository
+    private val userRepository: IUserRepository
 ) : ViewModel() {
 
     // -------------------------------------------------------------------------
-    // USER STATE
+    // 🔹 STATE
     // -------------------------------------------------------------------------
 
-    private val _user = MutableStateFlow<User?>(null)
+    /** Represents the current in-memory user retrieved from the repository. */
+    private val _user = MutableStateFlow(userRepository.getSessionUser())
     val user: StateFlow<User?> = _user
 
-    private val _message = MutableStateFlow<String?>(null)
-    val message: StateFlow<String?> = _message
+    /** Emits message resource IDs for the UI layer to show feedback. */
+    private val _messageRes = MutableStateFlow<Int?>(null)
+    val messageRes: StateFlow<Int?> = _messageRes
 
     // -------------------------------------------------------------------------
-    // USER MANAGEMENT
+    // 🔹 USER MANAGEMENT
     // -------------------------------------------------------------------------
 
-    /** Sets the currently active user. */
-    fun setActiveUser(user: User) {
-        _user.value = user
-    }
-
-    /** Clears the current active user (logout). */
-    fun clearUser() {
-        _user.value = null
-    }
-
-    /** Returns all registered users (used by moderators). */
+    /** Retrieves all registered users. */
     fun getAllUsers(): List<User> = userRepository.getAllUsers()
 
-    // -------------------------------------------------------------------------
-    // USER'S PLACES MANAGEMENT (LOCAL ONLY)
-    // -------------------------------------------------------------------------
+    /** Deactivates a user (logical disable). */
+    fun deactivateUser(userId: String) {
+        viewModelScope.launch {
+            val success = userRepository.deactivateUser(userId)
+            _messageRes.value =
+                if (success) R.string.msg_user_deactivated else R.string.msg_error_generic
 
-    /**
-     * Adds a place to the current user's local list.
-     * Does not persist it globally — that is handled by PlaceViewModel.
-     */
-    fun addPlaceToUser(place: Place) {
-        val currentUser = _user.value ?: return
-
-        val updatedPlaces = currentUser.places.toMutableList().apply { add(place.copy(owner = currentUser)) }
-        val updatedUser = currentUser.copy(places = updatedPlaces)
-
-        _user.value = updatedUser
-        viewModelScope.launch { userRepository.updateUser(updatedUser) }
-
-        _message.value = "Lugar agregado al usuario."
+            if (success && _user.value?.id == userId)
+                _user.value = userRepository.getUserById(userId)
+        }
     }
 
+    /** Reactivates a previously disabled user. */
+    fun activateUser(userId: String) {
+        viewModelScope.launch {
+            val success = userRepository.activateUser(userId)
+            _messageRes.value =
+                if (success) R.string.msg_user_activated else R.string.msg_error_generic
+
+            if (success && _user.value?.id == userId)
+                _user.value = userRepository.getUserById(userId)
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // 🔹 USER PLACES MANAGEMENT
+    // -------------------------------------------------------------------------
+
     /**
-     * Removes a place from the current user's local list.
-     * This does not delete the place globally.
+     * Adds a new place to the current user and persists the change.
+     * If no active user exists, this call has no effect.
+     */
+    fun addPlaceToUser(place: Place, onResult: (User?) -> Unit = {}) {
+        val currentUser = _user.value ?: return
+        viewModelScope.launch {
+            val success = userRepository.addPlaceToUser(currentUser.id, place)
+            _messageRes.value =
+                if (success) R.string.msg_place_created else R.string.msg_error_generic
+
+            if (success) {
+                // Recupera el usuario actualizado desde el repositorio
+                val updatedUser = userRepository.getUserById(currentUser.id)
+                _user.value = updatedUser
+                onResult(updatedUser)
+            } else {
+                onResult(null)
+            }
+        }
+    }
+
+
+
+
+    /**
+     * Removes a place from the user's list by its ID.
+     * Updates local and repository data if successful.
      */
     fun removePlaceFromUserList(placeId: String) {
         val currentUser = _user.value ?: return
+        viewModelScope.launch {
+            val success = userRepository.removePlaceFromUser(currentUser.id, placeId)
+            _messageRes.value =
+                if (success) R.string.msg_place_deleted else R.string.msg_place_not_found
 
-        val updatedPlaces = currentUser.places.filterNot { it.id == placeId }.toMutableList()
-        val updatedUser = currentUser.copy(places = updatedPlaces)
-
-        _user.value = updatedUser
-        viewModelScope.launch { userRepository.updateUser(updatedUser) }
-
-        _message.value = "Lugar eliminado del usuario."
+            if (success)
+                _user.value = userRepository.getUserById(currentUser.id)
+        }
     }
 
-    /** Returns all places associated with the current user. */
+    /**
+     * Updates a specific place in the user's owned list.
+     * Synchronizes both in-memory and persistent states.
+     */
+    fun updateUserPlace(updatedPlace: Place) {
+        val currentUser = _user.value ?: return
+        viewModelScope.launch {
+            val success = userRepository.updateUserPlace(currentUser.id, updatedPlace)
+            _messageRes.value =
+                if (success) R.string.msg_place_updated else R.string.msg_error_generic
+
+            if (success)
+                _user.value = userRepository.getUserById(currentUser.id)
+        }
+    }
+
+    /** Returns the list of places owned by the active user. */
     fun getUserPlaces(): List<Place> = _user.value?.places ?: emptyList()
 
     // -------------------------------------------------------------------------
-    // UTILITIES
+    // 🔹 UTILITIES
     // -------------------------------------------------------------------------
 
-    /** Clears the current message after displaying it on the UI. */
+    /** Clears the last emitted message resource ID. */
     fun clearMessage() {
-        _message.value = null
+        _messageRes.value = null
+    }
+
+    // -------------------------------------------------------------------------
+    // 🔹 FACTORY
+    // -------------------------------------------------------------------------
+
+    companion object {
+        /**
+         * Factory for dependency-safe creation of [UserViewModel].
+         * Allows injecting custom [IUserRepository] implementations.
+         */
+        fun provideFactory(
+            userRepository: IUserRepository
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                if (modelClass.isAssignableFrom(UserViewModel::class.java)) {
+                    return UserViewModel(userRepository) as T
+                }
+                throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+            }
+        }
     }
 }

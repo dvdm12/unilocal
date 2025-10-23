@@ -13,77 +13,70 @@ import java.util.UUID
  * - Supports creation using the [buildPlace] DSL to ensure valid initialization.
  * - Allows moderators or admins to list, update, or remove any place globally.
  *
- * This repository is independent from [UserRepository].
- * Coordination between both should occur at the ViewModel level.
+ * Compatible with transient `Place.owner: User?` to avoid recursive serialization.
  */
 object PlaceRepository {
 
     // -------------------------------------------------------------------------
-    // 🔹 INTERNAL STATE
+    // INTERNAL STATE
     // -------------------------------------------------------------------------
 
-    /** Internal mutable list of all places currently in memory. */
     private val _places = mutableListOf<Place>()
 
-    /** Public immutable view of all registered places. */
     val places: List<Place>
         get() = _places.toList()
 
     // -------------------------------------------------------------------------
-    // 🔹 CREATION
+    // CREATION
     // -------------------------------------------------------------------------
 
     /**
-     * Adds an existing [Place] instance to the repository.
-     *
-     * @param place The [Place] object to add.
-     * @return `true` if added successfully, `false` if a place with the same ID already exists.
+     * Adds an existing [Place] to the repository.
+     * If no owner is provided, assigns a dummy placeholder user.
      */
     fun addPlace(place: Place): Boolean {
         if (_places.any { it.id == place.id }) return false
-        _places.add(place)
+
+        val resolvedPlace = if (place.owner != null) {
+            place
+        } else {
+            place.copy(owner = dummyUser())
+        }
+
+        _places.add(resolvedPlace)
         return true
     }
 
     /**
      * Creates and registers a new [Place] using the [buildPlace] DSL.
-     *
-     * Example:
-     * ```
-     * PlaceRepository.createPlace {
-     *     name = "Café del Parque"
-     *     description = "Cafetería artesanal con vista al parque principal"
-     *     category = PlaceCategory.CAFE
-     *     address = "Cra 14 # 9-30, Armenia"
-     *     phone = "3205556789"
-     *     owner = currentUser
-     *     setImageUrls(listOf(URL("https://example.com/image1.jpg")))
-     * }
-     * ```
-     *
-     * @param init Lambda used to initialize the [PlaceBuilderDSL].
-     * @return The newly created and registered [Place].
+     * If no owner is set, assigns a dummy placeholder user to maintain integrity.
      */
     fun createPlace(init: PlaceBuilderDSL.() -> Unit): Place {
         val newPlace = buildPlace(init)
-        _places.add(newPlace)
-        return newPlace
+        val resolvedPlace = if (newPlace.owner != null) {
+            newPlace
+        } else {
+            newPlace.copy(owner = dummyUser())
+        }
+
+        _places.add(resolvedPlace)
+        return resolvedPlace
     }
 
     /**
-     * Creates and registers a minimal placeholder [Place] with generated defaults.
-     * This method ensures all required parameters are initialized properly.
+     * Creates a minimal placeholder [Place].
      */
     fun createEmptyPlace(): Place {
         val newPlace = buildPlace {
             id = UUID.randomUUID().toString()
         }
-        _places.add(newPlace)
-        return newPlace
+        val resolved = newPlace.copy(owner = dummyUser())
+        _places.add(resolved)
+        return resolved
     }
 
     // -------------------------------------------------------------------------
-    // 🔹 READ OPERATIONS
+    // READ OPERATIONS
     // -------------------------------------------------------------------------
 
     fun getAllPlaces(): List<Place> = _places.toList()
@@ -92,7 +85,7 @@ object PlaceRepository {
         _places.find { it.id == placeId }
 
     fun getPlacesByUser(userId: String): List<Place> =
-        _places.filter { it.owner.id == userId }
+        _places.filter { it.owner?.id == userId }
 
     fun getPlacesByStatus(status: PlaceStatus): List<Place> =
         _places.filter { it.status == status }
@@ -104,13 +97,18 @@ object PlaceRepository {
     }
 
     // -------------------------------------------------------------------------
-    // 🔹 UPDATE OPERATIONS
+    // UPDATE OPERATIONS
     // -------------------------------------------------------------------------
 
     fun updatePlace(updatedPlace: Place): Boolean {
         val index = _places.indexOfFirst { it.id == updatedPlace.id }
         return if (index != -1) {
-            _places[index] = updatedPlace
+            val resolved = if (updatedPlace.owner != null) {
+                updatedPlace
+            } else {
+                updatedPlace.copy(owner = dummyUser())
+            }
+            _places[index] = resolved
             true
         } else false
     }
@@ -118,13 +116,14 @@ object PlaceRepository {
     fun updatePlaceStatus(placeId: String, newStatus: PlaceStatus): Boolean {
         val index = _places.indexOfFirst { it.id == placeId }
         if (index == -1) return false
-        val updated = _places[index].copy(status = newStatus)
+        val existing = _places[index]
+        val updated = existing.copy(status = newStatus, owner = existing.owner ?: dummyUser())
         _places[index] = updated
         return true
     }
 
     // -------------------------------------------------------------------------
-    // 🔹 DELETE OPERATIONS
+    // DELETE OPERATIONS
     // -------------------------------------------------------------------------
 
     fun removePlace(placeId: String): Boolean {
@@ -136,12 +135,12 @@ object PlaceRepository {
 
     fun removePlacesByUser(userId: String): Int {
         val before = _places.size
-        _places.removeAll { it.owner.id == userId }
+        _places.removeAll { it.owner?.id == userId }
         return before - _places.size
     }
 
     // -------------------------------------------------------------------------
-    // 🔹 MAINTENANCE
+    // MAINTENANCE
     // -------------------------------------------------------------------------
 
     fun clear() {
@@ -149,12 +148,9 @@ object PlaceRepository {
     }
 
     // -------------------------------------------------------------------------
-    // 🔹 UTILITIES
+    // UTILITIES
     // -------------------------------------------------------------------------
 
-    /**
-     * Generates a dummy user when a place requires a non-null owner.
-     */
     private fun dummyUser(): User = User(
         id = "user-default",
         name = "Anonymous",

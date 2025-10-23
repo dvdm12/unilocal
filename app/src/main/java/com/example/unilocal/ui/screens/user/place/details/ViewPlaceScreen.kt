@@ -321,7 +321,7 @@ private fun PlaceContactSection(place: Place) {
             ) {
                 ContactRow(
                     icon = Icons.Filled.Person,
-                    label = place.owner.name,
+                    label = place.owner?.name ?: "Sin propietario asignado",
                     contentDescription = stringResource(R.string.cd_owner_icon)
                 )
 

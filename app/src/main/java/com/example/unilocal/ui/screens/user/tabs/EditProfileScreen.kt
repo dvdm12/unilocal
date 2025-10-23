@@ -26,6 +26,20 @@ import com.example.unilocal.viewmodel.data.session.UserSessionViewModel
 import com.example.unilocal.viewmodel.user.update.UserUpdateViewModel
 import kotlinx.coroutines.launch
 
+/**
+ * EditProfileScreen
+ *
+ * Displays a scrollable form that allows the user to update their profile information.
+ * It integrates with [UserUpdateViewModel] for validation and persistence,
+ * and [UserSessionViewModel] for managing the current session state.
+ *
+ * Features:
+ * - Allows editing of name, lastname, username, email, country, city, and password.
+ * - Preserves immutable fields such as places, isActive, and role.
+ * - Country and city dropdowns are optional and not validated.
+ * - Requires current password to authorize password changes.
+ * - Displays real-time validation feedback and snackbar messages.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
@@ -37,11 +51,10 @@ fun EditProfileScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    // Campos observables
+    // Observed state fields
     val name by userUpdateViewModel.name.collectAsState()
     val lastname by userUpdateViewModel.lastname.collectAsState()
     val username by userUpdateViewModel.username.collectAsState()
-    val phone by userUpdateViewModel.phone.collectAsState()
     val email by userUpdateViewModel.email.collectAsState()
     val country by userUpdateViewModel.country.collectAsState()
     val city by userUpdateViewModel.city.collectAsState()
@@ -51,13 +64,12 @@ fun EditProfileScreen(
     val message by userUpdateViewModel.message.collectAsState()
     val isUpdating by userUpdateViewModel.isUpdating.collectAsState()
 
-    // Errores
+    // Validation error states
     val nameError by userUpdateViewModel.nameError.collectAsState()
-    val phoneError by userUpdateViewModel.phoneError.collectAsState()
     val emailError by userUpdateViewModel.emailError.collectAsState()
     val passwordError by userUpdateViewModel.passwordError.collectAsState()
 
-    // Snackbar para mensajes globales
+    // Snackbar handler
     LaunchedEffect(message) {
         message?.let {
             scope.launch { snackbarHostState.showSnackbar(it) }
@@ -84,7 +96,7 @@ fun EditProfileScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // --------------------------------------------------------------
-            // 🔸 User Info Section
+            // User Information Section
             // --------------------------------------------------------------
             UserInfoSection(
                 name = name,
@@ -93,14 +105,11 @@ fun EditProfileScreen(
                 onLastnameChange = userUpdateViewModel::updateLastname,
                 username = username,
                 onUsernameChange = userUpdateViewModel::updateUsername,
-                phone = phone,
-                onPhoneChange = userUpdateViewModel::updatePhone,
-                nameError = nameError,
-                phoneError = phoneError
+                nameError = nameError
             )
 
             // --------------------------------------------------------------
-            // 🔸 Email Section
+            // Email Section
             // --------------------------------------------------------------
             EmailFieldSection(
                 email = email,
@@ -109,7 +118,7 @@ fun EditProfileScreen(
             )
 
             // --------------------------------------------------------------
-            // 🔸 Location Section (no validación)
+            // Location Section (not validated)
             // --------------------------------------------------------------
             LocationSection(
                 country = country,
@@ -120,7 +129,7 @@ fun EditProfileScreen(
             )
 
             // --------------------------------------------------------------
-            // 🔸 Password Section
+            // Password Section
             // --------------------------------------------------------------
             PasswordSection(
                 currentPassword = currentPassword,
@@ -135,7 +144,7 @@ fun EditProfileScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             // --------------------------------------------------------------
-            // 🔸 Action Buttons
+            // Action Buttons
             // --------------------------------------------------------------
             EditProfileActions(
                 isUpdating = isUpdating,
@@ -144,7 +153,6 @@ fun EditProfileScreen(
                         updateName("")
                         updateLastname("")
                         updateUsername("")
-                        updatePhone("")
                         updateEmail("")
                         updateCountry("Colombia")
                         updateCity("Armenia")
@@ -161,16 +169,9 @@ fun EditProfileScreen(
                 onSave = {
                     val currentUser = userSessionViewModel.currentUser.value
                     if (currentUser != null) {
-                        val updatedUser = currentUser.copy(
-                            name = name.ifBlank { currentUser.name },
-                            username = username.ifBlank { currentUser.username },
-                            password = newPassword.ifBlank { currentUser.password },
-                            email = email.ifBlank { currentUser.email },
-                            country = country,
-                            city = city
-                        )
-                        userUpdateViewModel.updateUser(updatedUser) {
-                            userSessionViewModel.setUser(it)
+                        // Delegate update to ViewModel
+                        userUpdateViewModel.updateUser(currentUser) { updated ->
+                            userSessionViewModel.setUser(updated)
                         }
                     }
                 }
@@ -179,9 +180,9 @@ fun EditProfileScreen(
     }
 }
 
-// -----------------------------------------------------------------------------
-// 🔹 USER INFO SECTION
-// -----------------------------------------------------------------------------
+/**
+ * User information section for editing name, lastname, and username.
+ */
 @Composable
 fun UserInfoSection(
     name: String,
@@ -190,10 +191,7 @@ fun UserInfoSection(
     onLastnameChange: (String) -> Unit,
     username: String,
     onUsernameChange: (String) -> Unit,
-    phone: String,
-    onPhoneChange: (String) -> Unit,
-    nameError: String?,
-    phoneError: String?
+    nameError: String?
 ) {
     AuthTextField(
         value = name,
@@ -222,21 +220,11 @@ fun UserInfoSection(
         leadingIcon = Icons.Default.Person,
         fieldType = AuthFieldType.Text
     )
-
-    AuthTextField(
-        value = phone,
-        onValueChange = onPhoneChange,
-        label = stringResource(R.string.register_phone),
-        placeholder = stringResource(R.string.register_phone),
-        leadingIcon = Icons.Default.Phone,
-        fieldType = AuthFieldType.Text
-    )
-    if (phoneError != null) FieldErrorText(phoneError)
 }
 
-// -----------------------------------------------------------------------------
-// 🔹 EMAIL SECTION
-// -----------------------------------------------------------------------------
+/**
+ * Email field section with basic validation feedback.
+ */
 @Composable
 fun EmailFieldSection(
     email: String,
@@ -254,9 +242,10 @@ fun EmailFieldSection(
     if (emailError != null) FieldErrorText(emailError)
 }
 
-// -----------------------------------------------------------------------------
-// 🔹 LOCATION SECTION (sin validación obligatoria)
-// -----------------------------------------------------------------------------
+/**
+ * Location section for selecting country and city.
+ * These dropdowns are optional and not validated.
+ */
 @Composable
 fun LocationSection(
     country: String,
@@ -280,9 +269,10 @@ fun LocationSection(
     )
 }
 
-// -----------------------------------------------------------------------------
-// 🔹 PASSWORD SECTION
-// -----------------------------------------------------------------------------
+/**
+ * Password section that includes current, new, and confirm fields.
+ * Current password is required for any password change.
+ */
 @Composable
 fun PasswordSection(
     currentPassword: String,
@@ -329,9 +319,9 @@ fun PasswordSection(
     if (passwordError != null) FieldErrorText(passwordError)
 }
 
-// -----------------------------------------------------------------------------
-// 🔹 FIELD ERROR TEXT COMPONENT
-// -----------------------------------------------------------------------------
+/**
+ * Displays a red error message below a field when validation fails.
+ */
 @Composable
 fun FieldErrorText(error: String) {
     Text(
@@ -342,9 +332,9 @@ fun FieldErrorText(error: String) {
     )
 }
 
-// -----------------------------------------------------------------------------
-// 🔹 ACTION BUTTONS
-// -----------------------------------------------------------------------------
+/**
+ * Row containing Clear and Save buttons for the profile form.
+ */
 @Composable
 fun EditProfileActions(
     isUpdating: Boolean,
@@ -377,11 +367,10 @@ fun EditProfileActions(
             shape = MaterialTheme.shapes.medium
         ) {
             Text(
-                text = if (isUpdating) "Guardando..." else stringResource(R.string.edit_profile_button_save),
-                fontSize = 13.sp, // 👈 solo este botón usa texto más pequeño
+                text = if (isUpdating) "Saving..." else stringResource(R.string.edit_profile_button_save),
+                fontSize = 13.sp,
                 style = MaterialTheme.typography.labelLarge
             )
         }
-
     }
 }

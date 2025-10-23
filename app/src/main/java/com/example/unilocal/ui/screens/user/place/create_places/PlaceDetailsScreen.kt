@@ -33,6 +33,7 @@ import com.example.unilocal.ui.components.home.AuthTextField
 import com.example.unilocal.ui.components.home.DropdownField
 import com.example.unilocal.ui.components.home.UniPrimaryButton
 import com.example.unilocal.ui.components.users.SimpleTopBar
+import com.example.unilocal.viewmodel.data.session.UserSessionViewModel
 import com.example.unilocal.viewmodel.place.PlaceViewModel
 import com.example.unilocal.viewmodel.schedule.ScheduleViewModel
 import com.example.unilocal.viewmodel.user.UserViewModel
@@ -49,6 +50,7 @@ import com.example.unilocal.viewmodel.user.UserViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceDetailsScreen(
+    userSessionViewModel: UserSessionViewModel,
     userViewModel: UserViewModel,
     placeViewModel: PlaceViewModel,
     scheduleViewModel: ScheduleViewModel,
@@ -65,7 +67,6 @@ fun PlaceDetailsScreen(
     val address by placeViewModel.address.collectAsState()
     val imageUrls by placeViewModel.imageUrls.collectAsState()
     val message by placeViewModel.message.collectAsState()
-    val user by userViewModel.user.collectAsState()
 
     // --- Message observer ---
     LaunchedEffect(message) {
@@ -135,7 +136,7 @@ fun PlaceDetailsScreen(
             UniPrimaryButton(
                 text = stringResource(R.string.action_publish),
                 onClick = {
-                    val currentUser = user ?: run {
+                    val currentUser = userSessionViewModel.getCurrentUser() ?: run {
                         Toast.makeText(
                             context,
                             context.getString(R.string.msg_user_not_found),
@@ -147,20 +148,36 @@ fun PlaceDetailsScreen(
                     val place = placeViewModel.createPlace(currentUser)
 
                     if (place != null) {
+                        userViewModel.addPlaceToUser(place) { updatedUser ->
+                            if (updatedUser != null) {
+                                userSessionViewModel.setUser(updatedUser)
 
-                        userViewModel.addPlaceToUser(place)
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.msg_place_created),
+                                    Toast.LENGTH_LONG
+                                ).show()
 
+                                placeViewModel.resetPlaceForm()
+                                scheduleViewModel.clearSchedules()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.msg_error_generic),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    } else {
                         Toast.makeText(
                             context,
-                            context.getString(R.string.msg_place_created),
-                            Toast.LENGTH_LONG
+                            context.getString(R.string.msg_error_generic),
+                            Toast.LENGTH_SHORT
                         ).show()
-
-                        placeViewModel.resetPlaceForm()
-                        scheduleViewModel.clearSchedules()
                     }
                 }
             )
+
 
         }
     }

@@ -13,13 +13,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel responsible for managing and validating the user profile update form.
+ * ViewModel responsible for managing the user profile update process.
  *
- * ✅ Features:
- * - Field-level validation with explicit feedback for the user.
- * - Ignores combo-box validation (country/city keep default values).
- * - Requires current password for secure password changes.
- * - Resets state after successful update.
+ * Responsibilities:
+ * - Provides field-level validation and error messages.
+ * - Preserves immutable properties (places, role, and active status) during updates.
+ * - Delegates the merging and persistence logic entirely to the UserRepository.
  */
 class UserUpdateViewModel(
     private val application: Application,
@@ -27,9 +26,8 @@ class UserUpdateViewModel(
 ) : AndroidViewModel(application) {
 
     // -------------------------------------------------------------------------
-    // 🔹 Form fields
+    // Form fields (observed state)
     // -------------------------------------------------------------------------
-
     private val _name = MutableStateFlow("")
     val name: StateFlow<String> = _name
 
@@ -38,9 +36,6 @@ class UserUpdateViewModel(
 
     private val _username = MutableStateFlow("")
     val username: StateFlow<String> = _username
-
-    private val _phone = MutableStateFlow("")
-    val phone: StateFlow<String> = _phone
 
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email
@@ -61,14 +56,10 @@ class UserUpdateViewModel(
     val confirmPassword: StateFlow<String> = _confirmPassword
 
     // -------------------------------------------------------------------------
-    // 🔹 Field errors for user feedback
+    // Error states
     // -------------------------------------------------------------------------
-
     private val _nameError = MutableStateFlow<String?>(null)
     val nameError: StateFlow<String?> = _nameError
-
-    private val _phoneError = MutableStateFlow<String?>(null)
-    val phoneError: StateFlow<String?> = _phoneError
 
     private val _emailError = MutableStateFlow<String?>(null)
     val emailError: StateFlow<String?> = _emailError
@@ -77,9 +68,8 @@ class UserUpdateViewModel(
     val passwordError: StateFlow<String?> = _passwordError
 
     // -------------------------------------------------------------------------
-    // 🔹 UI state
+    // UI state
     // -------------------------------------------------------------------------
-
     private val _isUpdating = MutableStateFlow(false)
     val isUpdating: StateFlow<Boolean> = _isUpdating
 
@@ -87,87 +77,8 @@ class UserUpdateViewModel(
     val message: StateFlow<String?> = _message
 
     // -------------------------------------------------------------------------
-    // 🔹 Validation rules
+    // Country-city map (no validation)
     // -------------------------------------------------------------------------
-
-    private fun isPhoneValid(phone: String): Boolean =
-        phone.matches(Regex("^\\d{7,}$"))
-
-    private fun isEmailValid(email: String): Boolean =
-        email.contains("@") && email.contains(".com")
-
-    private fun isPasswordValid(password: String): Boolean =
-        password.isBlank() || password.length >= 5
-
-    private fun isPasswordChangeValid(currentPass: String, newPass: String): Boolean =
-        if (newPass.isNotEmpty()) currentPass.isNotEmpty() else true
-
-    // -------------------------------------------------------------------------
-    // 🔹 Validation logic with detailed feedback
-    // -------------------------------------------------------------------------
-
-    private fun validateForm(): Boolean {
-        var valid = true
-
-        // --- Name ---
-        if (_name.value.isBlank()) {
-            _nameError.value = application.getString(R.string.msg_validation_name)
-            valid = false
-        } else _nameError.value = null
-
-        // --- Phone ---
-        if (!isPhoneValid(_phone.value)) {
-            _phoneError.value = application.getString(R.string.msg_error_phone_invalid)
-            valid = false
-        } else _phoneError.value = null
-
-        // --- Email ---
-        if (!isEmailValid(_email.value)) {
-            _emailError.value = application.getString(R.string.login_email_error)
-            valid = false
-        } else _emailError.value = null
-
-        // --- Passwords ---
-        if (_newPassword.value.isNotBlank()) {
-            when {
-                !isPasswordValid(_newPassword.value) -> {
-                    _passwordError.value = application.getString(R.string.login_password_error)
-                    valid = false
-                }
-                _newPassword.value != _confirmPassword.value -> {
-                    _passwordError.value = application.getString(R.string.edit_profile_confirm_password_placeholder)
-                    valid = false
-                }
-                _currentPassword.value.isBlank() -> {
-                    _passwordError.value = application.getString(R.string.msg_error_current_password_required)
-                    valid = false
-                }
-                else -> _passwordError.value = null
-            }
-        } else _passwordError.value = null
-
-        return valid
-    }
-
-    // -------------------------------------------------------------------------
-    // 🔹 Field updates
-    // -------------------------------------------------------------------------
-
-    fun updateName(value: String) = _name.tryEmit(value)
-    fun updateLastname(value: String) = _lastname.tryEmit(value)
-    fun updateUsername(value: String) = _username.tryEmit(value)
-    fun updatePhone(value: String) = _phone.tryEmit(value)
-    fun updateEmail(value: String) = _email.tryEmit(value)
-    fun updateCountry(value: String) = _country.tryEmit(value)
-    fun updateCity(value: String) = _city.tryEmit(value)
-    fun updateCurrentPassword(value: String) = _currentPassword.tryEmit(value)
-    fun updateNewPassword(value: String) = _newPassword.tryEmit(value)
-    fun updateConfirmPassword(value: String) = _confirmPassword.tryEmit(value)
-
-    // -------------------------------------------------------------------------
-    // 🔹 Country-city list (no validation required)
-    // -------------------------------------------------------------------------
-
     val americanCitiesMap: Map<String, List<String>> = mapOf(
         "Colombia" to listOf(
             "Bogotá", "Medellín", "Cali", "Barranquilla", "Cartagena",
@@ -201,43 +112,147 @@ class UserUpdateViewModel(
         )
     )
 
+    // -------------------------------------------------------------------------
+    // Validation helpers
+    // -------------------------------------------------------------------------
+    private fun isEmailValid(email: String): Boolean =
+        email.contains("@") && email.contains(".")
+
+    private fun isPasswordValid(password: String): Boolean =
+        password.isBlank() || password.length >= 5
+
+    /**
+     * Validates form input and updates error states.
+     * Country and city fields are excluded from validation.
+     */
+    private fun validateForm(): Boolean {
+        var isValid = true
+
+        // Validate name
+        if (_name.value.isBlank()) {
+            _nameError.value = application.getString(R.string.msg_error_field_required)
+            isValid = false
+        } else _nameError.value = null
+
+        // Validate email
+        if (_email.value.isBlank() || !isEmailValid(_email.value)) {
+            _emailError.value = application.getString(R.string.login_email_error)
+            isValid = false
+        } else _emailError.value = null
+
+        // Validate password logic
+        if (_newPassword.value.isNotBlank()) {
+            when {
+                !isPasswordValid(_newPassword.value) -> {
+                    _passwordError.value = application.getString(R.string.login_password_error)
+                    isValid = false
+                }
+                _confirmPassword.value != _newPassword.value -> {
+                    _passwordError.value = application.getString(R.string.msg_error_password_mismatch)
+                    isValid = false
+                }
+                _currentPassword.value.isBlank() -> {
+                    _passwordError.value = application.getString(R.string.msg_error_current_password_required)
+                    isValid = false
+                }
+                else -> _passwordError.value = null
+            }
+        } else _passwordError.value = null
+
+        return isValid
+    }
 
     // -------------------------------------------------------------------------
-    // 🔹 Core logic
+    // Public field updates
     // -------------------------------------------------------------------------
+    fun updateName(value: String) = _name.tryEmit(value)
+    fun updateLastname(value: String) = _lastname.tryEmit(value)
+    fun updateUsername(value: String) = _username.tryEmit(value)
+    fun updateEmail(value: String) = _email.tryEmit(value)
+    fun updateCountry(value: String) = _country.tryEmit(value)
+    fun updateCity(value: String) = _city.tryEmit(value)
+    fun updateCurrentPassword(value: String) = _currentPassword.tryEmit(value)
+    fun updateNewPassword(value: String) = _newPassword.tryEmit(value)
+    fun updateConfirmPassword(value: String) = _confirmPassword.tryEmit(value)
 
-    fun updateUser(user: User, onSuccess: (User) -> Unit = {}) {
+    // -------------------------------------------------------------------------
+    // Core logic
+    // -------------------------------------------------------------------------
+    fun updateUser(currentUser: User, onSuccess: (User) -> Unit = {}) {
         viewModelScope.launch {
             try {
                 _isUpdating.value = true
 
-                // Validate fields before update
+                // --- Log: Inicio de la actualización ---
+                android.util.Log.d("UserUpdate", ">>> Starting update for user ID=${currentUser.id}, name=${currentUser.name}")
+                android.util.Log.d("UserUpdate", "Current places (${currentUser.places.size}): ${currentUser.places.joinToString { it.name }}")
+
+                // --- Validar campos del formulario ---
                 if (!validateForm()) {
                     _message.value = application.getString(R.string.msg_field_required)
+                    android.util.Log.w("UserUpdate", "Validation failed: Missing or invalid fields")
                     return@launch
                 }
 
-                // Simulate persistence
-                userRepository.updateUser(user)
-                _message.value = application.getString(R.string.msg_user_updated)
+                // --- Validar cambio de contraseña ---
+                if (_newPassword.value.isNotBlank() && _currentPassword.value != currentUser.password) {
+                    _passwordError.value = application.getString(R.string.msg_error_current_password_incorrect)
+                    _message.value = application.getString(R.string.msg_error_current_password_required)
+                    android.util.Log.w("UserUpdate", "Password update blocked: current password mismatch")
+                    return@launch
+                }
 
-                resetForm()
-                onSuccess(user)
+                // --- Construir copia parcial editable ---
+                val partialUser = currentUser.copy(
+                    name = listOf(_name.value, _lastname.value)
+                        .filter { it.isNotBlank() }
+                        .joinToString(" "),
+                    username = _username.value.ifBlank { currentUser.username },
+                    password = _newPassword.value.ifBlank { currentUser.password },
+                    email = _email.value.ifBlank { currentUser.email },
+                    country = _country.value.ifBlank { currentUser.country },
+                    city = _city.value.ifBlank { currentUser.city }
+                )
+
+                android.util.Log.d("UserUpdate", "Prepared partialUser for merge: ${partialUser.name}")
+
+                // --- Persistencia mediante el repositorio ---
+                val success = userRepository.updateUser(partialUser)
+                android.util.Log.d("UserUpdate", "Repository update result: $success")
+
+                if (success) {
+                    val updated = userRepository.getUserById(currentUser.id)!!
+
+                    android.util.Log.d("UserUpdate", "User updated successfully")
+                    android.util.Log.d("UserUpdate", "Updated user ID=${updated.id}, name=${updated.name}")
+                    android.util.Log.d("UserUpdate", "Updated places (${updated.places.size}): ${updated.places.joinToString { it.name }}")
+
+                    _message.value = application.getString(R.string.msg_user_updated)
+                    resetForm()
+                    onSuccess(updated)
+                } else {
+                    _message.value = application.getString(R.string.msg_error_generic)
+                    android.util.Log.e("UserUpdate", "User not found in repository during update")
+                }
 
             } catch (e: Exception) {
                 _message.value = e.message ?: application.getString(R.string.msg_error_generic)
+                android.util.Log.e("UserUpdate", "Exception during user update", e)
             } finally {
                 _isUpdating.value = false
+                android.util.Log.d("UserUpdate", ">>> Update process completed for user ID=${currentUser.id}")
             }
         }
     }
 
-    /** Reset fields to initial state after successful update. */
+
+    // -------------------------------------------------------------------------
+    // Utility methods
+    // -------------------------------------------------------------------------
     private fun resetForm() {
         _name.value = ""
         _lastname.value = ""
         _username.value = ""
-        _phone.value = ""
         _email.value = ""
         _country.value = "Colombia"
         _city.value = "Armenia"
@@ -245,20 +260,17 @@ class UserUpdateViewModel(
         _newPassword.value = ""
         _confirmPassword.value = ""
         _nameError.value = null
-        _phoneError.value = null
         _emailError.value = null
         _passwordError.value = null
     }
 
-    /** Clears temporary messages (for Snackbar). */
     fun clearMessage() {
         _message.value = null
     }
 
     // -------------------------------------------------------------------------
-    // 🔹 Factory for dependency injection
+    // Factory for dependency injection
     // -------------------------------------------------------------------------
-
     class Factory(private val application: Application) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(UserUpdateViewModel::class.java)) {
@@ -269,4 +281,3 @@ class UserUpdateViewModel(
         }
     }
 }
-

@@ -77,6 +77,7 @@ fun UserNavigation(
         // --- Crear nuevo lugar ---
         composable(UserNavItem.ADD.route) {
             PlaceDetailsScreen(
+                userSessionViewModel=userSessionViewModel,
                 userViewModel = userViewModel,
                 placeViewModel= placeViewModel,
                 scheduleViewModel,
