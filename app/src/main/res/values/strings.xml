@@ -411,6 +411,7 @@
     <string name="msg_error_field_required">Campo nombre requerido</string>
     <string name="msg_user_activated">Usuario activado correctamente.</string>
     <string name="msg_user_deactivated">Usuario desactivado correctamente.</string>
+    <string name="msg_error_user_not_loaded">No se ha podido cargar el usuario actual</string>
 
 
 </resources>

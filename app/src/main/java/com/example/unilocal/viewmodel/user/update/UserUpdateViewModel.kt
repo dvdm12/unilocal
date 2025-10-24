@@ -13,12 +13,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel responsible for managing the user profile update process.
+ * ViewModel responsible for managing user profile updates and form validation.
  *
- * Responsibilities:
- * - Provides field-level validation and error messages.
- * - Preserves immutable properties (places, role, and active status) during updates.
- * - Delegates the merging and persistence logic entirely to the UserRepository.
+ * ✅ Features:
+ * - Field-level validation and real-time error feedback
+ * - Full control of form state (hydratable, resettable, protected against overwrites)
+ * - Password validation in plain text (no hashing yet)
+ * - Persistence via [UserRepository]
+ * - Automatic hydration after update
  */
 class UserUpdateViewModel(
     private val application: Application,
@@ -26,7 +28,7 @@ class UserUpdateViewModel(
 ) : AndroidViewModel(application) {
 
     // -------------------------------------------------------------------------
-    // Form fields (observed state)
+    // Form fields (observable states)
     // -------------------------------------------------------------------------
     private val _name = MutableStateFlow("")
     val name: StateFlow<String> = _name
@@ -76,8 +78,11 @@ class UserUpdateViewModel(
     private val _message = MutableStateFlow<String?>(null)
     val message: StateFlow<String?> = _message
 
+    /** Prevents overwriting user edits when hydrating the form */
+    private val _isDirty = MutableStateFlow(false)
+
     // -------------------------------------------------------------------------
-    // Country-city map (no validation)
+    // Country-city map (for dropdown UI)
     // -------------------------------------------------------------------------
     val americanCitiesMap: Map<String, List<String>> = mapOf(
         "Colombia" to listOf(
@@ -94,53 +99,38 @@ class UserUpdateViewModel(
         ),
         "Argentina" to listOf(
             "Buenos Aires", "Córdoba", "Rosario", "Mendoza", "La Plata",
-            "Mar del Plata", "Salta", "Santa Fe", "San Miguel de Tucumán", "Corrientes",
-            "Bahía Blanca", "Paraná", "Neuquén", "Formosa", "Santiago del Estero",
-            "Posadas", "San Salvador de Jujuy", "Resistencia", "Comodoro Rivadavia", "Río Cuarto"
+            "Mar del Plata", "Salta", "Santa Fe", "San Miguel de Tucumán", "Corrientes"
         ),
         "Chile" to listOf(
-            "Santiago", "Valparaíso", "Concepción", "La Serena", "Antofagasta",
-            "Temuco", "Rancagua", "Iquique", "Puerto Montt", "Talca",
-            "Arica", "Copiapó", "Chillán", "Osorno", "Punta Arenas",
-            "Los Ángeles", "Curicó", "Coyhaique", "Valdivia", "Calama"
+            "Santiago", "Valparaíso", "Concepción", "La Serena", "Antofagasta"
         ),
         "Perú" to listOf(
-            "Lima", "Arequipa", "Trujillo", "Chiclayo", "Piura",
-            "Cusco", "Iquitos", "Huancayo", "Tacna", "Puno",
-            "Juliaca", "Chimbote", "Ica", "Huaraz", "Cajamarca",
-            "Ayacucho", "Tumbes", "Tarapoto", "Moquegua", "Pucallpa"
+            "Lima", "Arequipa", "Trujillo", "Chiclayo", "Piura"
         )
     )
 
     // -------------------------------------------------------------------------
-    // Validation helpers
+    // Validation
     // -------------------------------------------------------------------------
-    private fun isEmailValid(email: String): Boolean =
-        email.contains("@") && email.contains(".")
+    private fun isEmailValid(email: String) =
+        Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$").matches(email)
 
-    private fun isPasswordValid(password: String): Boolean =
+    private fun isPasswordValid(password: String) =
         password.isBlank() || password.length >= 5
 
-    /**
-     * Validates form input and updates error states.
-     * Country and city fields are excluded from validation.
-     */
     private fun validateForm(): Boolean {
         var isValid = true
 
-        // Validate name
         if (_name.value.isBlank()) {
             _nameError.value = application.getString(R.string.msg_error_field_required)
             isValid = false
         } else _nameError.value = null
 
-        // Validate email
         if (_email.value.isBlank() || !isEmailValid(_email.value)) {
             _emailError.value = application.getString(R.string.login_email_error)
             isValid = false
         } else _emailError.value = null
 
-        // Validate password logic
         if (_newPassword.value.isNotBlank()) {
             when {
                 !isPasswordValid(_newPassword.value) -> {
@@ -163,92 +153,120 @@ class UserUpdateViewModel(
     }
 
     // -------------------------------------------------------------------------
-    // Public field updates
+    // Update helpers
     // -------------------------------------------------------------------------
-    fun updateName(value: String) = _name.tryEmit(value)
-    fun updateLastname(value: String) = _lastname.tryEmit(value)
-    fun updateUsername(value: String) = _username.tryEmit(value)
-    fun updateEmail(value: String) = _email.tryEmit(value)
-    fun updateCountry(value: String) = _country.tryEmit(value)
-    fun updateCity(value: String) = _city.tryEmit(value)
-    fun updateCurrentPassword(value: String) = _currentPassword.tryEmit(value)
-    fun updateNewPassword(value: String) = _newPassword.tryEmit(value)
-    fun updateConfirmPassword(value: String) = _confirmPassword.tryEmit(value)
+    private fun markDirty() { _isDirty.value = true }
+
+    fun updateName(v: String) { _name.tryEmit(v); markDirty() }
+    fun updateLastname(v: String) { _lastname.tryEmit(v); markDirty() }
+    fun updateUsername(v: String) { _username.tryEmit(v); markDirty() }
+    fun updateEmail(v: String) { _email.tryEmit(v); markDirty() }
+    fun updateCountry(v: String) { _country.tryEmit(v); markDirty() }
+    fun updateCity(v: String) { _city.tryEmit(v); markDirty() }
+    fun updateCurrentPassword(v: String) { _currentPassword.tryEmit(v); markDirty() }
+    fun updateNewPassword(v: String) { _newPassword.tryEmit(v); markDirty() }
+    fun updateConfirmPassword(v: String) { _confirmPassword.tryEmit(v); markDirty() }
 
     // -------------------------------------------------------------------------
-    // Core logic
+    // Hydration (prefill)
+    // -------------------------------------------------------------------------
+    fun prefillFrom(user: User, force: Boolean = false) {
+        if (!force && _isDirty.value) return
+
+        _name.value = user.name
+        _lastname.value = _lastname.value
+        _username.value = user.username
+        _email.value = user.email
+        _country.value = user.country
+        _city.value = user.city
+
+        _currentPassword.value = ""
+        _newPassword.value = ""
+        _confirmPassword.value = ""
+
+        _nameError.value = null
+        _emailError.value = null
+        _passwordError.value = null
+        _isDirty.value = false
+    }
+
+    // -------------------------------------------------------------------------
+    // Core update logic
     // -------------------------------------------------------------------------
     fun updateUser(currentUser: User, onSuccess: (User) -> Unit = {}) {
         viewModelScope.launch {
+            if (_isUpdating.value) return@launch
+
             try {
                 _isUpdating.value = true
+                logStart(currentUser)
 
-                // --- Log: Inicio de la actualización ---
-                android.util.Log.d("UserUpdate", ">>> Starting update for user ID=${currentUser.id}, name=${currentUser.name}")
-                android.util.Log.d("UserUpdate", "Current places (${currentUser.places.size}): ${currentUser.places.joinToString { it.name }}")
+                if (!validateFormAndPassword(currentUser)) return@launch
 
-                // --- Validar campos del formulario ---
-                if (!validateForm()) {
-                    _message.value = application.getString(R.string.msg_field_required)
-                    android.util.Log.w("UserUpdate", "Validation failed: Missing or invalid fields")
-                    return@launch
-                }
-
-                // --- Validar cambio de contraseña ---
-                if (_newPassword.value.isNotBlank() && _currentPassword.value != currentUser.password) {
-                    _passwordError.value = application.getString(R.string.msg_error_current_password_incorrect)
-                    _message.value = application.getString(R.string.msg_error_current_password_required)
-                    android.util.Log.w("UserUpdate", "Password update blocked: current password mismatch")
-                    return@launch
-                }
-
-                // --- Construir copia parcial editable ---
-                val partialUser = currentUser.copy(
-                    name = listOf(_name.value, _lastname.value)
-                        .filter { it.isNotBlank() }
-                        .joinToString(" "),
-                    username = _username.value.ifBlank { currentUser.username },
-                    password = _newPassword.value.ifBlank { currentUser.password },
-                    email = _email.value.ifBlank { currentUser.email },
-                    country = _country.value.ifBlank { currentUser.country },
-                    city = _city.value.ifBlank { currentUser.city }
-                )
-
-                android.util.Log.d("UserUpdate", "Prepared partialUser for merge: ${partialUser.name}")
-
-                // --- Persistencia mediante el repositorio ---
-                val success = userRepository.updateUser(partialUser)
-                android.util.Log.d("UserUpdate", "Repository update result: $success")
-
-                if (success) {
-                    val updated = userRepository.getUserById(currentUser.id)!!
-
-                    android.util.Log.d("UserUpdate", "User updated successfully")
-                    android.util.Log.d("UserUpdate", "Updated user ID=${updated.id}, name=${updated.name}")
-                    android.util.Log.d("UserUpdate", "Updated places (${updated.places.size}): ${updated.places.joinToString { it.name }}")
-
-                    _message.value = application.getString(R.string.msg_user_updated)
-                    resetForm()
-                    onSuccess(updated)
-                } else {
-                    _message.value = application.getString(R.string.msg_error_generic)
-                    android.util.Log.e("UserUpdate", "User not found in repository during update")
-                }
+                val updatedUser = buildUpdatedUser(currentUser)
+                persistUserUpdate(currentUser, updatedUser, onSuccess)
 
             } catch (e: Exception) {
-                _message.value = e.message ?: application.getString(R.string.msg_error_generic)
-                android.util.Log.e("UserUpdate", "Exception during user update", e)
+                handleException(e)
             } finally {
-                _isUpdating.value = false
-                android.util.Log.d("UserUpdate", ">>> Update process completed for user ID=${currentUser.id}")
+                finalizeUpdate(currentUser)
             }
         }
     }
 
+    private fun validateFormAndPassword(currentUser: User): Boolean {
+        if (!validateForm()) {
+            _message.value = application.getString(R.string.msg_field_required)
+            return false
+        }
+
+        if (_newPassword.value.isNotBlank() && _currentPassword.value.trim() != currentUser.password.trim()) {
+            _passwordError.value = application.getString(R.string.msg_error_current_password_incorrect)
+            _message.value = application.getString(R.string.msg_error_current_password_required)
+            return false
+        }
+
+        return true
+    }
+
+    private fun buildUpdatedUser(currentUser: User): User = currentUser.copy(
+        name = listOf(_name.value, _lastname.value)
+            .filter { it.isNotBlank() }
+            .joinToString(" ")
+            .ifBlank { currentUser.name },
+        username = _username.value.ifBlank { currentUser.username },
+        password = _newPassword.value.ifBlank { currentUser.password },
+        email = _email.value.ifBlank { currentUser.email },
+        country = _country.value.ifBlank { currentUser.country },
+        city = _city.value.ifBlank { currentUser.city },
+        places = currentUser.places,
+        role = currentUser.role,
+        isActive = currentUser.isActive
+    )
+
+    private suspend fun persistUserUpdate(currentUser: User, updated: User, onSuccess: (User) -> Unit) {
+        val success = userRepository.updateUser(updated)
+        if (success) {
+            val fresh = userRepository.getUserById(currentUser.id)
+            if (fresh != null) {
+                _message.value = application.getString(R.string.msg_user_updated)
+                prefillFrom(fresh, force = true)
+                onSuccess(fresh)
+            } else {
+                _message.value = application.getString(R.string.msg_error_generic)
+            }
+        } else {
+            _message.value = application.getString(R.string.msg_error_generic)
+        }
+    }
 
     // -------------------------------------------------------------------------
-    // Utility methods
+    // Utility and logging
     // -------------------------------------------------------------------------
+    fun clearMessage() { _message.value = null }
+
+    fun onExitEditScreen() = resetForm()
+
     private fun resetForm() {
         _name.value = ""
         _lastname.value = ""
@@ -262,10 +280,20 @@ class UserUpdateViewModel(
         _nameError.value = null
         _emailError.value = null
         _passwordError.value = null
+        _isDirty.value = false
     }
 
-    fun clearMessage() {
-        _message.value = null
+    private fun logStart(user: User) =
+        android.util.Log.d("UserUpdate", "Updating user ID=${user.id}, name=${user.name}")
+
+    private fun handleException(e: Exception) {
+        _message.value = e.message ?: application.getString(R.string.msg_error_generic)
+        android.util.Log.e("UserUpdate", "Exception during user update", e)
+    }
+
+    private fun finalizeUpdate(user: User?) {
+        _isUpdating.value = false
+        android.util.Log.d("UserUpdate", ">>> Update process completed for user ID=${user?.id ?: "unknown"}")
     }
 
     // -------------------------------------------------------------------------

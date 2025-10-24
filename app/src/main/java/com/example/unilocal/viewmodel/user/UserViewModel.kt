@@ -54,6 +54,11 @@ class UserViewModel(
         }
     }
 
+    fun setSessionUser(user: User) {
+        _user.value = user
+    }
+
+
     /** Reactivates a previously disabled user. */
     fun activateUser(userId: String) {
         viewModelScope.launch {

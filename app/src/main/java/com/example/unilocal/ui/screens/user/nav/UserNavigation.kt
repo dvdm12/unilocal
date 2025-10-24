@@ -51,6 +51,7 @@ fun UserNavigation(
         // --- Pantalla principal (inicio del usuario) ---
         composable(UserNavItem.HOME.route) {
             HomeUser(
+                userSessionViewModel= userSessionViewModel,
                 userViewModel = userViewModel,
                 placeViewModel = placeViewModel,
                 onView = { placeId ->
@@ -98,7 +99,7 @@ fun UserNavigation(
             EditProfileScreen(
                 userSessionViewModel=userSessionViewModel,
                 userUpdateViewModel=userUpdateViewModel,
-                onBackClick = onLogout
+                onlogoutClick = onLogout
             )
         }
     }

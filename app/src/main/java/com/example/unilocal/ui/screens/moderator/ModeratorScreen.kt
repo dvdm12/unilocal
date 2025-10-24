@@ -22,7 +22,6 @@ import com.example.unilocal.model.Place
 import com.example.unilocal.model.PlaceStatus
 import com.example.unilocal.ui.components.users.SimpleTopBar
 import com.example.unilocal.viewmodel.data.session.UserSessionViewModel
-import com.example.unilocal.viewmodel.place.PlaceViewModel
 import com.example.unilocal.viewmodel.user.UserViewModel
 
 /**

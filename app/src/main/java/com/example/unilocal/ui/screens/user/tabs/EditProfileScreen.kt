@@ -45,7 +45,7 @@ import kotlinx.coroutines.launch
 fun EditProfileScreen(
     userSessionViewModel: UserSessionViewModel,
     userUpdateViewModel: UserUpdateViewModel,
-    onBackClick: () -> Unit = {}
+    onlogoutClick: () -> Unit = {}
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -81,7 +81,10 @@ fun EditProfileScreen(
         topBar = {
             SimpleTopBar(
                 title = stringResource(R.string.edit_profile_title),
-                onLogoutClick = onBackClick
+                onLogoutClick = {
+                    userUpdateViewModel.onExitEditScreen()
+                    onlogoutClick
+                }
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -92,7 +95,8 @@ fun EditProfileScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp, vertical = 12.dp)
-                .background(Color.White),
+                .background(MaterialTheme.colorScheme.background)
+            ,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // --------------------------------------------------------------
@@ -149,31 +153,28 @@ fun EditProfileScreen(
             EditProfileActions(
                 isUpdating = isUpdating,
                 onClear = {
-                    userUpdateViewModel.apply {
-                        updateName("")
-                        updateLastname("")
-                        updateUsername("")
-                        updateEmail("")
-                        updateCountry("Colombia")
-                        updateCity("Armenia")
-                        updateCurrentPassword("")
-                        updateNewPassword("")
-                        updateConfirmPassword("")
-                    }
+                    userUpdateViewModel.onExitEditScreen()
                     scope.launch {
                         snackbarHostState.showSnackbar(
                             context.getString(R.string.snackbar_fields_cleared)
                         )
                     }
-                },
+                }
+                ,
                 onSave = {
-                    val currentUser = userSessionViewModel.currentUser.value
+                    val currentUser = userSessionViewModel.getCurrentUser()
                     if (currentUser != null) {
-                        // Delegate update to ViewModel
                         userUpdateViewModel.updateUser(currentUser) { updated ->
                             userSessionViewModel.setUser(updated)
                         }
+                    } else {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                context.getString(R.string.msg_error_user_not_loaded)
+                            )
+                        }
                     }
+
                 }
             )
         }

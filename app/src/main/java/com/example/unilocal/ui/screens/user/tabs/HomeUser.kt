@@ -29,6 +29,7 @@ import com.example.unilocal.model.PlaceStatus
 import com.example.unilocal.model.User
 import com.example.unilocal.ui.components.users.SimpleTopBar
 import com.example.unilocal.ui.screens.user.place.create_places.PlaceCard
+import com.example.unilocal.viewmodel.data.session.UserSessionViewModel
 import com.example.unilocal.viewmodel.place.PlaceViewModel
 import com.example.unilocal.viewmodel.user.UserViewModel
 
@@ -37,6 +38,7 @@ import com.example.unilocal.viewmodel.user.UserViewModel
  */
 @Composable
 fun HomeUser(
+    userSessionViewModel: UserSessionViewModel,
     userViewModel: UserViewModel,
     placeViewModel: PlaceViewModel,
     onBackClick: () -> Unit = {},
@@ -57,6 +59,12 @@ fun HomeUser(
 
     val showDeleteDialog = remember { mutableStateOf(false) }
     var selectedPlace by remember { mutableStateOf<Place?>(null) }
+
+    val sessionUser by userSessionViewModel.currentUser.collectAsState()
+    LaunchedEffect(sessionUser) {
+        sessionUser?.let { userViewModel.setSessionUser(it) }
+    }
+
 
     // 🔹 Filtrado reactivo
     val filteredPlaces by remember(user, searchQuery, selectedFilter) {
