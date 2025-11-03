@@ -3,6 +3,8 @@ package com.example.unilocal.repository
 import com.example.unilocal.model.Place
 import com.example.unilocal.model.Role
 import com.example.unilocal.model.User
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import java.util.UUID
 
 object UserRepository : IUserRepository {
@@ -35,6 +37,10 @@ object UserRepository : IUserRepository {
             role = Role.MODERATOR
         )
     )
+
+    fun testFirebase(){
+        val db = Firebase.firestore
+    }
 
     private var _sessionUser: User? = null
 

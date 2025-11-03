@@ -15,9 +15,9 @@ import androidx.navigation.compose.*
 import com.example.unilocal.model.Role
 import com.example.unilocal.ui.config.RouteScreen
 import com.example.unilocal.ui.screens.*
-import com.example.unilocal.ui.screens.moderator.ModeratorScreen
 import com.example.unilocal.ui.screens.user.nav.NavHomeUser
 import com.example.unilocal.repository.UserRepository
+import com.example.unilocal.ui.screens.moderator.nav.NavHomeModerator
 import com.example.unilocal.viewmodel.data.session.UserSessionViewModel
 import com.example.unilocal.viewmodel.login.LoginViewModel
 import com.example.unilocal.viewmodel.login.LoginViewModelFactory
@@ -192,14 +192,10 @@ fun Navigation() {
 
         // --- Moderator Navigation Graph ---
         composable<RouteScreen.ModeratorScreen> {
-            ModeratorScreen(
+            NavHomeModerator(
+                rootNavController = navController,
                 userSessionViewModel = userSessionViewModel,
-                userViewModel = userViewModel,
-                onLogoutConfirmed = {
-                    navController.navigate(RouteScreen.WelcomeScreen) {
-                        popUpTo(0)
-                    }
-                }
+                userViewModel = userViewModel
             )
         }
     }

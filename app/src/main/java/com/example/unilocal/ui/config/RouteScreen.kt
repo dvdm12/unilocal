@@ -10,6 +10,9 @@ sealed class RouteScreen{
     data object ModeratorScreen: RouteScreen()
 
     @Serializable
+    data object NavHomeModerator: RouteScreen()
+
+    @Serializable
     data object Login: RouteScreen()
 
     @Serializable

@@ -33,7 +33,7 @@ import com.example.unilocal.viewmodel.user.UserViewModel
 fun ModeratorScreen(
     userSessionViewModel: UserSessionViewModel,
     userViewModel: UserViewModel,
-    onLogoutConfirmed: () -> Unit = {}
+    onLogout: () -> Unit = {}
 ) {
     // 🔹 Obtener todos los lugares pendientes desde todos los usuarios
     val pendingPlaces by remember {
@@ -115,7 +115,7 @@ fun ModeratorScreen(
                     onClick = {
                         showLogoutDialog = false
                         userSessionViewModel.clearSession() // ✅ Cierre de sesión real
-                        onLogoutConfirmed() // ✅ Notifica al navegador principal
+                        onLogout() // ✅ Notifica al navegador principal
                     }
                 ) {
                     Text("Sí, cerrar", color = MaterialTheme.colorScheme.primary)
