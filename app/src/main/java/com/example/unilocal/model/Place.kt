@@ -1,6 +1,7 @@
 package com.example.unilocal.model
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import java.net.URL
 
 @Serializable
